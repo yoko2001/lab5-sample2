@@ -20,7 +20,9 @@ int main(int argc, char *argv[])
             cerr << "failed to open file: " << argv[1] << endl;
         }
     }
+    cout << "entering yyparse" << endl;
     yyparse();
+    cout << "parsed" << endl;
     if(root != NULL) {
         root->genNodeId();
         root->printAST();

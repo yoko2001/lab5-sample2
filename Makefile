@@ -7,11 +7,21 @@ all: run
 src/main.lex.yy.c: src/main.lex
 	 flex --noyywrap -o src/main.lex.yy.cpp  src/main.lex 
 
+src/main2.tab.c: src/main2.y 
+	bison -o src/main2.tab.cpp --defines=src/main2.tab.h -v src/main2.y
+
 src/main.tab.c: src/main.y
 	bison -o src/main.tab.cpp --defines=src/main.tab.h -v src/main.y
 
 src/pch.h.gch: src/pch.h
 	g++ -x c++-header -o src/pch.h.gch -c src/pch.h
+
+lex2: src/main.lex.yy.c
+
+yacc2: src/main2.tab.c
+
+main2: src/pch.h.gch
+	$(CC) $(CFLAGS) $(shell ls ./src/*.cpp) -o ./bin/main
 
 lex: src/main.lex.yy.c
 

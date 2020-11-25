@@ -6,15 +6,25 @@
     int yylex();
     int yyerror( char const * );
 %}
-%token T_CHAR T_INT T_STRING T_BOOL 
+%token T_CHAR T_INT T_STRING T_BOOL  LO_PT_MEMBER LO_MEMBER
+%token L_BRACKET R_BRACKET L_SQ_BRACKET R_SQ_BRACKET L_BRACE R_BRACE
+%token LO_EQ LO_N_EQ RO_AS_ADDEQ RO_AS_SUBEQ RO_AS_MULEQ RO_AS_DIVEQ RO_AS_SFTL_EQ
 
-%token LOP_ASSIGN 
+%token RO_AS_SFTR_EQ RO_AS_ANDEQ RO_AS_OREQ LO_AS_SELFINC LO_AS_SELFDEC RO_TRI_QUES
 
-%token SEMICOLON
+%token RO_TRI_COLON LO_MUL LO_DIV LO_ADD LO_SUB LO_BIT_NOT LO_MOD LO_SFT_L
+
+%token  LO_SFT_R LO_LGC_NOT LO_BIT_XOR LO_BIT_AND LO_BIT_OR RO_ASSIGN LO_LGC_OR LO_LGC_AND
+
+%token KW_IF KW_FOR KW_RET KW_STRUCT KW_WHILE KW_DO Q_UNSIGNED Q_CONST
+
+%token SEMICOLON LO_COMMA LO_REL_L LO_REL_G LO_REL_LE LO_REL_GE
 
 %token IDENTIFIER INTEGER CHAR BOOL STRING
 
-%left LOP_EQ
+%left RO_ASSIGN LO_LGC_OR LO_LGC_AND
+
+
 
 %%
 
@@ -32,7 +42,7 @@ statement
 ;
 
 declaration
-: T IDENTIFIER LOP_ASSIGN expr{  // declare and init
+: T IDENTIFIER RO_ASSIGN expr{  // declare and init
     TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
     node->stype = STMT_DECL;
     node->addChild($1);

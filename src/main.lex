@@ -20,16 +20,66 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 {BLOCKCOMMENT}  /* do nothing */
 {LINECOMMENT}  /* do nothing */
 
+"("     return L_BRACKET;
+")"     return R_BRACKET;
+"["     return L_SQ_BRACKET;
+"]"     return R_SQ_BRACKET;
+"{"     return L_BRACE;
+"}"     return R_BRACE;
+"=="    return LO_EQ;
+"!="    return LO_N_EQ;
+"+="    return RO_AS_ADDEQ;
+"-="    return RO_AS_SUBEQ;
+"*="    return RO_AS_MULEQ;
+"/="    return RO_AS_DIVEQ;
+"<<="   return RO_AS_SFTL_EQ;
+">>="   return RO_AS_SFTR_EQ;
+"&="    return RO_AS_ANDEQ;
+"|="    return RO_AS_OREQ; 
+"++"    return LO_AS_SELFINC;
+"--"    return LO_AS_SELFDEC;
+"?"     return RO_TRI_QUES;
+":"     return RO_TRI_COLON;
+"*"     return LO_MUL;
+"/"     return LO_DIV;
+"+"     return LO_ADD;
+"-"     return LO_SUB;
+"~"     return LO_BIT_NOT;
+"%"     return LO_MOD;
+"<<"    return LO_SFT_L;
+">>"    return LO_SFT_R;
+"!"     return LO_LGC_NOT;
+"||"    return LO_LGC_OR;
+"&&"    return LO_LGC_AND;
+"^"     return LO_BIT_XOR;
+"&"     return LO_BIT_AND;
+"|"     return LO_BIT_OR; 
+"="     {return RO_ASSIGN;}
+","     {return LO_COMMA;}
+"<"     return LO_REL_L;
+">"     return LO_REL_G;
+"<="    return LO_REL_LE;
+">="    return LO_REL_GE;    
+"."     return LO_MEMBER;
+"->"    return LO_PT_MEMBER;
+"int"   return T_INT;
+"bool"  return T_BOOL;
+"char"  return T_CHAR;
 
-"int" return T_INT;
-"bool" return T_BOOL;
-"char" return T_CHAR;
+"if"        return KW_IF;
+"for"       return KW_FOR;
+"return"    return KW_RET;
+"struct"    return KW_STRUCT;
+"while"     return KW_WHILE;
+"do"        return KW_DO;
 
-"=" return LOP_ASSIGN;
+"unsigned"  return  Q_UNSIGNED;
+"const"     return  Q_CONST;
 
 ";" return  SEMICOLON;
 
 {INTEGER} {
+    //cout<<"init int node"<<endl;
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_INT;
     node->int_val = atoi(yytext);
@@ -49,6 +99,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     TreeNode* node = new TreeNode(lineno, NODE_VAR);
     node->var_name = string(yytext);
     yylval = node;
+    //cout << "id parsed," <<node->var_name << node->nodeType<<endl;
     return IDENTIFIER;
 }
 
