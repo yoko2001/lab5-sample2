@@ -70,13 +70,17 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "for"       return KW_FOR;
 "return"    return KW_RET;
 "struct"    return KW_STRUCT;
+"union"     return KW_UNION;
 "while"     return KW_WHILE;
 "do"        return KW_DO;
 
-"unsigned"  return  Q_UNSIGNED;
+"unsigned"  return  T_UNSIGNED;
+"signed"    return T_SIGNED;
 "const"     return  Q_CONST;
 
+
 ";" return  SEMICOLON;
+":" return  COLON;
 
 {INTEGER} {
     //cout<<"init int node"<<endl;

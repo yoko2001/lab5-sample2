@@ -11,7 +11,9 @@ enum ValueType
     VALUE_STRING,
     COMPOSE_STRUCT,
     COMPOSE_UNION,
-    COMPOSE_FUNCTION
+    COMPOSE_FUNCTION,
+    VALUE_SIGNED,
+    VALUE_UNSIGNED,
 };
 
 class Type
@@ -38,7 +40,8 @@ static Type* TYPE_INT = new Type(VALUE_INT);
 static Type* TYPE_CHAR = new Type(VALUE_CHAR);
 static Type* TYPE_BOOL = new Type(VALUE_BOOL);
 static Type* TYPE_STRING = new Type(VALUE_STRING);
-
+static Type* TYPE_SIGNED = new Type(VALUE_SIGNED);
+static Type* TYPE_UNSIGNED = new Type(VALUE_UNSIGNED);
 int getSize(Type* type);
 
 #endif

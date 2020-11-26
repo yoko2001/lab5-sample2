@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     yyparse();
     cout << "parsed" << endl;
     if(root != NULL) {
-        root->genNodeId();
+        //root->genNodeId();
         root->printAST();
     }
     return 0;

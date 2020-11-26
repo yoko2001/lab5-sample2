@@ -1,56 +1,25 @@
+Nonterminals useless in grammar
+
+   argument-expression-list
+
+
 Terminals unused in grammar
 
    T_STRING
-   LO_PT_MEMBER
-   LO_MEMBER
-   L_BRACKET
-   R_BRACKET
-   L_SQ_BRACKET
-   R_SQ_BRACKET
-   L_BRACE
-   R_BRACE
-   LO_EQ
-   LO_N_EQ
-   RO_AS_ADDEQ
-   RO_AS_SUBEQ
-   RO_AS_MULEQ
-   RO_AS_DIVEQ
-   RO_AS_SFTL_EQ
-   RO_AS_SFTR_EQ
-   RO_AS_ANDEQ
-   RO_AS_OREQ
-   LO_AS_SELFINC
-   LO_AS_SELFDEC
-   RO_TRI_QUES
-   RO_TRI_COLON
-   LO_MUL
-   LO_DIV
-   LO_ADD
-   LO_SUB
-   LO_BIT_NOT
-   LO_MOD
-   LO_SFT_L
-   LO_SFT_R
-   LO_LGC_NOT
-   LO_BIT_XOR
-   LO_BIT_AND
-   LO_BIT_OR
-   LO_LGC_OR
-   LO_LGC_AND
    KW_IF
    KW_FOR
    KW_RET
-   KW_STRUCT
    KW_WHILE
    KW_DO
-   Q_UNSIGNED
-   Q_CONST
-   LO_COMMA
-   LO_REL_L
-   LO_REL_G
-   LO_REL_LE
-   LO_REL_GE
+   CHAR
    BOOL
+   STRING
+
+
+Rules useless in grammar
+
+  101 argument-expression-list: assignment-expression
+  102                         | argument-expression-list LO_COMMA assignment-expression
 
 
 Grammar
@@ -65,266 +34,2341 @@ Grammar
     4 statement: SEMICOLON
     5          | declaration SEMICOLON
 
-    6 declaration: T IDENTIFIER RO_ASSIGN expr
-    7            | T IDENTIFIER
+    6 declaration: type-specifier IDENTIFIER RO_ASSIGN expression
+    7            | type-specifier IDENTIFIER
 
-    8 expr: IDENTIFIER
-    9     | INTEGER
-   10     | CHAR
-   11     | STRING
+    8 expression: assignment-expression
+    9           | expression LO_COMMA assignment-expression
 
-   12 T: T_INT
-   13  | T_CHAR
-   14  | T_BOOL
+   10 assignment-operator: RO_ASSIGN
+   11                    | RO_AS_ADDEQ
+   12                    | RO_AS_ANDEQ
+   13                    | RO_AS_DIVEQ
+   14                    | RO_AS_MULEQ
+   15                    | RO_AS_OREQ
+   16                    | RO_AS_SFTL_EQ
+   17                    | RO_AS_SFTR_EQ
+   18                    | RO_AS_SUBEQ
+
+   19 assignment-expression: conditional-expression
+   20                      | unary-expression assignment-operator assignment-expression
+
+   21 conditional-expression: logical-OR-expression
+   22                       | logical-OR-expression RO_TRI_QUES expression RO_TRI_COLON conditional-expression
+
+   23 logical-OR-expression: logical-AND-expression
+   24                      | logical-OR-expression LO_LGC_OR logical-AND-expression
+
+   25 logical-AND-expression: inclusive-OR-expression
+   26                       | logical-AND-expression LO_LGC_AND inclusive-OR-expression
+
+   27 inclusive-OR-expression: exclusive-OR-expression
+   28                        | inclusive-OR-expression LO_BIT_OR exclusive-OR-expression
+
+   29 exclusive-OR-expression: AND-expression
+   30                        | exclusive-OR-expression LO_BIT_XOR AND-expression
+
+   31 AND-expression: equality-expression
+   32               | AND-expression LO_BIT_AND equality-expression
+
+   33 equality-expression: relational-expression
+   34                    | equality-expression LO_EQ relational-expression
+   35                    | equality-expression LO_N_EQ relational-expression
+
+   36 relational-expression: shift-expression
+   37                      | relational-expression LO_REL_L shift-expression
+   38                      | relational-expression LO_REL_G shift-expression
+   39                      | relational-expression LO_REL_LE shift-expression
+   40                      | relational-expression LO_REL_GE shift-expression
+
+   41 shift-expression: additive-expression
+   42                 | shift-expression LO_SFT_L additive-expression
+   43                 | shift-expression LO_SFT_R additive-expression
+
+   44 additive-expression: multiplicative-expression
+   45                    | additive-expression LO_ADD multiplicative-expression
+   46                    | additive-expression LO_SUB multiplicative-expression
+
+   47 multiplicative-expression: cast-expression
+   48                          | multiplicative-expression LO_MUL cast-expression
+   49                          | multiplicative-expression LO_DIV cast-expression
+   50                          | multiplicative-expression LO_MOD cast-expression
+
+   51 cast-expression: unary-expression
+   52                | L_BRACKET type-specifier R_BRACKET cast-expression
+
+   53 unary-operator: LO_BIT_AND
+   54               | LO_MUL
+   55               | LO_ADD
+   56               | LO_SUB
+   57               | LO_BIT_NOT
+   58               | LO_LGC_NOT
+
+   59 unary-expression: postfix-expression
+   60                 | LO_AS_SELFINC unary-expression
+   61                 | LO_AS_SELFDEC unary-expression
+   62                 | unary-operator cast-expression
+
+   63 postfix-expression: primary-expression
+   64                   | postfix-expression L_SQ_BRACKET expression R_SQ_BRACKET
+   65                   | postfix-expression LO_MEMBER IDENTIFIER
+   66                   | postfix-expression LO_PT_MEMBER IDENTIFIER
+   67                   | postfix-expression LO_AS_SELFINC
+   68                   | postfix-expression LO_AS_SELFDEC
+
+   69 primary-expression: IDENTIFIER
+   70                   | constant
+   71                   | L_BRACKET expression R_BRACKET
+
+   72 constant: INTEGER
+
+   73 type-specifier: T_INT
+   74               | T_CHAR
+   75               | T_BOOL
+   76               | T_SIGNED
+   77               | T_UNSIGNED
+   78               | struct-or-union-specifier
+
+   79 struct-or-union-specifier: struct-or-union IDENTIFIER L_BRACE struct-declaration-list R_BRACE
+   80                          | struct-or-union L_BRACE struct-declaration-list R_BRACE
+   81                          | struct-or-union IDENTIFIER
+
+   82 struct-or-union: KW_STRUCT
+   83                | KW_UNION
+
+   84 struct-declaration-list: struct-declaration
+   85                        | struct-declaration-list struct-declaration
+
+   86 struct-declaration: specifier-qualifier-list struct-declarator-list SEMICOLON
+
+   87 specifier-qualifier-list: type-specifier
+   88                         | type-specifier specifier-qualifier-list
+   89                         | type-qualifier
+   90                         | type-qualifier specifier-qualifier-list
+
+   91 struct-declarator-list: struct-declarator
+   92                       | struct-declarator-list LO_COMMA struct-declarator
+
+   93 struct-declarator: declarator
+   94                  | declarator COLON INTEGER
+
+   95 declarator: pointer direct-declarator
+   96           | direct-declarator
+
+   97 direct-declarator: IDENTIFIER
+
+   98 pointer: LO_MUL
+   99        | LO_MUL pointer
+
+  100 type-qualifier: Q_CONST
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-T_CHAR (258) 13
-T_INT (259) 12
+T_CHAR (258) 74
+T_INT (259) 73
 T_STRING (260)
-T_BOOL (261) 14
-LO_PT_MEMBER (262)
-LO_MEMBER (263)
-L_BRACKET (264)
-R_BRACKET (265)
-L_SQ_BRACKET (266)
-R_SQ_BRACKET (267)
-L_BRACE (268)
-R_BRACE (269)
-LO_EQ (270)
-LO_N_EQ (271)
-RO_AS_ADDEQ (272)
-RO_AS_SUBEQ (273)
-RO_AS_MULEQ (274)
-RO_AS_DIVEQ (275)
-RO_AS_SFTL_EQ (276)
-RO_AS_SFTR_EQ (277)
-RO_AS_ANDEQ (278)
-RO_AS_OREQ (279)
-LO_AS_SELFINC (280)
-LO_AS_SELFDEC (281)
-RO_TRI_QUES (282)
-RO_TRI_COLON (283)
-LO_MUL (284)
-LO_DIV (285)
-LO_ADD (286)
-LO_SUB (287)
-LO_BIT_NOT (288)
-LO_MOD (289)
-LO_SFT_L (290)
-LO_SFT_R (291)
-LO_LGC_NOT (292)
-LO_BIT_XOR (293)
-LO_BIT_AND (294)
-LO_BIT_OR (295)
-RO_ASSIGN (296) 6
-LO_LGC_OR (297)
-LO_LGC_AND (298)
-KW_IF (299)
-KW_FOR (300)
-KW_RET (301)
-KW_STRUCT (302)
-KW_WHILE (303)
-KW_DO (304)
-Q_UNSIGNED (305)
-Q_CONST (306)
-SEMICOLON (307) 4 5
-LO_COMMA (308)
-LO_REL_L (309)
-LO_REL_G (310)
-LO_REL_LE (311)
-LO_REL_GE (312)
-IDENTIFIER (313) 6 7 8
-INTEGER (314) 9
-CHAR (315) 10
-BOOL (316)
-STRING (317) 11
+T_BOOL (261) 75
+LO_EQ (262) 34
+LO_N_EQ (263) 35
+RO_AS_ADDEQ (264) 11
+RO_AS_SUBEQ (265) 18
+RO_AS_MULEQ (266) 14
+RO_AS_DIVEQ (267) 13
+RO_AS_SFTL_EQ (268) 16
+RO_AS_SFTR_EQ (269) 17
+RO_AS_ANDEQ (270) 12
+RO_AS_OREQ (271) 15
+LO_AS_SELFINC (272) 60 67
+LO_AS_SELFDEC (273) 61 68
+RO_TRI_QUES (274) 22
+RO_TRI_COLON (275) 22
+LO_MUL (276) 48 54 98 99
+LO_DIV (277) 49
+LO_ADD (278) 45 55
+LO_SUB (279) 46 56
+LO_BIT_NOT (280) 57
+LO_MOD (281) 50
+LO_SFT_L (282) 42
+LO_LGC_OR (283) 24
+LO_LGC_AND (284) 26
+LO_SFT_R (285) 43
+LO_LGC_NOT (286) 58
+LO_BIT_XOR (287) 30
+LO_BIT_AND (288) 32 53
+LO_BIT_OR (289) 28
+RO_ASSIGN (290) 6 10
+LO_COMMA (291) 9 92
+KW_IF (292)
+KW_FOR (293)
+KW_RET (294)
+KW_STRUCT (295) 82
+KW_WHILE (296)
+KW_DO (297)
+T_SIGNED (298) 76
+T_UNSIGNED (299) 77
+Q_CONST (300) 100
+SEMICOLON (301) 4 5 86
+COLON (302) 94
+LO_REL_L (303) 37
+LO_REL_G (304) 38
+LO_REL_LE (305) 39
+LO_REL_GE (306) 40
+KW_UNION (307) 83
+IDENTIFIER (308) 6 7 65 66 69 79 81 97
+INTEGER (309) 72 94
+CHAR (310)
+BOOL (311)
+STRING (312)
+LO_MEMBER (313) 65
+LO_PT_MEMBER (314) 66
+L_BRACKET (315) 52 71
+R_BRACKET (316) 52 71
+L_SQ_BRACKET (317) 64
+R_SQ_BRACKET (318) 64
+L_BRACE (319) 79 80
+R_BRACE (320) 79 80
 
 
 Nonterminals, with rules where they appear
 
-$accept (63)
+$accept (66)
     on left: 0
-program (64)
+program (67)
     on left: 1, on right: 0
-statements (65)
+statements (68)
     on left: 2 3, on right: 1 3
-statement (66)
+statement (69)
     on left: 4 5, on right: 2 3
-declaration (67)
+declaration (70)
     on left: 6 7, on right: 5
-expr (68)
-    on left: 8 9 10 11, on right: 6
-T (69)
-    on left: 12 13 14, on right: 6 7
+expression (71)
+    on left: 8 9, on right: 6 9 22 64 71
+assignment-operator (72)
+    on left: 10 11 12 13 14 15 16 17 18, on right: 20
+assignment-expression (73)
+    on left: 19 20, on right: 8 9 20
+conditional-expression (74)
+    on left: 21 22, on right: 19 22
+logical-OR-expression (75)
+    on left: 23 24, on right: 21 22 24
+logical-AND-expression (76)
+    on left: 25 26, on right: 23 24 26
+inclusive-OR-expression (77)
+    on left: 27 28, on right: 25 26 28
+exclusive-OR-expression (78)
+    on left: 29 30, on right: 27 28 30
+AND-expression (79)
+    on left: 31 32, on right: 29 30 32
+equality-expression (80)
+    on left: 33 34 35, on right: 31 32 34 35
+relational-expression (81)
+    on left: 36 37 38 39 40, on right: 33 34 35 37 38 39 40
+shift-expression (82)
+    on left: 41 42 43, on right: 36 37 38 39 40 42 43
+additive-expression (83)
+    on left: 44 45 46, on right: 41 42 43 45 46
+multiplicative-expression (84)
+    on left: 47 48 49 50, on right: 44 45 46 48 49 50
+cast-expression (85)
+    on left: 51 52, on right: 47 48 49 50 52 62
+unary-operator (86)
+    on left: 53 54 55 56 57 58, on right: 62
+unary-expression (87)
+    on left: 59 60 61 62, on right: 20 51 60 61
+postfix-expression (88)
+    on left: 63 64 65 66 67 68, on right: 59 64 65 66 67 68
+primary-expression (89)
+    on left: 69 70 71, on right: 63
+constant (90)
+    on left: 72, on right: 70
+type-specifier (91)
+    on left: 73 74 75 76 77 78, on right: 6 7 52 87 88
+struct-or-union-specifier (92)
+    on left: 79 80 81, on right: 78
+struct-or-union (93)
+    on left: 82 83, on right: 79 80 81
+struct-declaration-list (94)
+    on left: 84 85, on right: 79 80 85
+struct-declaration (95)
+    on left: 86, on right: 84 85
+specifier-qualifier-list (96)
+    on left: 87 88 89 90, on right: 86 88 90
+struct-declarator-list (97)
+    on left: 91 92, on right: 86 92
+struct-declarator (98)
+    on left: 93 94, on right: 91 92
+declarator (99)
+    on left: 95 96, on right: 93 94
+direct-declarator (100)
+    on left: 97, on right: 95 96
+pointer (101)
+    on left: 98 99, on right: 95 99
+type-qualifier (102)
+    on left: 100, on right: 89 90
 
 
 State 0
 
     0 $accept: . program $end
 
-    T_CHAR     shift, and go to state 1
-    T_INT      shift, and go to state 2
-    T_BOOL     shift, and go to state 3
-    SEMICOLON  shift, and go to state 4
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    SEMICOLON   shift, and go to state 7
+    KW_UNION    shift, and go to state 8
 
-    program      go to state 5
-    statements   go to state 6
-    statement    go to state 7
-    declaration  go to state 8
-    T            go to state 9
+    program                    go to state 9
+    statements                 go to state 10
+    statement                  go to state 11
+    declaration                go to state 12
+    type-specifier             go to state 13
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
 
 
 State 1
 
-   13 T: T_CHAR .
+   74 type-specifier: T_CHAR .
 
-    $default  reduce using rule 13 (T)
+    $default  reduce using rule 74 (type-specifier)
 
 
 State 2
 
-   12 T: T_INT .
+   73 type-specifier: T_INT .
 
-    $default  reduce using rule 12 (T)
+    $default  reduce using rule 73 (type-specifier)
 
 
 State 3
 
-   14 T: T_BOOL .
+   75 type-specifier: T_BOOL .
 
-    $default  reduce using rule 14 (T)
+    $default  reduce using rule 75 (type-specifier)
 
 
 State 4
+
+   82 struct-or-union: KW_STRUCT .
+
+    $default  reduce using rule 82 (struct-or-union)
+
+
+State 5
+
+   76 type-specifier: T_SIGNED .
+
+    $default  reduce using rule 76 (type-specifier)
+
+
+State 6
+
+   77 type-specifier: T_UNSIGNED .
+
+    $default  reduce using rule 77 (type-specifier)
+
+
+State 7
 
     4 statement: SEMICOLON .
 
     $default  reduce using rule 4 (statement)
 
 
-State 5
+State 8
+
+   83 struct-or-union: KW_UNION .
+
+    $default  reduce using rule 83 (struct-or-union)
+
+
+State 9
 
     0 $accept: program . $end
 
-    $end  shift, and go to state 10
+    $end  shift, and go to state 16
 
 
-State 6
+State 10
 
     1 program: statements .
     3 statements: statements . statement
 
-    T_CHAR     shift, and go to state 1
-    T_INT      shift, and go to state 2
-    T_BOOL     shift, and go to state 3
-    SEMICOLON  shift, and go to state 4
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    SEMICOLON   shift, and go to state 7
+    KW_UNION    shift, and go to state 8
 
     $default  reduce using rule 1 (program)
 
-    statement    go to state 11
-    declaration  go to state 8
-    T            go to state 9
+    statement                  go to state 17
+    declaration                go to state 12
+    type-specifier             go to state 13
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
 
 
-State 7
+State 11
 
     2 statements: statement .
 
     $default  reduce using rule 2 (statements)
 
 
-State 8
+State 12
 
     5 statement: declaration . SEMICOLON
 
-    SEMICOLON  shift, and go to state 12
+    SEMICOLON  shift, and go to state 18
 
 
-State 9
+State 13
 
-    6 declaration: T . IDENTIFIER RO_ASSIGN expr
-    7            | T . IDENTIFIER
+    6 declaration: type-specifier . IDENTIFIER RO_ASSIGN expression
+    7            | type-specifier . IDENTIFIER
 
-    IDENTIFIER  shift, and go to state 13
+    IDENTIFIER  shift, and go to state 19
 
 
-State 10
+State 14
+
+   78 type-specifier: struct-or-union-specifier .
+
+    $default  reduce using rule 78 (type-specifier)
+
+
+State 15
+
+   79 struct-or-union-specifier: struct-or-union . IDENTIFIER L_BRACE struct-declaration-list R_BRACE
+   80                          | struct-or-union . L_BRACE struct-declaration-list R_BRACE
+   81                          | struct-or-union . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 20
+    L_BRACE     shift, and go to state 21
+
+
+State 16
 
     0 $accept: program $end .
 
     $default  accept
 
 
-State 11
+State 17
 
     3 statements: statements statement .
 
     $default  reduce using rule 3 (statements)
 
 
-State 12
+State 18
 
     5 statement: declaration SEMICOLON .
 
     $default  reduce using rule 5 (statement)
 
 
-State 13
+State 19
 
-    6 declaration: T IDENTIFIER . RO_ASSIGN expr
-    7            | T IDENTIFIER .
+    6 declaration: type-specifier IDENTIFIER . RO_ASSIGN expression
+    7            | type-specifier IDENTIFIER .
 
-    RO_ASSIGN  shift, and go to state 14
+    RO_ASSIGN  shift, and go to state 22
 
     $default  reduce using rule 7 (declaration)
 
 
-State 14
+State 20
 
-    6 declaration: T IDENTIFIER RO_ASSIGN . expr
+   79 struct-or-union-specifier: struct-or-union IDENTIFIER . L_BRACE struct-declaration-list R_BRACE
+   81                          | struct-or-union IDENTIFIER .
 
-    IDENTIFIER  shift, and go to state 15
-    INTEGER     shift, and go to state 16
-    CHAR        shift, and go to state 17
-    STRING      shift, and go to state 18
+    L_BRACE  shift, and go to state 23
 
-    expr  go to state 19
+    $default  reduce using rule 81 (struct-or-union-specifier)
 
 
-State 15
+State 21
 
-    8 expr: IDENTIFIER .
+   80 struct-or-union-specifier: struct-or-union L_BRACE . struct-declaration-list R_BRACE
 
-    $default  reduce using rule 8 (expr)
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    Q_CONST     shift, and go to state 24
+    KW_UNION    shift, and go to state 8
 
-
-State 16
-
-    9 expr: INTEGER .
-
-    $default  reduce using rule 9 (expr)
-
-
-State 17
-
-   10 expr: CHAR .
-
-    $default  reduce using rule 10 (expr)
-
-
-State 18
-
-   11 expr: STRING .
-
-    $default  reduce using rule 11 (expr)
+    type-specifier             go to state 25
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+    struct-declaration-list    go to state 26
+    struct-declaration         go to state 27
+    specifier-qualifier-list   go to state 28
+    type-qualifier             go to state 29
 
 
-State 19
+State 22
 
-    6 declaration: T IDENTIFIER RO_ASSIGN expr .
+    6 declaration: type-specifier IDENTIFIER RO_ASSIGN . expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    expression                 go to state 41
+    assignment-expression      go to state 42
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 23
+
+   79 struct-or-union-specifier: struct-or-union IDENTIFIER L_BRACE . struct-declaration-list R_BRACE
+
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    Q_CONST     shift, and go to state 24
+    KW_UNION    shift, and go to state 8
+
+    type-specifier             go to state 25
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+    struct-declaration-list    go to state 60
+    struct-declaration         go to state 27
+    specifier-qualifier-list   go to state 28
+    type-qualifier             go to state 29
+
+
+State 24
+
+  100 type-qualifier: Q_CONST .
+
+    $default  reduce using rule 100 (type-qualifier)
+
+
+State 25
+
+   87 specifier-qualifier-list: type-specifier .
+   88                         | type-specifier . specifier-qualifier-list
+
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    Q_CONST     shift, and go to state 24
+    KW_UNION    shift, and go to state 8
+
+    $default  reduce using rule 87 (specifier-qualifier-list)
+
+    type-specifier             go to state 25
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+    specifier-qualifier-list   go to state 61
+    type-qualifier             go to state 29
+
+
+State 26
+
+   80 struct-or-union-specifier: struct-or-union L_BRACE struct-declaration-list . R_BRACE
+   85 struct-declaration-list: struct-declaration-list . struct-declaration
+
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    Q_CONST     shift, and go to state 24
+    KW_UNION    shift, and go to state 8
+    R_BRACE     shift, and go to state 62
+
+    type-specifier             go to state 25
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+    struct-declaration         go to state 63
+    specifier-qualifier-list   go to state 28
+    type-qualifier             go to state 29
+
+
+State 27
+
+   84 struct-declaration-list: struct-declaration .
+
+    $default  reduce using rule 84 (struct-declaration-list)
+
+
+State 28
+
+   86 struct-declaration: specifier-qualifier-list . struct-declarator-list SEMICOLON
+
+    LO_MUL      shift, and go to state 64
+    IDENTIFIER  shift, and go to state 65
+
+    struct-declarator-list  go to state 66
+    struct-declarator       go to state 67
+    declarator              go to state 68
+    direct-declarator       go to state 69
+    pointer                 go to state 70
+
+
+State 29
+
+   89 specifier-qualifier-list: type-qualifier .
+   90                         | type-qualifier . specifier-qualifier-list
+
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    Q_CONST     shift, and go to state 24
+    KW_UNION    shift, and go to state 8
+
+    $default  reduce using rule 89 (specifier-qualifier-list)
+
+    type-specifier             go to state 25
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+    specifier-qualifier-list   go to state 71
+    type-qualifier             go to state 29
+
+
+State 30
+
+   60 unary-expression: LO_AS_SELFINC . unary-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 72
+
+    unary-operator      go to state 55
+    unary-expression    go to state 73
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 31
+
+   61 unary-expression: LO_AS_SELFDEC . unary-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 72
+
+    unary-operator      go to state 55
+    unary-expression    go to state 74
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 32
+
+   54 unary-operator: LO_MUL .
+
+    $default  reduce using rule 54 (unary-operator)
+
+
+State 33
+
+   55 unary-operator: LO_ADD .
+
+    $default  reduce using rule 55 (unary-operator)
+
+
+State 34
+
+   56 unary-operator: LO_SUB .
+
+    $default  reduce using rule 56 (unary-operator)
+
+
+State 35
+
+   57 unary-operator: LO_BIT_NOT .
+
+    $default  reduce using rule 57 (unary-operator)
+
+
+State 36
+
+   58 unary-operator: LO_LGC_NOT .
+
+    $default  reduce using rule 58 (unary-operator)
+
+
+State 37
+
+   53 unary-operator: LO_BIT_AND .
+
+    $default  reduce using rule 53 (unary-operator)
+
+
+State 38
+
+   69 primary-expression: IDENTIFIER .
+
+    $default  reduce using rule 69 (primary-expression)
+
+
+State 39
+
+   72 constant: INTEGER .
+
+    $default  reduce using rule 72 (constant)
+
+
+State 40
+
+   52 cast-expression: L_BRACKET . type-specifier R_BRACKET cast-expression
+   71 primary-expression: L_BRACKET . expression R_BRACKET
+
+    T_CHAR         shift, and go to state 1
+    T_INT          shift, and go to state 2
+    T_BOOL         shift, and go to state 3
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    KW_STRUCT      shift, and go to state 4
+    T_SIGNED       shift, and go to state 5
+    T_UNSIGNED     shift, and go to state 6
+    KW_UNION       shift, and go to state 8
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    expression                 go to state 75
+    assignment-expression      go to state 42
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+    type-specifier             go to state 76
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+
+
+State 41
+
+    6 declaration: type-specifier IDENTIFIER RO_ASSIGN expression .
+    9 expression: expression . LO_COMMA assignment-expression
+
+    LO_COMMA  shift, and go to state 77
 
     $default  reduce using rule 6 (declaration)
+
+
+State 42
+
+    8 expression: assignment-expression .
+
+    $default  reduce using rule 8 (expression)
+
+
+State 43
+
+   19 assignment-expression: conditional-expression .
+
+    $default  reduce using rule 19 (assignment-expression)
+
+
+State 44
+
+   21 conditional-expression: logical-OR-expression .
+   22                       | logical-OR-expression . RO_TRI_QUES expression RO_TRI_COLON conditional-expression
+   24 logical-OR-expression: logical-OR-expression . LO_LGC_OR logical-AND-expression
+
+    RO_TRI_QUES  shift, and go to state 78
+    LO_LGC_OR    shift, and go to state 79
+
+    $default  reduce using rule 21 (conditional-expression)
+
+
+State 45
+
+   23 logical-OR-expression: logical-AND-expression .
+   26 logical-AND-expression: logical-AND-expression . LO_LGC_AND inclusive-OR-expression
+
+    LO_LGC_AND  shift, and go to state 80
+
+    $default  reduce using rule 23 (logical-OR-expression)
+
+
+State 46
+
+   25 logical-AND-expression: inclusive-OR-expression .
+   28 inclusive-OR-expression: inclusive-OR-expression . LO_BIT_OR exclusive-OR-expression
+
+    LO_BIT_OR  shift, and go to state 81
+
+    $default  reduce using rule 25 (logical-AND-expression)
+
+
+State 47
+
+   27 inclusive-OR-expression: exclusive-OR-expression .
+   30 exclusive-OR-expression: exclusive-OR-expression . LO_BIT_XOR AND-expression
+
+    LO_BIT_XOR  shift, and go to state 82
+
+    $default  reduce using rule 27 (inclusive-OR-expression)
+
+
+State 48
+
+   29 exclusive-OR-expression: AND-expression .
+   32 AND-expression: AND-expression . LO_BIT_AND equality-expression
+
+    LO_BIT_AND  shift, and go to state 83
+
+    $default  reduce using rule 29 (exclusive-OR-expression)
+
+
+State 49
+
+   31 AND-expression: equality-expression .
+   34 equality-expression: equality-expression . LO_EQ relational-expression
+   35                    | equality-expression . LO_N_EQ relational-expression
+
+    LO_EQ    shift, and go to state 84
+    LO_N_EQ  shift, and go to state 85
+
+    $default  reduce using rule 31 (AND-expression)
+
+
+State 50
+
+   33 equality-expression: relational-expression .
+   37 relational-expression: relational-expression . LO_REL_L shift-expression
+   38                      | relational-expression . LO_REL_G shift-expression
+   39                      | relational-expression . LO_REL_LE shift-expression
+   40                      | relational-expression . LO_REL_GE shift-expression
+
+    LO_REL_L   shift, and go to state 86
+    LO_REL_G   shift, and go to state 87
+    LO_REL_LE  shift, and go to state 88
+    LO_REL_GE  shift, and go to state 89
+
+    $default  reduce using rule 33 (equality-expression)
+
+
+State 51
+
+   36 relational-expression: shift-expression .
+   42 shift-expression: shift-expression . LO_SFT_L additive-expression
+   43                 | shift-expression . LO_SFT_R additive-expression
+
+    LO_SFT_L  shift, and go to state 90
+    LO_SFT_R  shift, and go to state 91
+
+    $default  reduce using rule 36 (relational-expression)
+
+
+State 52
+
+   41 shift-expression: additive-expression .
+   45 additive-expression: additive-expression . LO_ADD multiplicative-expression
+   46                    | additive-expression . LO_SUB multiplicative-expression
+
+    LO_ADD  shift, and go to state 92
+    LO_SUB  shift, and go to state 93
+
+    $default  reduce using rule 41 (shift-expression)
+
+
+State 53
+
+   44 additive-expression: multiplicative-expression .
+   48 multiplicative-expression: multiplicative-expression . LO_MUL cast-expression
+   49                          | multiplicative-expression . LO_DIV cast-expression
+   50                          | multiplicative-expression . LO_MOD cast-expression
+
+    LO_MUL  shift, and go to state 94
+    LO_DIV  shift, and go to state 95
+    LO_MOD  shift, and go to state 96
+
+    $default  reduce using rule 44 (additive-expression)
+
+
+State 54
+
+   47 multiplicative-expression: cast-expression .
+
+    $default  reduce using rule 47 (multiplicative-expression)
+
+
+State 55
+
+   62 unary-expression: unary-operator . cast-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    cast-expression     go to state 97
+    unary-operator      go to state 55
+    unary-expression    go to state 98
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 56
+
+   20 assignment-expression: unary-expression . assignment-operator assignment-expression
+   51 cast-expression: unary-expression .
+
+    RO_AS_ADDEQ    shift, and go to state 99
+    RO_AS_SUBEQ    shift, and go to state 100
+    RO_AS_MULEQ    shift, and go to state 101
+    RO_AS_DIVEQ    shift, and go to state 102
+    RO_AS_SFTL_EQ  shift, and go to state 103
+    RO_AS_SFTR_EQ  shift, and go to state 104
+    RO_AS_ANDEQ    shift, and go to state 105
+    RO_AS_OREQ     shift, and go to state 106
+    RO_ASSIGN      shift, and go to state 107
+
+    $default  reduce using rule 51 (cast-expression)
+
+    assignment-operator  go to state 108
+
+
+State 57
+
+   59 unary-expression: postfix-expression .
+   64 postfix-expression: postfix-expression . L_SQ_BRACKET expression R_SQ_BRACKET
+   65                   | postfix-expression . LO_MEMBER IDENTIFIER
+   66                   | postfix-expression . LO_PT_MEMBER IDENTIFIER
+   67                   | postfix-expression . LO_AS_SELFINC
+   68                   | postfix-expression . LO_AS_SELFDEC
+
+    LO_AS_SELFINC  shift, and go to state 109
+    LO_AS_SELFDEC  shift, and go to state 110
+    LO_MEMBER      shift, and go to state 111
+    LO_PT_MEMBER   shift, and go to state 112
+    L_SQ_BRACKET   shift, and go to state 113
+
+    $default  reduce using rule 59 (unary-expression)
+
+
+State 58
+
+   63 postfix-expression: primary-expression .
+
+    $default  reduce using rule 63 (postfix-expression)
+
+
+State 59
+
+   70 primary-expression: constant .
+
+    $default  reduce using rule 70 (primary-expression)
+
+
+State 60
+
+   79 struct-or-union-specifier: struct-or-union IDENTIFIER L_BRACE struct-declaration-list . R_BRACE
+   85 struct-declaration-list: struct-declaration-list . struct-declaration
+
+    T_CHAR      shift, and go to state 1
+    T_INT       shift, and go to state 2
+    T_BOOL      shift, and go to state 3
+    KW_STRUCT   shift, and go to state 4
+    T_SIGNED    shift, and go to state 5
+    T_UNSIGNED  shift, and go to state 6
+    Q_CONST     shift, and go to state 24
+    KW_UNION    shift, and go to state 8
+    R_BRACE     shift, and go to state 114
+
+    type-specifier             go to state 25
+    struct-or-union-specifier  go to state 14
+    struct-or-union            go to state 15
+    struct-declaration         go to state 63
+    specifier-qualifier-list   go to state 28
+    type-qualifier             go to state 29
+
+
+State 61
+
+   88 specifier-qualifier-list: type-specifier specifier-qualifier-list .
+
+    $default  reduce using rule 88 (specifier-qualifier-list)
+
+
+State 62
+
+   80 struct-or-union-specifier: struct-or-union L_BRACE struct-declaration-list R_BRACE .
+
+    $default  reduce using rule 80 (struct-or-union-specifier)
+
+
+State 63
+
+   85 struct-declaration-list: struct-declaration-list struct-declaration .
+
+    $default  reduce using rule 85 (struct-declaration-list)
+
+
+State 64
+
+   98 pointer: LO_MUL .
+   99        | LO_MUL . pointer
+
+    LO_MUL  shift, and go to state 64
+
+    $default  reduce using rule 98 (pointer)
+
+    pointer  go to state 115
+
+
+State 65
+
+   97 direct-declarator: IDENTIFIER .
+
+    $default  reduce using rule 97 (direct-declarator)
+
+
+State 66
+
+   86 struct-declaration: specifier-qualifier-list struct-declarator-list . SEMICOLON
+   92 struct-declarator-list: struct-declarator-list . LO_COMMA struct-declarator
+
+    LO_COMMA   shift, and go to state 116
+    SEMICOLON  shift, and go to state 117
+
+
+State 67
+
+   91 struct-declarator-list: struct-declarator .
+
+    $default  reduce using rule 91 (struct-declarator-list)
+
+
+State 68
+
+   93 struct-declarator: declarator .
+   94                  | declarator . COLON INTEGER
+
+    COLON  shift, and go to state 118
+
+    $default  reduce using rule 93 (struct-declarator)
+
+
+State 69
+
+   96 declarator: direct-declarator .
+
+    $default  reduce using rule 96 (declarator)
+
+
+State 70
+
+   95 declarator: pointer . direct-declarator
+
+    IDENTIFIER  shift, and go to state 65
+
+    direct-declarator  go to state 119
+
+
+State 71
+
+   90 specifier-qualifier-list: type-qualifier specifier-qualifier-list .
+
+    $default  reduce using rule 90 (specifier-qualifier-list)
+
+
+State 72
+
+   71 primary-expression: L_BRACKET . expression R_BRACKET
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    expression                 go to state 75
+    assignment-expression      go to state 42
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 73
+
+   60 unary-expression: LO_AS_SELFINC unary-expression .
+
+    $default  reduce using rule 60 (unary-expression)
+
+
+State 74
+
+   61 unary-expression: LO_AS_SELFDEC unary-expression .
+
+    $default  reduce using rule 61 (unary-expression)
+
+
+State 75
+
+    9 expression: expression . LO_COMMA assignment-expression
+   71 primary-expression: L_BRACKET expression . R_BRACKET
+
+    LO_COMMA   shift, and go to state 77
+    R_BRACKET  shift, and go to state 120
+
+
+State 76
+
+   52 cast-expression: L_BRACKET type-specifier . R_BRACKET cast-expression
+
+    R_BRACKET  shift, and go to state 121
+
+
+State 77
+
+    9 expression: expression LO_COMMA . assignment-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    assignment-expression      go to state 122
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 78
+
+   22 conditional-expression: logical-OR-expression RO_TRI_QUES . expression RO_TRI_COLON conditional-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    expression                 go to state 123
+    assignment-expression      go to state 42
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 79
+
+   24 logical-OR-expression: logical-OR-expression LO_LGC_OR . logical-AND-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    logical-AND-expression     go to state 124
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 80
+
+   26 logical-AND-expression: logical-AND-expression LO_LGC_AND . inclusive-OR-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    inclusive-OR-expression    go to state 125
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 81
+
+   28 inclusive-OR-expression: inclusive-OR-expression LO_BIT_OR . exclusive-OR-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    exclusive-OR-expression    go to state 126
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 82
+
+   30 exclusive-OR-expression: exclusive-OR-expression LO_BIT_XOR . AND-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    AND-expression             go to state 127
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 83
+
+   32 AND-expression: AND-expression LO_BIT_AND . equality-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    equality-expression        go to state 128
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 84
+
+   34 equality-expression: equality-expression LO_EQ . relational-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    relational-expression      go to state 129
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 85
+
+   35 equality-expression: equality-expression LO_N_EQ . relational-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    relational-expression      go to state 130
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 86
+
+   37 relational-expression: relational-expression LO_REL_L . shift-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    shift-expression           go to state 131
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 87
+
+   38 relational-expression: relational-expression LO_REL_G . shift-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    shift-expression           go to state 132
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 88
+
+   39 relational-expression: relational-expression LO_REL_LE . shift-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    shift-expression           go to state 133
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 89
+
+   40 relational-expression: relational-expression LO_REL_GE . shift-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    shift-expression           go to state 134
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 90
+
+   42 shift-expression: shift-expression LO_SFT_L . additive-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    additive-expression        go to state 135
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 91
+
+   43 shift-expression: shift-expression LO_SFT_R . additive-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    additive-expression        go to state 136
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 92
+
+   45 additive-expression: additive-expression LO_ADD . multiplicative-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    multiplicative-expression  go to state 137
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 93
+
+   46 additive-expression: additive-expression LO_SUB . multiplicative-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    multiplicative-expression  go to state 138
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 94
+
+   48 multiplicative-expression: multiplicative-expression LO_MUL . cast-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    cast-expression     go to state 139
+    unary-operator      go to state 55
+    unary-expression    go to state 98
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 95
+
+   49 multiplicative-expression: multiplicative-expression LO_DIV . cast-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    cast-expression     go to state 140
+    unary-operator      go to state 55
+    unary-expression    go to state 98
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 96
+
+   50 multiplicative-expression: multiplicative-expression LO_MOD . cast-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    cast-expression     go to state 141
+    unary-operator      go to state 55
+    unary-expression    go to state 98
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 97
+
+   62 unary-expression: unary-operator cast-expression .
+
+    $default  reduce using rule 62 (unary-expression)
+
+
+State 98
+
+   51 cast-expression: unary-expression .
+
+    $default  reduce using rule 51 (cast-expression)
+
+
+State 99
+
+   11 assignment-operator: RO_AS_ADDEQ .
+
+    $default  reduce using rule 11 (assignment-operator)
+
+
+State 100
+
+   18 assignment-operator: RO_AS_SUBEQ .
+
+    $default  reduce using rule 18 (assignment-operator)
+
+
+State 101
+
+   14 assignment-operator: RO_AS_MULEQ .
+
+    $default  reduce using rule 14 (assignment-operator)
+
+
+State 102
+
+   13 assignment-operator: RO_AS_DIVEQ .
+
+    $default  reduce using rule 13 (assignment-operator)
+
+
+State 103
+
+   16 assignment-operator: RO_AS_SFTL_EQ .
+
+    $default  reduce using rule 16 (assignment-operator)
+
+
+State 104
+
+   17 assignment-operator: RO_AS_SFTR_EQ .
+
+    $default  reduce using rule 17 (assignment-operator)
+
+
+State 105
+
+   12 assignment-operator: RO_AS_ANDEQ .
+
+    $default  reduce using rule 12 (assignment-operator)
+
+
+State 106
+
+   15 assignment-operator: RO_AS_OREQ .
+
+    $default  reduce using rule 15 (assignment-operator)
+
+
+State 107
+
+   10 assignment-operator: RO_ASSIGN .
+
+    $default  reduce using rule 10 (assignment-operator)
+
+
+State 108
+
+   20 assignment-expression: unary-expression assignment-operator . assignment-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    assignment-expression      go to state 142
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 109
+
+   67 postfix-expression: postfix-expression LO_AS_SELFINC .
+
+    $default  reduce using rule 67 (postfix-expression)
+
+
+State 110
+
+   68 postfix-expression: postfix-expression LO_AS_SELFDEC .
+
+    $default  reduce using rule 68 (postfix-expression)
+
+
+State 111
+
+   65 postfix-expression: postfix-expression LO_MEMBER . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 143
+
+
+State 112
+
+   66 postfix-expression: postfix-expression LO_PT_MEMBER . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 144
+
+
+State 113
+
+   64 postfix-expression: postfix-expression L_SQ_BRACKET . expression R_SQ_BRACKET
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    expression                 go to state 145
+    assignment-expression      go to state 42
+    conditional-expression     go to state 43
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 56
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 114
+
+   79 struct-or-union-specifier: struct-or-union IDENTIFIER L_BRACE struct-declaration-list R_BRACE .
+
+    $default  reduce using rule 79 (struct-or-union-specifier)
+
+
+State 115
+
+   99 pointer: LO_MUL pointer .
+
+    $default  reduce using rule 99 (pointer)
+
+
+State 116
+
+   92 struct-declarator-list: struct-declarator-list LO_COMMA . struct-declarator
+
+    LO_MUL      shift, and go to state 64
+    IDENTIFIER  shift, and go to state 65
+
+    struct-declarator  go to state 146
+    declarator         go to state 68
+    direct-declarator  go to state 69
+    pointer            go to state 70
+
+
+State 117
+
+   86 struct-declaration: specifier-qualifier-list struct-declarator-list SEMICOLON .
+
+    $default  reduce using rule 86 (struct-declaration)
+
+
+State 118
+
+   94 struct-declarator: declarator COLON . INTEGER
+
+    INTEGER  shift, and go to state 147
+
+
+State 119
+
+   95 declarator: pointer direct-declarator .
+
+    $default  reduce using rule 95 (declarator)
+
+
+State 120
+
+   71 primary-expression: L_BRACKET expression R_BRACKET .
+
+    $default  reduce using rule 71 (primary-expression)
+
+
+State 121
+
+   52 cast-expression: L_BRACKET type-specifier R_BRACKET . cast-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    cast-expression     go to state 148
+    unary-operator      go to state 55
+    unary-expression    go to state 98
+    postfix-expression  go to state 57
+    primary-expression  go to state 58
+    constant            go to state 59
+
+
+State 122
+
+    9 expression: expression LO_COMMA assignment-expression .
+
+    $default  reduce using rule 9 (expression)
+
+
+State 123
+
+    9 expression: expression . LO_COMMA assignment-expression
+   22 conditional-expression: logical-OR-expression RO_TRI_QUES expression . RO_TRI_COLON conditional-expression
+
+    RO_TRI_COLON  shift, and go to state 149
+    LO_COMMA      shift, and go to state 77
+
+
+State 124
+
+   24 logical-OR-expression: logical-OR-expression LO_LGC_OR logical-AND-expression .
+   26 logical-AND-expression: logical-AND-expression . LO_LGC_AND inclusive-OR-expression
+
+    LO_LGC_AND  shift, and go to state 80
+
+    $default  reduce using rule 24 (logical-OR-expression)
+
+
+State 125
+
+   26 logical-AND-expression: logical-AND-expression LO_LGC_AND inclusive-OR-expression .
+   28 inclusive-OR-expression: inclusive-OR-expression . LO_BIT_OR exclusive-OR-expression
+
+    LO_BIT_OR  shift, and go to state 81
+
+    $default  reduce using rule 26 (logical-AND-expression)
+
+
+State 126
+
+   28 inclusive-OR-expression: inclusive-OR-expression LO_BIT_OR exclusive-OR-expression .
+   30 exclusive-OR-expression: exclusive-OR-expression . LO_BIT_XOR AND-expression
+
+    LO_BIT_XOR  shift, and go to state 82
+
+    $default  reduce using rule 28 (inclusive-OR-expression)
+
+
+State 127
+
+   30 exclusive-OR-expression: exclusive-OR-expression LO_BIT_XOR AND-expression .
+   32 AND-expression: AND-expression . LO_BIT_AND equality-expression
+
+    LO_BIT_AND  shift, and go to state 83
+
+    $default  reduce using rule 30 (exclusive-OR-expression)
+
+
+State 128
+
+   32 AND-expression: AND-expression LO_BIT_AND equality-expression .
+   34 equality-expression: equality-expression . LO_EQ relational-expression
+   35                    | equality-expression . LO_N_EQ relational-expression
+
+    LO_EQ    shift, and go to state 84
+    LO_N_EQ  shift, and go to state 85
+
+    $default  reduce using rule 32 (AND-expression)
+
+
+State 129
+
+   34 equality-expression: equality-expression LO_EQ relational-expression .
+   37 relational-expression: relational-expression . LO_REL_L shift-expression
+   38                      | relational-expression . LO_REL_G shift-expression
+   39                      | relational-expression . LO_REL_LE shift-expression
+   40                      | relational-expression . LO_REL_GE shift-expression
+
+    LO_REL_L   shift, and go to state 86
+    LO_REL_G   shift, and go to state 87
+    LO_REL_LE  shift, and go to state 88
+    LO_REL_GE  shift, and go to state 89
+
+    $default  reduce using rule 34 (equality-expression)
+
+
+State 130
+
+   35 equality-expression: equality-expression LO_N_EQ relational-expression .
+   37 relational-expression: relational-expression . LO_REL_L shift-expression
+   38                      | relational-expression . LO_REL_G shift-expression
+   39                      | relational-expression . LO_REL_LE shift-expression
+   40                      | relational-expression . LO_REL_GE shift-expression
+
+    LO_REL_L   shift, and go to state 86
+    LO_REL_G   shift, and go to state 87
+    LO_REL_LE  shift, and go to state 88
+    LO_REL_GE  shift, and go to state 89
+
+    $default  reduce using rule 35 (equality-expression)
+
+
+State 131
+
+   37 relational-expression: relational-expression LO_REL_L shift-expression .
+   42 shift-expression: shift-expression . LO_SFT_L additive-expression
+   43                 | shift-expression . LO_SFT_R additive-expression
+
+    LO_SFT_L  shift, and go to state 90
+    LO_SFT_R  shift, and go to state 91
+
+    $default  reduce using rule 37 (relational-expression)
+
+
+State 132
+
+   38 relational-expression: relational-expression LO_REL_G shift-expression .
+   42 shift-expression: shift-expression . LO_SFT_L additive-expression
+   43                 | shift-expression . LO_SFT_R additive-expression
+
+    LO_SFT_L  shift, and go to state 90
+    LO_SFT_R  shift, and go to state 91
+
+    $default  reduce using rule 38 (relational-expression)
+
+
+State 133
+
+   39 relational-expression: relational-expression LO_REL_LE shift-expression .
+   42 shift-expression: shift-expression . LO_SFT_L additive-expression
+   43                 | shift-expression . LO_SFT_R additive-expression
+
+    LO_SFT_L  shift, and go to state 90
+    LO_SFT_R  shift, and go to state 91
+
+    $default  reduce using rule 39 (relational-expression)
+
+
+State 134
+
+   40 relational-expression: relational-expression LO_REL_GE shift-expression .
+   42 shift-expression: shift-expression . LO_SFT_L additive-expression
+   43                 | shift-expression . LO_SFT_R additive-expression
+
+    LO_SFT_L  shift, and go to state 90
+    LO_SFT_R  shift, and go to state 91
+
+    $default  reduce using rule 40 (relational-expression)
+
+
+State 135
+
+   42 shift-expression: shift-expression LO_SFT_L additive-expression .
+   45 additive-expression: additive-expression . LO_ADD multiplicative-expression
+   46                    | additive-expression . LO_SUB multiplicative-expression
+
+    LO_ADD  shift, and go to state 92
+    LO_SUB  shift, and go to state 93
+
+    $default  reduce using rule 42 (shift-expression)
+
+
+State 136
+
+   43 shift-expression: shift-expression LO_SFT_R additive-expression .
+   45 additive-expression: additive-expression . LO_ADD multiplicative-expression
+   46                    | additive-expression . LO_SUB multiplicative-expression
+
+    LO_ADD  shift, and go to state 92
+    LO_SUB  shift, and go to state 93
+
+    $default  reduce using rule 43 (shift-expression)
+
+
+State 137
+
+   45 additive-expression: additive-expression LO_ADD multiplicative-expression .
+   48 multiplicative-expression: multiplicative-expression . LO_MUL cast-expression
+   49                          | multiplicative-expression . LO_DIV cast-expression
+   50                          | multiplicative-expression . LO_MOD cast-expression
+
+    LO_MUL  shift, and go to state 94
+    LO_DIV  shift, and go to state 95
+    LO_MOD  shift, and go to state 96
+
+    $default  reduce using rule 45 (additive-expression)
+
+
+State 138
+
+   46 additive-expression: additive-expression LO_SUB multiplicative-expression .
+   48 multiplicative-expression: multiplicative-expression . LO_MUL cast-expression
+   49                          | multiplicative-expression . LO_DIV cast-expression
+   50                          | multiplicative-expression . LO_MOD cast-expression
+
+    LO_MUL  shift, and go to state 94
+    LO_DIV  shift, and go to state 95
+    LO_MOD  shift, and go to state 96
+
+    $default  reduce using rule 46 (additive-expression)
+
+
+State 139
+
+   48 multiplicative-expression: multiplicative-expression LO_MUL cast-expression .
+
+    $default  reduce using rule 48 (multiplicative-expression)
+
+
+State 140
+
+   49 multiplicative-expression: multiplicative-expression LO_DIV cast-expression .
+
+    $default  reduce using rule 49 (multiplicative-expression)
+
+
+State 141
+
+   50 multiplicative-expression: multiplicative-expression LO_MOD cast-expression .
+
+    $default  reduce using rule 50 (multiplicative-expression)
+
+
+State 142
+
+   20 assignment-expression: unary-expression assignment-operator assignment-expression .
+
+    $default  reduce using rule 20 (assignment-expression)
+
+
+State 143
+
+   65 postfix-expression: postfix-expression LO_MEMBER IDENTIFIER .
+
+    $default  reduce using rule 65 (postfix-expression)
+
+
+State 144
+
+   66 postfix-expression: postfix-expression LO_PT_MEMBER IDENTIFIER .
+
+    $default  reduce using rule 66 (postfix-expression)
+
+
+State 145
+
+    9 expression: expression . LO_COMMA assignment-expression
+   64 postfix-expression: postfix-expression L_SQ_BRACKET expression . R_SQ_BRACKET
+
+    LO_COMMA      shift, and go to state 77
+    R_SQ_BRACKET  shift, and go to state 150
+
+
+State 146
+
+   92 struct-declarator-list: struct-declarator-list LO_COMMA struct-declarator .
+
+    $default  reduce using rule 92 (struct-declarator-list)
+
+
+State 147
+
+   94 struct-declarator: declarator COLON INTEGER .
+
+    $default  reduce using rule 94 (struct-declarator)
+
+
+State 148
+
+   52 cast-expression: L_BRACKET type-specifier R_BRACKET cast-expression .
+
+    $default  reduce using rule 52 (cast-expression)
+
+
+State 149
+
+   22 conditional-expression: logical-OR-expression RO_TRI_QUES expression RO_TRI_COLON . conditional-expression
+
+    LO_AS_SELFINC  shift, and go to state 30
+    LO_AS_SELFDEC  shift, and go to state 31
+    LO_MUL         shift, and go to state 32
+    LO_ADD         shift, and go to state 33
+    LO_SUB         shift, and go to state 34
+    LO_BIT_NOT     shift, and go to state 35
+    LO_LGC_NOT     shift, and go to state 36
+    LO_BIT_AND     shift, and go to state 37
+    IDENTIFIER     shift, and go to state 38
+    INTEGER        shift, and go to state 39
+    L_BRACKET      shift, and go to state 40
+
+    conditional-expression     go to state 151
+    logical-OR-expression      go to state 44
+    logical-AND-expression     go to state 45
+    inclusive-OR-expression    go to state 46
+    exclusive-OR-expression    go to state 47
+    AND-expression             go to state 48
+    equality-expression        go to state 49
+    relational-expression      go to state 50
+    shift-expression           go to state 51
+    additive-expression        go to state 52
+    multiplicative-expression  go to state 53
+    cast-expression            go to state 54
+    unary-operator             go to state 55
+    unary-expression           go to state 98
+    postfix-expression         go to state 57
+    primary-expression         go to state 58
+    constant                   go to state 59
+
+
+State 150
+
+   64 postfix-expression: postfix-expression L_SQ_BRACKET expression R_SQ_BRACKET .
+
+    $default  reduce using rule 64 (postfix-expression)
+
+
+State 151
+
+   22 conditional-expression: logical-OR-expression RO_TRI_QUES expression RO_TRI_COLON conditional-expression .
+
+    $default  reduce using rule 22 (conditional-expression)

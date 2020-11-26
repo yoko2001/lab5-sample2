@@ -1,7 +1,8 @@
 #include "tree.h"
 
-int TreeNode::_now_id;
+int TreeNode::_now_id = 0;
 #define func_all_children(childptr, func) \
+    if(!childptr) cout << "none"; \
     while(childptr){                \
         func(childptr);\
         childptr = childptr->sibling;\
@@ -25,16 +26,17 @@ void TreeNode::addChild(TreeNode* child) {
     assert(child!=nullptr);
     //cout << "add child\n";
     if (this->child){
-        //cout << "enter sibling adding\n";
+        //cout << "addding child"<< child->nodeID <<" to" <<nodeID<<endl;
         this->child->addSibling(child);
     }else{
+        //cout << "addding child"<<child->nodeID <<" to "<<nodeID<<endl;
         this->child = child;
     }
     
 }
 
 void TreeNode::addSibling(TreeNode* sibling){
-    //cout << "adding sibling\n";
+    //cout << "adding sibling "<< sibling->nodeID << " to "<< this->nodeID <<endl;
     TreeNode* start = this->sibling;
     TreeNode* tail = nullptr;
     if (!start){
@@ -47,24 +49,25 @@ void TreeNode::addSibling(TreeNode* sibling){
 
 TreeNode::TreeNode(int lineno, NodeType type):lineno(lineno), nodeType(type){
     genNodeId();    //assign a ID for node
-    _now_id = 0;
+    //_now_id = 0;
     //cout << "build success,type: " <<nodeType2String(type)<<endl; 
 }
 
 void TreeNode::genNodeId() {
     nodeID = _now_id++;
+   //cout<<_now_id<<endl;
 }
 
 void TreeNode::printNodeInfo() {
-    cout << "lno@:" << setw(10) << lineno; 
-    cout << "@" <<setw(10) << nodeID;
-    cout << setw(20) << nodeType2String(nodeType);
+    cout << "lno@:"  << setw(4) << lineno ; 
+    cout << "  @" << nodeID;
+    cout << setw(15) <<nodeType2String(nodeType) ;
 }
 
 void TreeNode::printChildrenId() {
     struct TreeNode* childptr;
-    childptr = child;
-    if(childptr) return;
+    childptr = this->child;
+    if(!childptr) return;
     cout << "[ ";
     func_all_children(childptr, __printNodeId);
     cout << " ]";
