@@ -14,6 +14,16 @@ string Type::getTypeInfo() {
             return "char";
         case VALUE_STRING:
             return "string";
+        case VALUE_ARRAY:
+            return "array of";
+        case VALUE_POINTER:
+            return "pointer of";
+        case VALUE_SIGNED:
+            return "signed";
+        case VALUE_UNSIGNED:
+            return "unsigned";
+        case VALUE_CONST:
+            return "const";
         default:
             cerr << "shouldn't reach here, typeinfo";
             assert(0);

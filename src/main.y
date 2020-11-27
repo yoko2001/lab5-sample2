@@ -6,6 +6,7 @@
     extern int lineno;
     int yylex();
     int yyerror( char const * );
+    
 %}
 %token T_CHAR T_INT T_STRING T_BOOL 
 
@@ -17,7 +18,7 @@
 
 %token  LO_SFT_R LO_LGC_NOT LO_BIT_XOR LO_BIT_AND LO_BIT_OR RO_ASSIGN LO_COMMA
 
-%token KW_IF KW_FOR KW_RET KW_STRUCT KW_WHILE KW_DO T_SIGNED T_UNSIGNED Q_CONST
+%token KW_CONTINUE KW_BREAK KW_IF KW_FOR KW_RET KW_STRUCT KW_WHILE KW_DO KW_ELSE T_SIGNED T_UNSIGNED Q_CONST
 
 %token SEMICOLON COLON LO_REL_L LO_REL_G LO_REL_LE LO_REL_GE KW_UNION
 
@@ -42,35 +43,208 @@ statements
 
 statement
 : SEMICOLON  {$$ = new TreeNode(lineno, NODE_STMT); $$->stype = STMT_SKIP;}
-| declaration SEMICOLON {$$ = $1;}
+| declaration {$$ = $1;}
+| compound-statement{$$ = $1;}
+| expression-statement{$$ = $1;}
+| selection-statement{$$ = $1;}
+| iteration-statement{$$ = $1;}
+| jump-statement{$$ = $1;}
 ;
 
-
-declaration
-: type-specifier IDENTIFIER RO_ASSIGN expression{  // declare and init
-    TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
-    node->stype = STMT_DECL;
-    node->addChild($1);
-    node->addChild($2);
-    node->addChild($4);
-    $$ = node;   
-} 
-| type-specifier IDENTIFIER {
-    TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
-    node->stype = STMT_DECL;
-    node->addChild($1);
-    node->addChild($2);
-    $$ = node;   
+jump-statement
+:   KW_BREAK SEMICOLON{
+    TreeNode* node = new TreeNode(lineno, NODE_BREAK);
+    $$ = node;
+}
+|   KW_CONTINUE SEMICOLON{
+    TreeNode* node = new TreeNode(lineno, NODE_CONTINUE);
+    $$ = node; 
 }
 ;
+
+iteration-statement
+:   KW_WHILE L_BRACKET expression R_BRACKET statement{
+    TreeNode* node = new TreeNode(lineno, NODE_WHILE);
+    node->addChild($3);
+    node->addChild($5);
+    $$ = node;
+}
+|   KW_DO statement KW_WHILE  L_BRACKET expression R_BRACKET{
+    TreeNode* node = new TreeNode(lineno, NODE_DO_WHILE);
+    node->addChild($5);
+    node->addChild($2);
+    $$ = node;
+}
+|   KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET{
+    TreeNode* node = new TreeNode(lineno, NODE_FOR);
+    node->addChild(null_node);
+    node->addChild(null_node);
+    node->addChild(null_node);
+    $$ = node;
+}
+|   KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET{
+    TreeNode* node = new TreeNode(lineno, NODE_FOR);
+    node->addChild($3);
+    node->addChild($5);
+    node->addChild($7);
+    $$ = node;
+}
+;
+
+
+
+selection-statement
+:   KW_IF L_BRACKET expression R_BRACKET statement{
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_SELECT;
+    node->addChild($3);
+    node->addChild($5);
+    $$ = node;
+}
+|   KW_IF L_BRACKET expression R_BRACKET statement  KW_ELSE statement{
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_SELECT;
+    node->addChild($3);
+    node->addChild($5);
+    node->addChild($7);
+    $$ = node;
+}
+;
+
+expression-statement
+:   SEMICOLON{$$ = new TreeNode(lineno, NODE_STMT); $$->stype = STMT_SKIP;}
+|   expression SEMICOLON{
+    $$ = $1;
+}
+
+compound-statement
+:   L_BRACE block-item-list R_BRACE{
+    $$ = new TreeNode(lineno, NODE_STMT); 
+    $$->stype = STMT_COMPOUND;
+    $$->addChild($2);
+}
+|   L_BRACE R_BRACE{
+    $$ = new TreeNode(lineno, NODE_STMT); 
+    $$->stype = STMT_COMPOUND;
+}
+;
+
+block-item-list
+:   block-item{
+    $$ = $1;
+}
+|   block-item-list block-item{
+    $1->addSibling($2);
+    $$ = $1;
+}
+;
+
+block-item
+:   declaration{
+    $$ = $1;
+}
+|   statement{
+    $$ = $1;
+}
+;
+
+declaration
+:   declaration-specifiers  init-declarator-list SEMICOLON{
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_DECL;
+    node->addChild($1);
+    node->addChild($2);
+    $$ = node;
+}
+|   declaration-specifiers{
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_DECL;
+    node->addChild($1);
+    $$ = node;
+}
+;
+
+declaration-specifiers
+:   type-specifier{
+    $$ = $1;
+}
+|   type-specifier declaration-specifiers{
+    $1 -> addSibling($2);
+    $$ = $1;
+}
+|   type-qualifier{
+    $$ = $1;
+}
+|   type-qualifier declaration-specifiers{
+    $1->addSibling($2);
+    $$ = $1;
+}
+;
+
+type-qualifier:
+
+init-declarator-list
+:   init-declarator{
+    $$ = $1;
+}
+|   init-declarator-list LO_COMMA init-declarator{
+    $1->addSibling($2);
+    $$ = $1;
+}
+;
+
+init-declarator
+:   declarator{
+    TreeNode* node = new TreeNode(lineno, NODE_DECL_VARS);
+    node->addChild($1);
+    $$ = node;
+}   
+|   declarator RO_ASSIGN initializer{
+    TreeNode* node = new TreeNode(lineno, NODE_INIT_DECL_VARS);
+    node->addChild($1);
+    node->addChild($3);
+    $$ = node;
+}
+;
+
+initializer
+:   assignment-expression{
+    TreeNode* node = new TreeNode(lineno, NODE_DECL_INIT);
+    node->addChild($1);
+    //cout << "ckpt1\n";
+    $$ = node;
+    //cout << "ckpt2\n";
+}
+|   L_BRACE initializer-list R_BRACE{
+    TreeNode* node = new TreeNode(lineno, NODE_DECL_INIT);
+    node->addChild($2);
+    $$ = node;
+}
+;
+
+initializer-list
+:   initializer{
+    $$ = $1;
+}
+|   initializer-list LO_COMMA initializer{
+    $1->addSibling($3);
+    $$ = $1;
+}
+;
+
 
 
 expression
 :   assignment-expression{
-    $$ = $1;
+    TreeNode* node = new TreeNode(lineno, NODE_EXPR);
+    node->addChild($1);
+    $$ = node;
 }
 |   expression LO_COMMA assignment-expression{
-    $1->addChild($2);
+    //TreeNode* node = new TreeNode(lineno, NODE_EXPR);
+    
+    $1->addSibling($2);
+    $$ = $1;
 }
 ;
 assignment-operator
@@ -90,7 +264,7 @@ assignment-expression
     $$ = $1;
 }
 |   unary-expression  assignment-operator  assignment-expression{
-    TreeNode* node = new TreeNode($1->lineno, NODE_ASSI);
+    TreeNode* node = new TreeNode($1->lineno, NODE_EXPR);
     node-> optype = $2->optype;
     node-> addChild($1);
     node-> addChild($2);
@@ -351,7 +525,7 @@ argument-expression-list
     $$ = $1;
 }
 |   argument-expression-list LO_COMMA assignment-expression{
-    cout << "argument expression list adding sibling\n";
+    //cout << "argument expression list adding sibling\n";
     $1 -> addSibling($3);
     $$ = $1;
 }
@@ -411,11 +585,23 @@ primary-expression
 constant
 :   INTEGER{
     $$ = $1;
+    // if ($1->nodeType == NODE_CONST){
+    //         cout << "const";
+    //     }
+    // if($1->type == TYPE_INT){
+        
+    // }else{
+    //     cout << "完蛋\n";
+    // }
+    // if ($1->type){
+    //     cout<< " yacc node->type" << $1->type << endl;
+    //     cout << " yacc TYPE_INT" << TYPE_INT << endl;
+    // }
 }
 ;
 
 type-specifier
-: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;} 
+: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT; } 
 | T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
 | T_BOOL {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_BOOL;}
 | T_SIGNED {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_SIGNED;}
@@ -464,25 +650,43 @@ struct-declarator-list:
 ;
 
 struct-declarator:
-    declarator{}
+    declarator{$$ = $1;}
 |   declarator COLON INTEGER{}
 ;
 
 declarator:
     pointer direct-declarator{}
-|   direct-declarator{}
+|   direct-declarator{$$ = $1; }
 ;
 
 direct-declarator:
-    IDENTIFIER{};
+IDENTIFIER{
+    $$ = $1;
+}
+|   direct-declarator L_SQ_BRACKET  assignment-expression R_SQ_BRACKET{
+    TreeNode* node = new TreeNode(lineno, NODE_TYPE);
+    node->type = TYPE_ARRAY;
+    cout << "ARRAY!!!\n";
+    node->addChild($1);
+    node->addChild($3);
+    $$ = node;
+}
+;   
 
 pointer:
-    LO_MUL  {}
-|   LO_MUL pointer{}
+    LO_MUL  {TreeNode* node = new TreeNode(lineno, NODE_TYPE); node->type = TYPE_POINTER; $$ = node;}
+|   LO_MUL pointer{
+        TreeNode* node = new TreeNode(lineno, NODE_TYPE); 
+        node->type = TYPE_POINTER;
+        node->addSibling($2);
+        $$ = node;
+    }
 ;
 
 type-qualifier:
-    Q_CONST{};
+    Q_CONST{
+        $$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CONST;
+    };
 %%
 
 

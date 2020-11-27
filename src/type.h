@@ -14,6 +14,9 @@ enum ValueType
     COMPOSE_FUNCTION,
     VALUE_SIGNED,
     VALUE_UNSIGNED,
+    VALUE_CONST,
+    VALUE_POINTER,
+    VALUE_ARRAY,
 };
 
 class Type
@@ -36,12 +39,27 @@ public:
 };
 
 // 设置几个常量Type，可以节省空间开销
-static Type* TYPE_INT = new Type(VALUE_INT);
-static Type* TYPE_CHAR = new Type(VALUE_CHAR);
-static Type* TYPE_BOOL = new Type(VALUE_BOOL);
-static Type* TYPE_STRING = new Type(VALUE_STRING);
-static Type* TYPE_SIGNED = new Type(VALUE_SIGNED);
-static Type* TYPE_UNSIGNED = new Type(VALUE_UNSIGNED);
+#ifndef __INIT__TYPES__
+#define __INIT__TYPES__
+// static Type* TYPE_CHAR = new Type(VALUE_CHAR);
+// static Type* TYPE_BOOL = new Type(VALUE_BOOL);
+// static Type* TYPE_STRING = new Type(VALUE_STRING);
+// static Type* TYPE_SIGNED = new Type(VALUE_SIGNED);
+// static Type* TYPE_UNSIGNED = new Type(VALUE_UNSIGNED);
+// static Type* TYPE_CONST = new Type(VALUE_CONST);
+// static Type* TYPE_POINTER = new Type(VALUE_POINTER);
+// static Type* TYPE_ARRAY = new Type(VALUE_ARRAY);
+extern Type* TYPE_INT;
+extern Type* TYPE_CHAR;
+extern Type* TYPE_BOOL;
+extern Type* TYPE_STRING;
+extern Type* TYPE_SIGNED;
+extern Type* TYPE_UNSIGNED;
+extern Type* TYPE_CONST;
+extern Type* TYPE_POINTER;
+extern Type* TYPE_ARRAY;
+extern Type* TYPE_INT;
+#endif
 int getSize(Type* type);
 
 #endif

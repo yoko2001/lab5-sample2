@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "type.h"
 
+
 enum NodeType
 {
     NODE_CONST, 
@@ -14,6 +15,17 @@ enum NodeType
     NODE_STMT,
     NODE_PROG,
     NODE_OP,
+    NODE_INIT_DECL_VARS, //用来表示一个int a = 1，b； 中的a=1部分
+    NODE_DECL_VARS,      //用来表示一个int a = 1，b； 中的b  部分
+    NODE_DECL_SPCF,      //int unsigned static extern ...
+    NODE_DECL_INIT,
+    NODE_WHILE,
+    NODE_DO_WHILE,
+    NODE_FOR,
+    NODE_CONTINUE,
+    NODE_BREAK,
+    NODE_NULL,          //for null node
+    
 };
 
 enum OperatorType
@@ -65,6 +77,9 @@ enum OperatorType
 enum StmtType {
     STMT_SKIP,
     STMT_DECL,
+    STMT_COMPOUND,
+    STMT_BLOCK,
+    STMT_SELECT,
 }
 ;
 
@@ -85,7 +100,7 @@ public:
 
     void printAST(); // 先输出自己 + 孩子们的id；再依次让每个孩子输出AST。
     void printSpecialInfo();
-
+    void print_stme_info();
     void genNodeId();
 public:
     static int _now_id;
@@ -102,11 +117,14 @@ public:
     static string nodeType2String (NodeType type);
     static string opType2String (OperatorType type);
     static string sType2String (StmtType type);
+    void print_type_info();
 private:
     void __printNodeId(TreeNode* tn);
     void __addSibling(TreeNode* tn);
 public:
     TreeNode(int lineno, NodeType type);
 };
+
+extern TreeNode* null_node;
 
 #endif

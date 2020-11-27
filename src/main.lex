@@ -67,12 +67,15 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "char"  return T_CHAR;
 
 "if"        return KW_IF;
+"else"      return KW_ELSE;
 "for"       return KW_FOR;
 "return"    return KW_RET;
 "struct"    return KW_STRUCT;
 "union"     return KW_UNION;
 "while"     return KW_WHILE;
 "do"        return KW_DO;
+"continue"  return KW_CONTINUE;
+"break"     return KW_BREAK;
 
 "unsigned"  return  T_UNSIGNED;
 "signed"    return T_SIGNED;
@@ -86,6 +89,9 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     //cout<<"init int node"<<endl;
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_INT;
+    //if(node->type == TYPE_INT) cout << "ok";
+    //cout << "lex TYPE_INT"<< TYPE_INT << endl;
+    //cout << "lex node->type"<< node->type << endl;
     node->int_val = atoi(yytext);
     yylval = node;
     return INTEGER;

@@ -1,23 +1,102 @@
 entering yyparse
+ARRAY!!!
 parsed
-lno@:   0  @20      NODE_PROG[ @11 @15 @19  ]
-lno@:   1  @11      NODE_STMT[ @0 @1 @10  ]
-lno@:   1  @0               
-lno@:   1  @1       NODE_VAR
-lno@:   1  @10      NODE_EXPR[ @6 @9  ]
-lno@:   1  @6      NODE_EXPR[ @4 @5  ]
-lno@:   1  @4      NODE_EXPR[ @2 @3  ]
-lno@:   1  @2     NODE_CONST
-lno@:   1  @3     NODE_CONST
-lno@:   1  @5     NODE_CONST
-lno@:   1  @9      NODE_EXPR[ @7 @8  ]
-lno@:   1  @7     NODE_CONST
-lno@:   1  @8     NODE_CONST
-lno@:   2  @15      NODE_STMT[ @12 @13 @14  ]
-lno@:   2  @12               
-lno@:   2  @13       NODE_VAR
-lno@:   2  @14     NODE_CONST
-lno@:   3  @19      NODE_STMT[ @16 @17 @18  ]
-lno@:   3  @16               
-lno@:   3  @17       NODE_VAR
-lno@:   3  @18     NODE_CONST
+lno@:   0  @102      NODE_PROG[ @16 @26 @32 @49 @101  ]
+lno@:   1  @16      NODE_STMT[ @1 @15  ]declaration
+lno@:   1  @1               int
+lno@:   1  @15               [ @2 @14  ]
+lno@:   1  @2       NODE_VAR variable: a
+lno@:   1  @14               [ @13  ][initializer]
+lno@:   1  @13      NODE_EXPR[ @8 @12  ]
+lno@:   1  @8      NODE_EXPR[ @7  ]
+lno@:   1  @7      NODE_EXPR[ @5 @6  ]
+lno@:   1  @5      NODE_EXPR[ @3 @4  ]
+lno@:   1  @3     NODE_CONST val: 0
+lno@:   1  @4     NODE_CONST val: 1
+lno@:   1  @6     NODE_CONST val: 2
+lno@:   1  @12      NODE_EXPR[ @11  ]
+lno@:   1  @11      NODE_EXPR[ @9 @10  ]
+lno@:   1  @9     NODE_CONST val: 5
+lno@:   1  @10     NODE_CONST val: 6
+lno@:   2  @26      NODE_STMT[ @17 @21 @19  ]declaration
+lno@:   2  @17               int
+lno@:   2  @21               [ @18 @20  ]
+lno@:   2  @18       NODE_VAR variable: b
+lno@:   2  @20               [ @19  ][initializer]
+lno@:   2  @19     NODE_CONST val: 1
+lno@:   2  @19     NODE_CONST val: 1
+lno@:   3  @32      NODE_STMT[ @27 @31  ]declaration
+lno@:   3  @27               int
+lno@:   3  @31               [ @28 @30  ]
+lno@:   3  @28       NODE_VAR variable: c
+lno@:   3  @30               [ @29  ][initializer]
+lno@:   3  @29     NODE_CONST val: 1
+lno@:   4  @49      NODE_STMT[ @33 @48  ]declaration
+lno@:   4  @33               int
+lno@:   4  @48               [ @38 @47  ]
+lno@:   4  @38               [ @34 @37  ]array of
+lno@:   4  @34       NODE_VAR variable: name
+lno@:   4  @37      NODE_EXPR[ @35 @36  ]
+lno@:   4  @35     NODE_CONST val: 2
+lno@:   4  @36     NODE_CONST val: 10
+lno@:   4  @47               [ @40 @42 @44 @46  ][initializer]
+lno@:   4  @40               [ @39  ][initializer]
+lno@:   4  @39     NODE_CONST val: 2
+lno@:   4  @42               [ @41  ][initializer]
+lno@:   4  @41     NODE_CONST val: 3
+lno@:   4  @44               [ @43  ][initializer]
+lno@:   4  @43     NODE_CONST val: 4
+lno@:   4  @46               [ @45  ][initializer]
+lno@:   4  @45     NODE_CONST val: 5
+lno@:  17  @101      NODE_STMT[ @70 @83 @90 @100  ]compound
+lno@:   9  @70      NODE_STMT[ @57 @69  ]select
+lno@:   6  @57      NODE_EXPR[ @56  ]
+lno@:   6  @56      NODE_EXPR[ @50 @51 @55  ]
+lno@:   6  @50       NODE_VAR variable: a
+lno@:   6  @51               [operator]
+lno@:   6  @55      NODE_EXPR[ @54  ]
+lno@:   6  @54      NODE_EXPR[ @52 @53  ]
+lno@:   6  @52       NODE_VAR variable: c
+lno@:   6  @53     NODE_CONST val: 1
+lno@:   8  @69      NODE_STMT[ @68  ]compound
+lno@:   7  @68      NODE_EXPR[ @67  ]
+lno@:   7  @67      NODE_EXPR[ @58 @59 @66  ]
+lno@:   7  @58       NODE_VAR variable: a
+lno@:   7  @59               [operator]
+lno@:   7  @66      NODE_EXPR[ @62 @65  ]
+lno@:   7  @62      NODE_EXPR[ @60 @61  ]
+lno@:   7  @60       NODE_VAR variable: b
+lno@:   7  @61       NODE_VAR variable: c
+lno@:   7  @65      NODE_EXPR[ @63 @64  ]
+lno@:   7  @63     NODE_CONST val: 12
+lno@:   7  @64     NODE_CONST val: 8
+lno@:   9  @83               [ @75 @79 @82  ][iteration for]
+lno@:   9  @75      NODE_EXPR[ @74  ]
+lno@:   9  @74      NODE_EXPR[ @71 @72 @73  ]
+lno@:   9  @71       NODE_VAR variable: i
+lno@:   9  @72               [operator]
+lno@:   9  @73     NODE_CONST val: 0
+lno@:   9  @79      NODE_EXPR[ @78  ]
+lno@:   9  @78      NODE_EXPR[ @76 @77  ]
+lno@:   9  @76       NODE_VAR variable: i
+lno@:   9  @77     NODE_CONST val: 25
+lno@:   9  @82      NODE_EXPR[ @81  ]
+lno@:   9  @81      NODE_EXPR[ @80  ]
+lno@:   9  @80       NODE_VAR variable: i
+lno@:  12  @90      NODE_STMT[ @88 @89  ]compound
+lno@:  10  @88      NODE_EXPR[ @87  ]
+lno@:  10  @87      NODE_EXPR[ @84 @85 @86  ]
+lno@:  10  @84       NODE_VAR variable: a
+lno@:  10  @85               [operator]
+lno@:  10  @86       NODE_VAR variable: i
+lno@:  11  @89               [CONTINUE]
+lno@:  16  @100               [ @92 @99  ][iteration while]
+lno@:  13  @92      NODE_EXPR[ @91  ]
+lno@:  13  @91       NODE_VAR variable: i
+lno@:  16  @99      NODE_STMT[ @97 @98  ]compound
+lno@:  14  @97      NODE_EXPR[ @96  ]
+lno@:  14  @96      NODE_EXPR[ @93 @94 @95  ]
+lno@:  14  @93       NODE_VAR variable: a
+lno@:  14  @94               [operator]
+lno@:  14  @95     NODE_CONST val: 0
+lno@:  15  @98               [BREAK]
