@@ -15,17 +15,24 @@ enum NodeType
     NODE_STMT,
     NODE_PROG,
     NODE_OP,
+    NODE_DECL,  //作为下面NODE_INIT_DECL_VARS和NODE_DECL_VARS的上层
     NODE_INIT_DECL_VARS, //用来表示一个int a = 1，b； 中的a=1部分
     NODE_DECL_VARS,      //用来表示一个int a = 1，b； 中的b  部分
     NODE_DECL_SPCF,      //int unsigned static extern ...
     NODE_DECL_INIT,
+    NODE_DECL_FUNC,     //used for declare of function
+    NODE_PARA_DECL_LIST,
+    NODE_PARA_DECL,
     NODE_WHILE,
     NODE_DO_WHILE,
     NODE_FOR,
     NODE_CONTINUE,
     NODE_BREAK,
+    NODE_RET,
     NODE_NULL,          //for null node
-    
+    NODE_EXTERN_DECL,   //toppest below translation unit
+    NODE_EXTERN_FUNC_DECL,
+    NODE_ARGUMENT_LIST,
 };
 
 enum OperatorType
@@ -72,6 +79,7 @@ enum OperatorType
     OP_OFFSET_ACCESS,   // a[expr]
     OP_AC_MEMBER,       //a.name
     OP_PTAC_MEMBER,     //a->name
+    OP_FUNC_CALL,       //f(1, 2);
 };
 
 enum StmtType {

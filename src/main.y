@@ -32,17 +32,45 @@
 %left RO_AS_SFTR_EQ RO_AS_ANDEQ RO_AS_OREQ LO_LGC_OR LO_LGC_AND LO_REL_L LO_REL_G LO_REL_LE LO_REL_GE
 
 %%
-
-program
-: statements {root = new TreeNode(0, NODE_PROG); root->addChild($1);};
-
-statements
-:  statement {$$=$1;}
-|  statements statement {$$=$1; $$->addSibling($2);}
+translation-unit:
+external-declaration{
+    root = new TreeNode(0, NODE_PROG);
+    root->addChild($1);
+}
+| translation-unit external-declaration{
+    root->addChild($2);
+}
 ;
 
-statement
-: SEMICOLON  {$$ = new TreeNode(lineno, NODE_STMT); $$->stype = STMT_SKIP;}
+external-declaration:
+function-definition{
+    TreeNode* node = new TreeNode(lineno, NODE_EXTERN_DECL);
+    node->addChild($1);
+    $$ = node;
+}
+|   declaration{
+    TreeNode* node = new TreeNode(lineno, NODE_EXTERN_DECL);
+    node->addChild($1);
+    $$ = node;
+}
+;
+
+function-definition:
+declaration-specifiers  declarator compound-statement{
+    TreeNode* node = new TreeNode(lineno, NODE_EXTERN_FUNC_DECL);
+    node->addChild($1);
+    node->addChild($2);
+    node->addChild($3);
+    $$ = node;
+}
+
+statements:
+statement {$$=$1;}
+| statements statement {$$=$1; $$->addSibling($2);}
+;
+
+statement:
+  SEMICOLON  {$$ = new TreeNode(lineno, NODE_STMT); $$->stype = STMT_SKIP;}
 | declaration {$$ = $1;}
 | compound-statement{$$ = $1;}
 | expression-statement{$$ = $1;}
@@ -51,14 +79,23 @@ statement
 | jump-statement{$$ = $1;}
 ;
 
-jump-statement
-:   KW_BREAK SEMICOLON{
+jump-statement:
+    KW_BREAK SEMICOLON{
     TreeNode* node = new TreeNode(lineno, NODE_BREAK);
     $$ = node;
 }
 |   KW_CONTINUE SEMICOLON{
     TreeNode* node = new TreeNode(lineno, NODE_CONTINUE);
     $$ = node; 
+}
+|   KW_RET SEMICOLON{
+    TreeNode* node = new TreeNode(lineno, NODE_RET);
+    $$ = node;
+}
+|   KW_RET  assignment-expression SEMICOLON{
+    TreeNode* node = new TreeNode(lineno, NODE_RET);
+    $$ = node;
+    $$->addChild($2);
 }
 ;
 
@@ -181,7 +218,6 @@ declaration-specifiers
 }
 ;
 
-type-qualifier:
 
 init-declarator-list
 :   init-declarator{
@@ -195,15 +231,19 @@ init-declarator-list
 
 init-declarator
 :   declarator{
+    TreeNode* fnode = new TreeNode(lineno, NODE_DECL);
     TreeNode* node = new TreeNode(lineno, NODE_DECL_VARS);
     node->addChild($1);
-    $$ = node;
+    fnode->addChild(node);
+    $$ = fnode;
 }   
 |   declarator RO_ASSIGN initializer{
+    TreeNode* fnode = new TreeNode(lineno, NODE_DECL);
     TreeNode* node = new TreeNode(lineno, NODE_INIT_DECL_VARS);
     node->addChild($1);
     node->addChild($3);
-    $$ = node;
+    fnode->addChild(node);
+    $$ = fnode;
 }
 ;
 
@@ -520,19 +560,9 @@ unary-expression
 }
 ;
 
-argument-expression-list
-:   assignment-expression{
-    $$ = $1;
-}
-|   argument-expression-list LO_COMMA assignment-expression{
-    //cout << "argument expression list adding sibling\n";
-    $1 -> addSibling($3);
-    $$ = $1;
-}
-;
 
-postfix-expression
-:   primary-expression{
+postfix-expression:
+   primary-expression{
     $$ = $1;
 }
 |   postfix-expression L_SQ_BRACKET expression R_SQ_BRACKET{
@@ -568,10 +598,33 @@ postfix-expression
     node -> addChild($1);
     $$ = node;
 }
+|   postfix-expression L_BRACKET  argument-expression-list R_BRACKET{
+    TreeNode* node = new TreeNode(lineno, NODE_EXPR);
+    cout << "postfix func\n";
+    node->optype = OP_FUNC_CALL;
+    node->addChild($1);
+    node->addChild($3);
+    $$ = node;
+}
 ;
 
-primary-expression
-:   IDENTIFIER{
+argument-expression-list:
+assignment-expression{
+    TreeNode* node = new TreeNode(lineno, NODE_ARGUMENT_LIST);
+    node->addChild($1);
+    //cout << "ae\n";
+    $$ = node;
+}
+|   argument-expression-list LO_COMMA assignment-expression{
+    //cout << "aes\n";
+    $1->addChild($3);
+    $$ = $1;
+}
+;
+
+primary-expression:
+   IDENTIFIER{
+    //cout << "id\n";
     $$ = $1;
 }
 |   constant{
@@ -666,12 +719,41 @@ IDENTIFIER{
 |   direct-declarator L_SQ_BRACKET  assignment-expression R_SQ_BRACKET{
     TreeNode* node = new TreeNode(lineno, NODE_TYPE);
     node->type = TYPE_ARRAY;
-    cout << "ARRAY!!!\n";
+    //cout << "ARRAY!!!\n";
     node->addChild($1);
     node->addChild($3);
     $$ = node;
 }
+|   direct-declarator L_BRACKET parameter-type-list R_BRACKET{
+    TreeNode* fnode = new TreeNode(lineno, NODE_DECL);
+    TreeNode* node = new TreeNode(lineno, NODE_DECL_FUNC);
+    node->addChild($1);
+    node->addChild($3);
+    fnode->addChild(node);
+    $$ = node;
+}
 ;   
+parameter-type-list: 
+parameter-declaration{
+    TreeNode* node = new TreeNode(lineno, NODE_PARA_DECL_LIST);
+    node->addChild($1);
+    $$ = node;
+}
+|   parameter-type-list LO_COMMA parameter-declaration{
+    $1->addChild($3);
+    $$ = $1;
+}
+;
+
+parameter-declaration:
+declaration-specifiers declarator{
+    TreeNode* node = new TreeNode(lineno, NODE_PARA_DECL);
+    node->addChild($1); 
+    node->addChild($2);
+    $$ = $1;
+}
+;
+
 
 pointer:
     LO_MUL  {TreeNode* node = new TreeNode(lineno, NODE_TYPE); node->type = TYPE_POINTER; $$ = node;}

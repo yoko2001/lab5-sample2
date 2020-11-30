@@ -228,6 +228,24 @@ string TreeNode::nodeType2String (NodeType type){
     case NODE_PROG:
         ret = "NODE_PROG";
         break;
+    case NODE_DECL:
+        ret = "FATHER_DECL";
+        break;
+    case NODE_INIT_DECL_VARS:
+        ret = "NODE_INIT_DECL_VARS";
+        break;
+    case NODE_DECL_VARS:
+        ret = "NODE_DECL_VARS";
+        break;
+    case NODE_DECL_FUNC:
+        ret = "NODE_DECL_FUNC";
+        break;
+    case NODE_EXTERN_DECL:
+        ret = "NODE_EXTERN_DECL";
+        break;
+    case NODE_EXTERN_FUNC_DECL:
+        ret = "NODE_EXTERN_FUNC_DECL";
+        break;
     default:
         break;
     }
