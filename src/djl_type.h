@@ -1,6 +1,9 @@
 #ifndef __DJL_TYPE_H__
 #define __DJL_TYPE_H__
-
+#include<vector>
+#include"stdlib.h"
+#include"string.h"
+#include<iostream>
 /*
  * SysY Language's Type System
  * Widely referenced open source compiler
@@ -12,9 +15,21 @@
 
 //type category
 enum{
-    CHAR, UCHAR, INT, UINT, POINTER, DOUBLE, 
-    STRUCT, ARRAY, FUNCTION,
+    CCHAR, UCHAR, INT, UINT, DOUBLE,POINTER ,VOID,
+    STRUCT,UNION,  ARRAY, FUNCTION,
 };
+extern struct type Types[VOID - CCHAR + 1];
+
+#define T(categ) (Types + categ)
+#define IsPtrType(ty)      (ty->categ == POINTER)
+#define IsRecordType(ty)   (ty->categ == STRUCT || ty->categ == UNION)
+#define IsFunctionType(ty) (ty->categ == FUNCTION)
+#define IsIncompletePtr(ty) (ty->categ == POINTER && ty->bty->size == 0)
+#define IsVoidPtr(ty)       (ty->categ == POINTER && ty->bty->categ == VOID)
+#define NotFunctionPtr(ty)  (ty->categ == POINTER && ty->bty->categ != FUNCTION)
+
+const char * GetCategName(int categ);
+
 
 // type qualifier
 enum { CONST = 0x1, VOLATILE = 0x2 };
@@ -35,7 +50,6 @@ enum { CONST = 0x1, VOLATILE = 0x2 };
     unsigned int align  :16;    \
     unsigned int size  ;    \
     struct type * bty  ;
-
 
 typedef struct type
 {
@@ -62,9 +76,7 @@ typedef struct field
     int offset;
     char* id;
     int bits;
-#ifdef __ENDIAN_CONTROL__
     int pos;
-#endif
     _Type ty;
     struct field* next;
 }* _Field;
@@ -89,5 +101,26 @@ typedef struct recordType
     //for test whether it is incomplete type.
     int complete;
 } *_RecordType;
+
+typedef struct functionType
+{
+	TYPE_COMMON
+	int hasArgu;
+    int hasProto;
+    std::vector<_Type> param_types; 
+} *_FunctionType;
+
+
+_Type Qualify(int qual, _Type ty);
+_Type UnQualify(_Type ty);
+_Type PointerTo(_Type ty);
+_Type ArrayOf(int len, _Type ty);
+_Type FunctionReturn(_Type ty,  int argu, int proto, std::vector<_Type> p);
+
+_Type  StartRecord(char *id, int categ);
+_Field AddField(_Type ty, char *id, _Type fty, int bits);
+_Field LookupField(_Type ty, char *id);
+void EndRecord(_Type ty);
+void SetupTypeSystem(void);
 
 #endif

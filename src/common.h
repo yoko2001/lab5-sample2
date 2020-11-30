@@ -12,6 +12,7 @@ using std::stack;
 #define YYSTYPE TreeNode *
 
 #include "./tree.h"
+#include "djl_type.h"
 #include "./main.tab.h"
 
 #endif

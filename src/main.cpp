@@ -36,5 +36,7 @@ int main(int argc, char *argv[])
         //root->genNodeId();
         root->printAST();
     }
+    cout << "setting up type system\n";
+    SetupTypeSystem();
     return 0;
 }

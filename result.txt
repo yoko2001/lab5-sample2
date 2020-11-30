@@ -135,3 +135,4 @@ lno@:  19  @133       NODE_VAR variable: a
 lno@:  19  @134               [operator]
 lno@:  19  @135     NODE_CONST val: 0
 lno@:  20  @138               [BREAK]
+setting up type system
