@@ -170,7 +170,7 @@ _Field AddField(_Type ty, char *id, _Type fty, int bits){
 		}
 	}
 	// If one field member is const ,the total struct object is const.
-	if (fty->qual & CONST)
+	if (fty->qual & SHIFT_CONST)
 	{
 		rty->hasConstFld = 1;
 	}

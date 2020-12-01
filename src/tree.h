@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "type.h"
-
+#include "djl_type.h"
 
 enum NodeType
 {
@@ -15,12 +15,15 @@ enum NodeType
     NODE_STMT,
     NODE_PROG,
     NODE_OP,
+    NODE_DECL_LIST, //list of NODE_DECL
     NODE_DECL,  //作为下面NODE_INIT_DECL_VARS和NODE_DECL_VARS的上层
     NODE_INIT_DECL_VARS, //用来表示一个int a = 1，b； 中的a=1部分
     NODE_DECL_VARS,      //用来表示一个int a = 1，b； 中的b  部分
     NODE_DECL_SPCF,      //int unsigned static extern ...
     NODE_DECL_INIT,
     NODE_DECL_FUNC,     //used for declare of function
+    NODE_PT_DECLARATOR, //***a **a *a
+    NODE_DECLARATOR,    //a
     NODE_PARA_DECL_LIST,
     NODE_PARA_DECL,
     NODE_WHILE,
@@ -126,6 +129,11 @@ public:
     static string opType2String (OperatorType type);
     static string sType2String (StmtType type);
     void print_type_info();
+    _Type NODE_STMT_Dump();
+    _Type NODE_DECL_LIST_Dump(_Type);
+    _Type NODE_DECL_Dump(_Type);
+    _Type NODE_DECL_SPCT_Dump(_Type);
+    void typeDump();
 private:
     void __printNodeId(TreeNode* tn);
     void __addSibling(TreeNode* tn);

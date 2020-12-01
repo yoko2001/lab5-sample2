@@ -32,7 +32,7 @@ const char * GetCategName(int categ);
 
 
 // type qualifier
-enum { CONST = 0x1, VOLATILE = 0x2 };
+enum { SHIFT_CONST = 0x1, SHIFT_VOLATILE = 0x2 };
 
 /*
  * A "TYPE HEADER", which any TYPE should

@@ -58,7 +58,9 @@ function-definition{
 function-definition:
 declaration-specifiers  declarator compound-statement{
     TreeNode* node = new TreeNode(lineno, NODE_EXTERN_FUNC_DECL);
-    node->addChild($1);
+    TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
+    node2->addChild($1);
+    node->addChild(node2);
     node->addChild($2);
     node->addChild($3);
     $$ = node;
@@ -188,15 +190,19 @@ block-item
 declaration
 :   declaration-specifiers  init-declarator-list SEMICOLON{
     TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
+    node2->addChild($1);
     node->stype = STMT_DECL;
-    node->addChild($1);
+    node->addChild(node2);
     node->addChild($2);
     $$ = node;
 }
 |   declaration-specifiers{
     TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
+    node2->addChild($1);
     node->stype = STMT_DECL;
-    node->addChild($1);
+    node->addChild(node2);
     $$ = node;
 }
 ;
@@ -219,12 +225,14 @@ declaration-specifiers
 ;
 
 
-init-declarator-list
-:   init-declarator{
-    $$ = $1;
+init-declarator-list:
+   init-declarator{
+    TreeNode* node = new TreeNode(lineno, NODE_DECL_LIST);
+    node->addChild($1);
+    $$ = node;
 }
 |   init-declarator-list LO_COMMA init-declarator{
-    $1->addSibling($2);
+    $1->addChild($3);
     $$ = $1;
 }
 ;
@@ -708,8 +716,16 @@ struct-declarator:
 ;
 
 declarator:
-    pointer direct-declarator{}
-|   direct-declarator{$$ = $1; }
+    pointer declarator{
+        TreeNode*node = new TreeNode(lineno, NODE_PT_DECLARATOR);
+        node->addChild($2);
+        $$ = node;
+    }
+|   direct-declarator{
+        TreeNode*node = new TreeNode(lineno, NODE_DECLARATOR);
+        node->addChild($1);
+        $$ = node;
+    }
 ;
 
 direct-declarator:
@@ -730,17 +746,19 @@ IDENTIFIER{
     node->addChild($1);
     node->addChild($3);
     fnode->addChild(node);
-    $$ = node;
+    $$ = fnode;
 }
 ;   
 parameter-type-list: 
 parameter-declaration{
     TreeNode* node = new TreeNode(lineno, NODE_PARA_DECL_LIST);
+    //cout << "ck1";
     node->addChild($1);
     $$ = node;
 }
 |   parameter-type-list LO_COMMA parameter-declaration{
     $1->addChild($3);
+    //cout << $1->nodeType;
     $$ = $1;
 }
 ;
@@ -748,9 +766,11 @@ parameter-declaration{
 parameter-declaration:
 declaration-specifiers declarator{
     TreeNode* node = new TreeNode(lineno, NODE_PARA_DECL);
-    node->addChild($1); 
+    TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
+    node2->addChild($1);
+    node->addChild(node2); 
     node->addChild($2);
-    $$ = $1;
+    $$ = node;
 }
 ;
 

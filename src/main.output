@@ -26,6 +26,7 @@ Rules useless in parser due to conflicts
 
 State 14 conflicts: 8 shift/reduce
 State 17 conflicts: 8 shift/reduce
+State 20 conflicts: 1 shift/reduce
 State 28 conflicts: 1 shift/reduce
 State 86 conflicts: 30 reduce/reduce
 State 96 conflicts: 29 reduce/reduce
@@ -217,7 +218,7 @@ Grammar
   133 struct-declarator: declarator
   134                  | declarator COLON INTEGER
 
-  135 declarator: pointer direct-declarator
+  135 declarator: pointer declarator
   136           | direct-declarator
 
   137 direct-declarator: IDENTIFIER
@@ -405,9 +406,9 @@ struct-declarator-list (114)
 struct-declarator (115)
     on left: 133 134, on right: 131 132
 declarator (116)
-    on left: 135 136, on right: 5 39 40 133 134 142
+    on left: 135 136, on right: 5 39 40 133 134 135 142
 direct-declarator (117)
-    on left: 137 138 139, on right: 135 136 138 139
+    on left: 137 138 139, on right: 136 138 139
 parameter-type-list (118)
     on left: 140 141, on right: 139 141
 parameter-declaration (119)
@@ -662,6 +663,7 @@ State 20
 
     LO_MUL  shift, and go to state 20
 
+    LO_MUL    [reduce using rule 143 (pointer)]
     $default  reduce using rule 143 (pointer)
 
     pointer  go to state 31
@@ -718,11 +720,14 @@ State 25
 
 State 26
 
-  135 declarator: pointer . direct-declarator
+  135 declarator: pointer . declarator
 
+    LO_MUL      shift, and go to state 20
     IDENTIFIER  shift, and go to state 21
 
-    direct-declarator  go to state 39
+    declarator         go to state 39
+    direct-declarator  go to state 25
+    pointer            go to state 26
 
 
 State 27
@@ -974,12 +979,7 @@ State 38
 
 State 39
 
-  135 declarator: pointer direct-declarator .
-  138 direct-declarator: direct-declarator . L_SQ_BRACKET assignment-expression R_SQ_BRACKET
-  139                  | direct-declarator . L_BRACKET parameter-type-list R_BRACKET
-
-    L_BRACKET     shift, and go to state 37
-    L_SQ_BRACKET  shift, and go to state 38
+  135 declarator: pointer declarator .
 
     $default  reduce using rule 135 (declarator)
 
