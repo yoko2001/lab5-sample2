@@ -133,12 +133,15 @@ public:
     _Type NODE_DECL_LIST_Dump(_Type);
     _Type NODE_DECL_Dump(_Type);
     _Type NODE_DECL_SPCT_Dump(_Type);
-    void typeDump();
+    _FunctionType NODE_PARA_LIST_Dump(_FunctionType);
+    void typeDump(); //DUMP ALL BASE TYPES (called by root)
+    void funcTypeDump();    //DUMP ALL FUNC TYPES (called by root)
 private:
     void __printNodeId(TreeNode* tn);
     void __addSibling(TreeNode* tn);
 public:
-    TreeNode(int lineno, NodeType type);
+    TreeNode(int lineno, NodeType type);   
+
 };
 
 extern TreeNode* null_node;

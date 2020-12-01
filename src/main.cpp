@@ -39,5 +39,6 @@ int main(int argc, char *argv[])
     cout << "setting up type system\n";
     SetupTypeSystem();
     root->typeDump();
+    root->funcTypeDump();
     return 0;
 }

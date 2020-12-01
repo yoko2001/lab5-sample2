@@ -371,7 +371,7 @@ _Type TreeNode::NODE_DECL_SPCT_Dump(_Type typeSp){
 }
 
 _Type TreeNode::NODE_DECL_LIST_Dump(_Type typeSp){
-    if(!this->nodeType == NODE_DECL_LIST){
+    if(!(this->nodeType == NODE_DECL_LIST)){
         cout << "should't call NODE_DECL_LIST_Dump";
         return NULL;
     }
@@ -395,6 +395,7 @@ _Type TreeNode::NODE_STMT_Dump(){
         cout << t->size<<endl;
         this->child->sibling->NODE_DECL_LIST_Dump(t);
     }
+    return t;
 }
 
 void TreeNode::typeDump(){
@@ -408,6 +409,56 @@ void TreeNode::typeDump(){
             c->typeDump();
             c = c->sibling;
         }
+    }
+    return;
+}
+_FunctionType TreeNode::NODE_PARA_LIST_Dump(_FunctionType fty){
+    if(!(this->nodeType == NODE_PARA_DECL_LIST)){
+        cout << "should't call NODE_PARA_LIST_Dump: " <<this->nodeID << endl;
+    }
+    TreeNode* paranode = this->child;
+    while(paranode){
+        _Type paratype = NULL;
+        if (paranode->nodeType == NODE_PARA_DECL){
+            paratype = paranode->child->NODE_DECL_SPCT_Dump(paratype);
+            paratype = paranode->child->sibling->NODE_DECL_Dump(paratype);
+            cout << "para size: " << paratype->size<<endl;
+        }
+        fty->param_types.push_back(paratype);
+        paranode = paranode->sibling;
+    }
+    return fty;
+}
+
+void TreeNode::funcTypeDump(){
+    if((this->nodeType == NODE_EXTERN_FUNC_DECL)){
+        TreeNode* spcf = this->child;
+        TreeNode* dcl_and_paras = spcf->sibling->child->child;
+
+        _FunctionType func_ret_type = (_FunctionType)malloc(sizeof(struct functionType));
+        memset(func_ret_type, 0, sizeof(struct functionType));
+        func_ret_type->categ = FUNCTION;
+        if (!(spcf->nodeType == NODE_DECL_SPCF)){
+            cout << nodeID << " wrong\n"; 
+            return;
+        }
+        cout << "get function specifier\n";
+        func_ret_type->bty = spcf->NODE_DECL_SPCT_Dump(func_ret_type->bty);
+
+        cout << "get function params\n";
+        if (!(dcl_and_paras->nodeType == NODE_DECL_FUNC)){
+            cout << nodeID << " wrong\n"; 
+            return;
+        }
+        func_ret_type->bty = dcl_and_paras->child->NODE_DECL_Dump(func_ret_type->bty);
+        func_ret_type = dcl_and_paras->child->sibling->NODE_PARA_LIST_Dump(func_ret_type);
+        cout << func_ret_type << " func set\n"; 
+        return;
+    }
+    TreeNode* c = this->child;
+    while(c){
+        c->funcTypeDump();
+        c = c->sibling;
     }
     return;
 }

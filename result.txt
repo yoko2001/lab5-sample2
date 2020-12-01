@@ -195,30 +195,44 @@ setting up type system
 4
 16
 NODE_INIT_DECL_VARS
-a is set to type @0x60f440
+a is set to type @0x610440
 4
 28
 NODE_INIT_DECL_VARS
-b is set to type @0x60f440
+b is set to type @0x610440
 35
 NODE_INIT_DECL_VARS
-c is set to type @0x60f440
+c is set to type @0x610440
 4
 46
 NODE_INIT_DECL_VARS
-c is set to type @0x14b4cd0
+c is set to type @0x2496cd0
 4
 83
 NODE_DECL_VARS
 got array 
 got array 
-bb is set to type @0x14b4d10
+bb is set to type @0x2496d10
 4
 105
 NODE_INIT_DECL_VARS
 got array 
-name is set to type @0x14b4d30
+name is set to type @0x2496d30
 4
 116
 NODE_DECL_VARS
-pt is set to type @0x14b4d50
+pt is set to type @0x2496d50
+get function specifier
+get function params
+f is set to type @0x610440
+a is set to type @0x610440
+para size: 4
+b is set to type @0x610440
+para size: 4
+0x2496d70 func set
+get function specifier
+get function params
+main is set to type @0x610440
+a is set to type @0x610440
+para size: 4
+0x2496df0 func set
