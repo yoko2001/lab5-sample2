@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "type.h"
 #include "djl_type.h"
+#include "domain.h"
 
 enum NodeType
 {
@@ -13,6 +14,7 @@ enum NodeType
     NODE_TYPE,
     NODE_ASSI,
     NODE_STMT,
+    NODE_BLOCK_LIST,
     NODE_PROG,
     NODE_OP,
     NODE_DECL_LIST, //list of NODE_DECL
@@ -102,6 +104,7 @@ public:
 
     TreeNode* child = nullptr;
     TreeNode* sibling = nullptr;
+    TreeNode* father = nullptr;
 
     void addChild(TreeNode*);
     void addSibling(TreeNode*);
@@ -124,6 +127,7 @@ public:
     bool b_val;
     string str_val;
     string var_name;
+    struct _domain* domain;
 public:
     static string nodeType2String (NodeType type);
     static string opType2String (OperatorType type);
@@ -131,9 +135,10 @@ public:
     void print_type_info();
     _Type NODE_STMT_Dump();
     _Type NODE_DECL_LIST_Dump(_Type);
-    _Type NODE_DECL_Dump(_Type);
+    _Type NODE_DECL_Dump(_Type, char* funcname = NULL);
     _Type NODE_DECL_SPCT_Dump(_Type);
     _FunctionType NODE_PARA_LIST_Dump(_FunctionType);
+    void domain_dump();  //has to call before typeDump;
     void typeDump(); //DUMP ALL BASE TYPES (called by root)
     void funcTypeDump();    //DUMP ALL FUNC TYPES (called by root)
 private:

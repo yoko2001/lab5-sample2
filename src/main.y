@@ -1,9 +1,11 @@
 %{
     #include "common.h"
     #include "tree.h"
+    #include "domain.h"
     #define YYSTYPE TreeNode *  
     TreeNode* root;
     extern int lineno;
+    extern domain* d_root;
     int yylex();
     int yyerror( char const * );
     
@@ -35,6 +37,7 @@
 translation-unit:
 external-declaration{
     root = new TreeNode(0, NODE_PROG);
+    root->domain = d_root;
     root->addChild($1);
 }
 | translation-unit external-declaration{
@@ -59,8 +62,8 @@ function-definition:
 declaration-specifiers  declarator compound-statement{
     TreeNode* node = new TreeNode(lineno, NODE_EXTERN_FUNC_DECL);
     TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
-    node2->addChild($1);
     node->addChild(node2);
+    node2->addChild($1);
     node->addChild($2);
     node->addChild($3);
     $$ = node;
@@ -114,18 +117,19 @@ iteration-statement
     node->addChild($2);
     $$ = node;
 }
-|   KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET{
+|   KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET statement{
     TreeNode* node = new TreeNode(lineno, NODE_FOR);
     node->addChild(null_node);
     node->addChild(null_node);
     node->addChild(null_node);
     $$ = node;
 }
-|   KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET{
+|   KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET statement{
     TreeNode* node = new TreeNode(lineno, NODE_FOR);
     node->addChild($3);
     node->addChild($5);
     node->addChild($7);
+    node->addChild($9);
     $$ = node;
 }
 ;
@@ -170,10 +174,11 @@ compound-statement
 
 block-item-list
 :   block-item{
-    $$ = $1;
+    $$ = new TreeNode(lineno, NODE_BLOCK_LIST);
+    $$->addChild($1);
 }
 |   block-item-list block-item{
-    $1->addSibling($2);
+    $1->addChild($2);
     $$ = $1;
 }
 ;
@@ -191,18 +196,20 @@ declaration
 :   declaration-specifiers  init-declarator-list SEMICOLON{
     TreeNode* node = new TreeNode(lineno, NODE_STMT);
     TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
-    node2->addChild($1);
+    
     node->stype = STMT_DECL;
     node->addChild(node2);
+    node2->addChild($1);
     node->addChild($2);
     $$ = node;
 }
 |   declaration-specifiers{
     TreeNode* node = new TreeNode(lineno, NODE_STMT);
     TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
-    node2->addChild($1);
+    
     node->stype = STMT_DECL;
     node->addChild(node2);
+    node2->addChild($1);
     $$ = node;
 }
 ;
@@ -767,9 +774,18 @@ parameter-declaration:
 declaration-specifiers declarator{
     TreeNode* node = new TreeNode(lineno, NODE_PARA_DECL);
     TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
-    node2->addChild($1);
+    
     node->addChild(node2); 
+    node2->addChild($1);
     node->addChild($2);
+    $$ = node;
+}
+|   declaration-specifiers{
+    TreeNode* node = new TreeNode(lineno, NODE_PARA_DECL);
+    TreeNode* node2 = new TreeNode(lineno, NODE_DECL_SPCF);
+    
+    node->addChild(node2); 
+    node2->addChild($1);
     $$ = node;
 }
 ;

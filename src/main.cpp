@@ -15,8 +15,10 @@ Type* TYPE_CONST = new Type(VALUE_CONST);
 Type* TYPE_POINTER = new Type(VALUE_POINTER);
 Type* TYPE_ARRAY = new Type(VALUE_ARRAY);
 TreeNode* null_node = new TreeNode(-1, NODE_NULL);
+_domain *d_root;
 int main(int argc, char *argv[])
 {
+    d_root = new _domain();
     if (argc == 2)
     {
         FILE *fin = fopen(argv[1], "r");
@@ -37,8 +39,12 @@ int main(int argc, char *argv[])
         root->printAST();
     }
     cout << "setting up type system\n";
+    root->domain = d_root;
+    //if (root->domain->type == global) cout << "ok\n";
+    root->domain_dump();
     SetupTypeSystem();
     root->typeDump();
     root->funcTypeDump();
+    
     return 0;
 }

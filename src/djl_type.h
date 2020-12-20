@@ -13,6 +13,9 @@
  * https://github.com/sheisc/ucc162.3.git
  */
 
+//MAX length of id
+#define MAX_ID_LEN 64
+
 //type category
 enum{
     CCHAR, UCHAR, INT, UINT, DOUBLE,POINTER ,VOID,

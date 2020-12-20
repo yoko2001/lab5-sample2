@@ -13,8 +13,8 @@ Terminals unused in grammar
 
 Rules useless in grammar
 
-  146 statements: statement
-  147           | statements statement
+  147 statements: statement
+  148           | statements statement
 
 
 Rules useless in parser due to conflicts
@@ -61,8 +61,8 @@ Grammar
 
    17 iteration-statement: KW_WHILE L_BRACKET expression R_BRACKET statement
    18                    | KW_DO statement KW_WHILE L_BRACKET expression R_BRACKET
-   19                    | KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET
-   20                    | KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET
+   19                    | KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET statement
+   20                    | KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET statement
 
    21 selection-statement: KW_IF L_BRACKET expression R_BRACKET statement
    22                    | KW_IF L_BRACKET expression R_BRACKET statement KW_ELSE statement
@@ -229,11 +229,12 @@ Grammar
   141                    | parameter-type-list LO_COMMA parameter-declaration
 
   142 parameter-declaration: declaration-specifiers declarator
+  143                      | declaration-specifiers
 
-  143 pointer: LO_MUL
-  144        | LO_MUL pointer
+  144 pointer: LO_MUL
+  145        | LO_MUL pointer
 
-  145 type-qualifier: Q_CONST
+  146 type-qualifier: Q_CONST
 
 
 Terminals, with rules where they appear
@@ -258,7 +259,7 @@ LO_AS_SELFINC (272) 97 104
 LO_AS_SELFDEC (273) 98 105
 RO_TRI_QUES (274) 59
 RO_TRI_COLON (275) 59
-LO_MUL (276) 85 91 143 144
+LO_MUL (276) 85 91 144 145
 LO_DIV (277) 86
 LO_ADD (278) 82 92
 LO_SUB (279) 83 93
@@ -285,7 +286,7 @@ KW_DO (299) 18
 KW_ELSE (300) 22
 T_SIGNED (301) 116
 T_UNSIGNED (302) 117
-Q_CONST (303) 145
+Q_CONST (303) 146
 SEMICOLON (304) 6 13 14 15 16 19 20 23 24 31 126
 COLON (305) 134
 LO_REL_L (306) 74
@@ -319,7 +320,7 @@ external-declaration (71)
 function-definition (72)
     on left: 5, on right: 3
 statement (73)
-    on left: 6 7 8 9 10 11 12, on right: 17 18 21 22 30
+    on left: 6 7 8 9 10 11 12, on right: 17 18 19 20 21 22 30
 jump-statement (74)
     on left: 13 14 15 16, on right: 12
 iteration-statement (75)
@@ -337,7 +338,7 @@ block-item (80)
 declaration (81)
     on left: 31 32, on right: 4 7 29
 declaration-specifiers (82)
-    on left: 33 34 35 36, on right: 5 31 32 34 36 142
+    on left: 33 34 35 36, on right: 5 31 32 34 36 142 143
 init-declarator-list (83)
     on left: 37 38, on right: 31 38
 init-declarator (84)
@@ -412,11 +413,11 @@ direct-declarator (117)
 parameter-type-list (118)
     on left: 140 141, on right: 139 141
 parameter-declaration (119)
-    on left: 142, on right: 140 141
+    on left: 142 143, on right: 140 141
 pointer (120)
-    on left: 143 144, on right: 135 144
+    on left: 144 145, on right: 135 145
 type-qualifier (121)
-    on left: 145, on right: 35 36 129 130
+    on left: 146, on right: 35 36 129 130
 
 
 State 0
@@ -487,9 +488,9 @@ State 6
 
 State 7
 
-  145 type-qualifier: Q_CONST .
+  146 type-qualifier: Q_CONST .
 
-    $default  reduce using rule 145 (type-qualifier)
+    $default  reduce using rule 146 (type-qualifier)
 
 
 State 8
@@ -658,13 +659,13 @@ State 19
 
 State 20
 
-  143 pointer: LO_MUL .
-  144        | LO_MUL . pointer
+  144 pointer: LO_MUL .
+  145        | LO_MUL . pointer
 
     LO_MUL  shift, and go to state 20
 
-    LO_MUL    [reduce using rule 143 (pointer)]
-    $default  reduce using rule 143 (pointer)
+    LO_MUL    [reduce using rule 144 (pointer)]
+    $default  reduce using rule 144 (pointer)
 
     pointer  go to state 31
 
@@ -779,9 +780,9 @@ State 30
 
 State 31
 
-  144 pointer: LO_MUL pointer .
+  145 pointer: LO_MUL pointer .
 
-    $default  reduce using rule 144 (pointer)
+    $default  reduce using rule 145 (pointer)
 
 
 State 32
@@ -1550,8 +1551,8 @@ State 81
 
 State 82
 
-   19 iteration-statement: KW_FOR . L_BRACKET SEMICOLON SEMICOLON R_BRACKET
-   20                    | KW_FOR . L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET
+   19 iteration-statement: KW_FOR . L_BRACKET SEMICOLON SEMICOLON R_BRACKET statement
+   20                    | KW_FOR . L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET statement
 
     L_BRACKET  shift, and go to state 159
 
@@ -1964,9 +1965,12 @@ State 99
 State 100
 
   142 parameter-declaration: declaration-specifiers . declarator
+  143                      | declaration-specifiers .
 
     LO_MUL      shift, and go to state 20
     IDENTIFIER  shift, and go to state 21
+
+    $default  reduce using rule 143 (parameter-declaration)
 
     declarator         go to state 169
     direct-declarator  go to state 25
@@ -2955,8 +2959,8 @@ State 158
 
 State 159
 
-   19 iteration-statement: KW_FOR L_BRACKET . SEMICOLON SEMICOLON R_BRACKET
-   20                    | KW_FOR L_BRACKET . expression SEMICOLON expression SEMICOLON expression R_BRACKET
+   19 iteration-statement: KW_FOR L_BRACKET . SEMICOLON SEMICOLON R_BRACKET statement
+   20                    | KW_FOR L_BRACKET . expression SEMICOLON expression SEMICOLON expression R_BRACKET statement
 
     LO_AS_SELFINC  shift, and go to state 48
     LO_AS_SELFDEC  shift, and go to state 49
@@ -3538,14 +3542,14 @@ State 206
 
 State 207
 
-   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON . SEMICOLON R_BRACKET
+   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON . SEMICOLON R_BRACKET statement
 
     SEMICOLON  shift, and go to state 223
 
 
 State 208
 
-   20 iteration-statement: KW_FOR L_BRACKET expression . SEMICOLON expression SEMICOLON expression R_BRACKET
+   20 iteration-statement: KW_FOR L_BRACKET expression . SEMICOLON expression SEMICOLON expression R_BRACKET statement
    46 expression: expression . LO_COMMA assignment-expression
 
     LO_COMMA   shift, and go to state 167
@@ -3771,14 +3775,14 @@ State 222
 
 State 223
 
-   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON SEMICOLON . R_BRACKET
+   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON SEMICOLON . R_BRACKET statement
 
     R_BRACKET  shift, and go to state 230
 
 
 State 224
 
-   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON . expression SEMICOLON expression R_BRACKET
+   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON . expression SEMICOLON expression R_BRACKET statement
 
     LO_AS_SELFINC  shift, and go to state 48
     LO_AS_SELFDEC  shift, and go to state 49
@@ -3943,18 +3947,77 @@ State 229
 
 State 230
 
-   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET .
+   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET . statement
 
-    $default  reduce using rule 19 (iteration-statement)
+    T_CHAR         shift, and go to state 1
+    T_INT          shift, and go to state 2
+    T_BOOL         shift, and go to state 3
+    LO_AS_SELFINC  shift, and go to state 48
+    LO_AS_SELFDEC  shift, and go to state 49
+    LO_MUL         shift, and go to state 50
+    LO_ADD         shift, and go to state 51
+    LO_SUB         shift, and go to state 52
+    LO_BIT_NOT     shift, and go to state 53
+    LO_LGC_NOT     shift, and go to state 54
+    LO_BIT_AND     shift, and go to state 55
+    KW_CONTINUE    shift, and go to state 79
+    KW_BREAK       shift, and go to state 80
+    KW_IF          shift, and go to state 81
+    KW_FOR         shift, and go to state 82
+    KW_RET         shift, and go to state 83
+    KW_STRUCT      shift, and go to state 4
+    KW_WHILE       shift, and go to state 84
+    KW_DO          shift, and go to state 85
+    T_SIGNED       shift, and go to state 5
+    T_UNSIGNED     shift, and go to state 6
+    Q_CONST        shift, and go to state 7
+    SEMICOLON      shift, and go to state 86
+    KW_UNION       shift, and go to state 8
+    IDENTIFIER     shift, and go to state 56
+    INTEGER        shift, and go to state 57
+    L_BRACKET      shift, and go to state 58
+    L_BRACE        shift, and go to state 35
+
+    statement                  go to state 235
+    jump-statement             go to state 89
+    iteration-statement        go to state 90
+    selection-statement        go to state 91
+    expression-statement       go to state 92
+    compound-statement         go to state 93
+    declaration                go to state 164
+    declaration-specifiers     go to state 97
+    expression                 go to state 98
+    assignment-expression      go to state 99
+    conditional-expression     go to state 62
+    logical-OR-expression      go to state 63
+    logical-AND-expression     go to state 64
+    inclusive-OR-expression    go to state 65
+    exclusive-OR-expression    go to state 66
+    AND-expression             go to state 67
+    equality-expression        go to state 68
+    relational-expression      go to state 69
+    shift-expression           go to state 70
+    additive-expression        go to state 71
+    multiplicative-expression  go to state 72
+    cast-expression            go to state 73
+    unary-operator             go to state 74
+    unary-expression           go to state 75
+    postfix-expression         go to state 76
+    primary-expression         go to state 77
+    constant                   go to state 78
+    type-specifier             go to state 14
+    struct-or-union-specifier  go to state 15
+    struct-or-union            go to state 16
+    type-qualifier             go to state 17
 
 
 State 231
 
-   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression . SEMICOLON expression R_BRACKET
+   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression . SEMICOLON expression R_BRACKET statement
    46 expression: expression . LO_COMMA assignment-expression
 
     LO_COMMA   shift, and go to state 167
-    SEMICOLON  shift, and go to state 235
+    SEMICOLON  shift, and go to state 236
 
 
 State 232
@@ -3970,7 +4033,7 @@ State 233
    46 expression: expression . LO_COMMA assignment-expression
 
     LO_COMMA   shift, and go to state 167
-    R_BRACKET  shift, and go to state 236
+    R_BRACKET  shift, and go to state 237
 
 
 State 234
@@ -4006,7 +4069,7 @@ State 234
     L_BRACKET      shift, and go to state 58
     L_BRACE        shift, and go to state 35
 
-    statement                  go to state 237
+    statement                  go to state 238
     jump-statement             go to state 89
     iteration-statement        go to state 90
     selection-statement        go to state 91
@@ -4041,7 +4104,14 @@ State 234
 
 State 235
 
-   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON . expression R_BRACKET
+   19 iteration-statement: KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET statement .
+
+    $default  reduce using rule 19 (iteration-statement)
+
+
+State 236
+
+   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON . expression R_BRACKET statement
 
     LO_AS_SELFINC  shift, and go to state 48
     LO_AS_SELFDEC  shift, and go to state 49
@@ -4055,7 +4125,7 @@ State 235
     INTEGER        shift, and go to state 57
     L_BRACKET      shift, and go to state 58
 
-    expression                 go to state 238
+    expression                 go to state 239
     assignment-expression      go to state 99
     conditional-expression     go to state 62
     logical-OR-expression      go to state 63
@@ -4076,31 +4146,97 @@ State 235
     constant                   go to state 78
 
 
-State 236
+State 237
 
    18 iteration-statement: KW_DO statement KW_WHILE L_BRACKET expression R_BRACKET .
 
     $default  reduce using rule 18 (iteration-statement)
 
 
-State 237
+State 238
 
    22 selection-statement: KW_IF L_BRACKET expression R_BRACKET statement KW_ELSE statement .
 
     $default  reduce using rule 22 (selection-statement)
 
 
-State 238
+State 239
 
-   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression . R_BRACKET
+   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression . R_BRACKET statement
    46 expression: expression . LO_COMMA assignment-expression
 
     LO_COMMA   shift, and go to state 167
-    R_BRACKET  shift, and go to state 239
+    R_BRACKET  shift, and go to state 240
 
 
-State 239
+State 240
 
-   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET .
+   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET . statement
+
+    T_CHAR         shift, and go to state 1
+    T_INT          shift, and go to state 2
+    T_BOOL         shift, and go to state 3
+    LO_AS_SELFINC  shift, and go to state 48
+    LO_AS_SELFDEC  shift, and go to state 49
+    LO_MUL         shift, and go to state 50
+    LO_ADD         shift, and go to state 51
+    LO_SUB         shift, and go to state 52
+    LO_BIT_NOT     shift, and go to state 53
+    LO_LGC_NOT     shift, and go to state 54
+    LO_BIT_AND     shift, and go to state 55
+    KW_CONTINUE    shift, and go to state 79
+    KW_BREAK       shift, and go to state 80
+    KW_IF          shift, and go to state 81
+    KW_FOR         shift, and go to state 82
+    KW_RET         shift, and go to state 83
+    KW_STRUCT      shift, and go to state 4
+    KW_WHILE       shift, and go to state 84
+    KW_DO          shift, and go to state 85
+    T_SIGNED       shift, and go to state 5
+    T_UNSIGNED     shift, and go to state 6
+    Q_CONST        shift, and go to state 7
+    SEMICOLON      shift, and go to state 86
+    KW_UNION       shift, and go to state 8
+    IDENTIFIER     shift, and go to state 56
+    INTEGER        shift, and go to state 57
+    L_BRACKET      shift, and go to state 58
+    L_BRACE        shift, and go to state 35
+
+    statement                  go to state 241
+    jump-statement             go to state 89
+    iteration-statement        go to state 90
+    selection-statement        go to state 91
+    expression-statement       go to state 92
+    compound-statement         go to state 93
+    declaration                go to state 164
+    declaration-specifiers     go to state 97
+    expression                 go to state 98
+    assignment-expression      go to state 99
+    conditional-expression     go to state 62
+    logical-OR-expression      go to state 63
+    logical-AND-expression     go to state 64
+    inclusive-OR-expression    go to state 65
+    exclusive-OR-expression    go to state 66
+    AND-expression             go to state 67
+    equality-expression        go to state 68
+    relational-expression      go to state 69
+    shift-expression           go to state 70
+    additive-expression        go to state 71
+    multiplicative-expression  go to state 72
+    cast-expression            go to state 73
+    unary-operator             go to state 74
+    unary-expression           go to state 75
+    postfix-expression         go to state 76
+    primary-expression         go to state 77
+    constant                   go to state 78
+    type-specifier             go to state 14
+    struct-or-union-specifier  go to state 15
+    struct-or-union            go to state 16
+    type-qualifier             go to state 17
+
+
+State 241
+
+   20 iteration-statement: KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET statement .
 
     $default  reduce using rule 20 (iteration-statement)

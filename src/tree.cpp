@@ -37,9 +37,11 @@ void TreeNode::addChild(TreeNode* child) {
     if (this->child){
         //cout << "addding child"<< child->nodeID <<" to" <<nodeID<<endl;
         this->child->addSibling(child);
+        child->father = this;
     }else{
         //cout << "addding child"<<child->nodeID <<" to "<<nodeID<<endl;
         this->child = child;
+        child->father = this;
     }
     
 }
@@ -50,10 +52,12 @@ void TreeNode::addSibling(TreeNode* sibling){
     TreeNode* tail = nullptr;
     if (!start){
         this->sibling = sibling;
+        sibling->father = this->father;
         return;
     }
     get_tail(start, tail, sibling);
     tail->sibling = sibling;
+    sibling->father = this->father;
 }
 
 TreeNode::TreeNode(int lineno, NodeType type):lineno(lineno), nodeType(type){
@@ -270,24 +274,38 @@ string TreeNode::nodeType2String (NodeType type){
     return ret;
 }
 
-_Type TreeNode::NODE_DECL_Dump(_Type typeSp){
+_Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
     if(typeSp && (this->nodeType == NODE_DECLARATOR)){
-        if (this->child->nodeType == NODE_VAR){
-            cout << this->child->var_name<< " is set to type @" << typeSp << endl; 
+        if (this->child->nodeType == NODE_VAR){ 
+            strcpy(func_name, (child->var_name).c_str());
+            //cout << child->var_name.c_str() << endl;
+            if (this->father->domain)
+                this->father->domain->add_element(func_name, this->lineno, typeSp);
+            //cout << func_name << " is set to type @" << typeSp << endl; 
+            //cout << this->father->domain->domainid << " " << this->nodeID <<" " <<this->lineno<<" ckpt1\n";
         }
         return typeSp;
     }
     _Type retType;
+
     //ARRAY
     if (this->nodeType == NODE_TYPE &&
-             this->type->type == VALUE_ARRAY){
-            //递归
-            cout << "got array \n";
-            retType = ArrayOf(5, typeSp);
-            return this->child->NODE_DECL_Dump(retType);
-        }
+    this->type->type == VALUE_ARRAY){
+        //递归
+        cout << "got array \n";
+        retType = ArrayOf(5, typeSp);
+        return this->child->NODE_DECL_Dump(retType, func_name);
+    }
+
     if (this->nodeType == NODE_VAR){
-        cout << this->var_name<< " is set to type @" << typeSp << endl; 
+        cout << this->var_name<< " return type set to type @" << typeSp << endl; 
+        //cout << "ckpt2\n";
+        if (!func_name) cout << "???\n";
+        strcpy(func_name, (this->var_name).c_str());
+        if(this->father->domain && !(this->father->nodeType == NODE_DECL_FUNC)){
+            this->father->domain->add_element(func_name, this->lineno, typeSp);
+            //cout << "XXX" << endl;
+        }
         return typeSp;
     }
     if (((this->nodeType != NODE_DECL) || (typeSp == NULL) )){
@@ -299,6 +317,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp){
     
     retType = typeSp;
     cout <<  this->nodeID <<endl;
+
     if (init_or_no_init_node){
         if (init_or_no_init_node->nodeType == NODE_INIT_DECL_VARS){
             cout << "NODE_INIT_DECL_VARS\n";
@@ -308,11 +327,11 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp){
             if (ExtendVarNode->nodeType == NODE_DECLARATOR){
                 //这里找到了
                 retType = typeSp;
-                retType = ExtendVarNode->child->NODE_DECL_Dump(retType);
+                retType = ExtendVarNode->child->NODE_DECL_Dump(retType, func_name);
             }else if (ExtendVarNode->nodeType == NODE_PT_DECLARATOR){
                 _Type pointered = PointerTo(typeSp);
                 //递归
-                retType = ExtendVarNode->child->NODE_DECL_Dump(pointered);
+                retType = ExtendVarNode->child->NODE_DECL_Dump(pointered, func_name);
             }
         }
         if (init_or_no_init_node->nodeType == NODE_DECL_VARS){
@@ -322,12 +341,13 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp){
             if (ExtendVarNode->nodeType == NODE_DECLARATOR){
                 //这里找到了
                 retType = typeSp;
-                retType = ExtendVarNode->child->NODE_DECL_Dump(retType);
+                retType = ExtendVarNode->child->NODE_DECL_Dump(retType, func_name);
             }
             else if (ExtendVarNode->nodeType == NODE_PT_DECLARATOR){
                 _Type pointered = PointerTo(typeSp);
+                printf("pointer\n");
                 //递归
-                retType = ExtendVarNode->child->NODE_DECL_Dump(pointered);
+                retType = ExtendVarNode->child->NODE_DECL_Dump(pointered, func_name);
             }
         }
         //ARRAY
@@ -365,6 +385,17 @@ _Type TreeNode::NODE_DECL_SPCT_Dump(_Type typeSp){
             else retType = T(INT);
             retType = Qualify(mark, retType);
         }
+        if (specifier->type->type == VALUE_CHAR){
+            if (retType) {
+                cout << "ERROR more than one type\n";
+                return retType; //
+            }
+            int mark = 0;
+            if (_const) mark+=SHIFT_CONST;
+            if (_unsigned) retType = T(UCHAR);
+            else retType = T(CCHAR);
+            retType = Qualify(mark, retType);
+        }
         specifier = specifier->sibling;
     }
     return retType;
@@ -377,7 +408,10 @@ _Type TreeNode::NODE_DECL_LIST_Dump(_Type typeSp){
     }
     TreeNode* decl_node = this->child;  //FATHER NODE_DECL
     while(decl_node){
-        _Type t = decl_node->NODE_DECL_Dump(typeSp);
+        char* tmp = (char*)malloc(sizeof(__u_char) * MAX_ID_LEN);
+        tmp[0] = '\0';
+        _Type t = decl_node->NODE_DECL_Dump(typeSp, tmp);
+        cout << "decl node's size of type is: " << t->size<<endl;
         decl_node = decl_node->sibling;
     }
     return typeSp;
@@ -392,7 +426,8 @@ _Type TreeNode::NODE_STMT_Dump(){
     //check specifier and declaration
     if(this->child && this->child->sibling){
         t = this->child->NODE_DECL_SPCT_Dump(t);
-        cout << t->size<<endl;
+        cout << "basic size of type is: " << t->size<<endl;
+        //cout << "list dump: \n";
         this->child->sibling->NODE_DECL_LIST_Dump(t);
     }
     return t;
@@ -417,11 +452,13 @@ _FunctionType TreeNode::NODE_PARA_LIST_Dump(_FunctionType fty){
         cout << "should't call NODE_PARA_LIST_Dump: " <<this->nodeID << endl;
     }
     TreeNode* paranode = this->child;
+    char tmp[100];
     while(paranode){
         _Type paratype = NULL;
         if (paranode->nodeType == NODE_PARA_DECL){
             paratype = paranode->child->NODE_DECL_SPCT_Dump(paratype);
-            paratype = paranode->child->sibling->NODE_DECL_Dump(paratype);
+            if(paranode->child->sibling)
+                paratype = paranode->child->sibling->NODE_DECL_Dump(paratype, tmp);
             cout << "para size: " << paratype->size<<endl;
         }
         fty->param_types.push_back(paratype);
@@ -442,23 +479,64 @@ void TreeNode::funcTypeDump(){
             cout << nodeID << " wrong\n"; 
             return;
         }
-        cout << "get function specifier\n";
+
+        //cout << "get function specifier\n";
         func_ret_type->bty = spcf->NODE_DECL_SPCT_Dump(func_ret_type->bty);
 
-        cout << "get function params\n";
+        //cout << "get function params\n";
         if (!(dcl_and_paras->nodeType == NODE_DECL_FUNC)){
             cout << nodeID << " wrong\n"; 
             return;
         }
-        func_ret_type->bty = dcl_and_paras->child->NODE_DECL_Dump(func_ret_type->bty);
+        char funcname[MAX_ID_LEN] ="";
+        func_ret_type->bty = dcl_and_paras->child->NODE_DECL_Dump(func_ret_type->bty, funcname);
         func_ret_type = dcl_and_paras->child->sibling->NODE_PARA_LIST_Dump(func_ret_type);
-        cout << func_ret_type << " func set\n"; 
+        cout <<funcname<< func_ret_type << " func set\n"; 
+        this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
         return;
     }
     TreeNode* c = this->child;
     while(c){
         c->funcTypeDump();
         c = c->sibling;
+    }
+    return;
+}
+#define isKWNODE(nt) ((nt == NODE_CONST) || (nt == NODE_BREAK))
+void TreeNode::domain_dump(){
+    if ((this->nodeType == NODE_CONST || this->nodeType == NODE_VAR) || 
+        this->nodeType == NODE_DECL_INIT ||(this->nodeType == NODE_TYPE)
+        || isKWNODE(this->nodeType)) return;
+    if (!this->father) {
+        
+        if (!(this->nodeType == NODE_PROG)){
+            cout << "nofather " << nodeID << endl;
+            return;
+        }
+    }
+    if (this->nodeType == NODE_STMT && this->stype == STMT_COMPOUND){
+        cout << "born_son_domain STMT_COMPOUND\n";
+        this->domain = born_son_domain(this->father->domain);
+        
+    }
+    else if (this->nodeType == NODE_EXTERN_FUNC_DECL){
+        cout << "born_son_domain NODE_EXTERN_FUNC_DECL\n";
+        this->domain = born_son_domain(this->father->domain);
+    }
+    else if (this->domain && (this->domain->type==global)){
+        cout << "start domain dump\n";
+        //return;
+    }
+    else{
+        this->domain = father->domain;
+    }
+    TreeNode* c = this->child;
+    
+    while (c)
+    {
+        c->domain_dump();
+        c = c->sibling;
+        //return;
     }
     return;
 }

@@ -6,18 +6,21 @@ int f(int a, int b){
     return a+b;
 }
 int bb[5][5];
-int name[2*10] = {2, 3, 4, 5};
+int name[2*10] = {2, 3, 4, 5};//could be hard
 
 int* pt;
 
-int main(int a){
+int main(int){
     if (a = (c > 1)){
+        int h;
+        h = 1;
         a= b + c - 12 * 8;
     }
     for(i = 0; i < 25; i++){
         a = f(i, 1);
         continue;
-    }
+    }//串层
+   // for(;;;) a++;
     while(i){
         a = 0;
         break;
