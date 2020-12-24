@@ -666,6 +666,9 @@ constant
     //     cout << " yacc TYPE_INT" << TYPE_INT << endl;
     // }
 }
+|   STRING{
+    $$ = $1;
+}
 ;
 
 type-specifier

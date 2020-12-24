@@ -4,9 +4,10 @@
 #include<iostream>
 #include "djl_type.h"
 typedef struct _domain_elem{
-    std::string s;
-    int pos;
-    _Type ty;
+    std::string s;  //name
+    int pos;        //lineno
+    _Type ty;       //sysType
+    bool defined;   //if just declared or already defined
     _domain_elem(std::string s, int p, _Type ty):s(s), pos(p), ty(ty){}
 } domain_elem;
 enum domain_type{
@@ -38,5 +39,7 @@ typedef struct _domain{
 return the new domain, which is a son of the given domain
  */
 domain* born_son_domain(domain* fa);
+
+domain_elem* LookupID(domain* dm, std::string name);
 
 #endif

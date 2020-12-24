@@ -6,6 +6,17 @@
 #include "djl_type.h"
 #include "domain.h"
 
+#define BsysTypeArray 0
+#define BsysTypeFunc  1
+#define BsysTypeRvalue 1<<1;    
+#define sysTyClear(mark)   mark = 0
+#define sysTySetArr(mark)  mark |= BsysTypeArray
+#define sysTySetFunc(mark) mark |= BsysTypeFunc
+#define sysTySetRval(mark) mark |= BsysTypeRvalue
+#define sysTyIsArr(mark)   mark & BsysTypeArray
+#define sysTyIsFunc(mark)  mark & BsysTypeFunc
+#define sysTyIsRval(mark)  mark & BsysTypeRvalue
+
 enum NodeType
 {
     NODE_CONST, 
@@ -39,6 +50,7 @@ enum NodeType
     NODE_EXTERN_FUNC_DECL,
     NODE_ARGUMENT_LIST,
 };
+
 
 enum OperatorType
 {
@@ -85,7 +97,12 @@ enum OperatorType
     OP_AC_MEMBER,       //a.name
     OP_PTAC_MEMBER,     //a->name
     OP_FUNC_CALL,       //f(1, 2);
+
+    OP_CONST,           // 'a' or 123 or 0x88
+    OP_ID,              // a  or  jj  or  "q4e"
+    OP_NONE,
 };
+#define Is_Op_As(op) (((op) >= OP_ASSIGN) && ((op) <= OP_AS_SUB_EQ))
 
 enum StmtType {
     STMT_SKIP,
@@ -96,6 +113,8 @@ enum StmtType {
 }
 ;
 
+
+typedef 
 struct TreeNode {
 public:
     int nodeID;  // 用于作业的序号输出
@@ -122,33 +141,56 @@ public:
     OperatorType optype;  // 如果是表达式
     Type* type;  // 变量、类型、表达式结点，有类型。
     StmtType stype;
+    
+    /**
+     * should be a union of size 4, also works thisway
+     */
     int int_val;
     char ch_val;
     bool b_val;
+    void* p_val;
     string str_val;
+
+    bool l_value;
+
+
     string var_name;
     struct _domain* domain;
+    _Type sysType; 
+    uint typeMark;
+
 public:
     static string nodeType2String (NodeType type);
     static string opType2String (OperatorType type);
     static string sType2String (StmtType type);
     void print_type_info();
+    void copyto(TreeNode* nn);
+    void domain_dump();  //has to call before typeDump;
+    void typeDump(); //DUMP ALL BASE TYPES (called by root)
+    void funcTypeDump();    //DUMP ALL FUNC TYPES (called by root)
+    void typeCheck();
+    inline void swapchild();
+private:
     _Type NODE_STMT_Dump();
     _Type NODE_DECL_LIST_Dump(_Type);
     _Type NODE_DECL_Dump(_Type, char* funcname = NULL);
     _Type NODE_DECL_SPCT_Dump(_Type);
     _FunctionType NODE_PARA_LIST_Dump(_FunctionType);
-    void domain_dump();  //has to call before typeDump;
-    void typeDump(); //DUMP ALL BASE TYPES (called by root)
-    void funcTypeDump();    //DUMP ALL FUNC TYPES (called by root)
-private:
     void __printNodeId(TreeNode* tn);
     void __addSibling(TreeNode* tn);
+
+    //type check
+    void tyCheckUndef();
+    void tyCheckFunction();
+    void tyCheckGlobalDeclaration();
+    void CheckInitializerInternal(TreeNode* initializer, _Type ty);
+
 public:
     TreeNode(int lineno, NodeType type);   
 
-};
+} TreeNode;
 
-extern TreeNode* null_node;
+extern struct TreeNode* null_node;
+
 
 #endif

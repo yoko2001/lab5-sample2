@@ -1,4 +1,6 @@
 #include "tree.h"
+#include "error.h"
+#include "exprchck.h"
 extern TreeNode* null_node;
 
 int TreeNode::_now_id = 0;
@@ -60,8 +62,24 @@ void TreeNode::addSibling(TreeNode* sibling){
     sibling->father = this->father;
 }
 
+void TreeNode::copyto(TreeNode* nn){
+    nn->sysType = sysType;
+    nn->type = type;
+    nn->typeMark = typeMark;
+    nn->var_name = var_name;
+    nn->nodeID = nodeID;
+    nn->nodeType = nodeType;
+    nn->optype = optype;
+    nn->p_val = p_val;
+    nn->sibling = sibling;
+    nn->str_val = str_val;
+    nn->stype = stype;
+    nn->lineno = lineno;
+}
+
 TreeNode::TreeNode(int lineno, NodeType type):lineno(lineno), nodeType(type){
     genNodeId();    //assign a ID for node
+    this->sysType = NULL;
     //_now_id = 0;
     //cout << "build success,type: " <<nodeType2String(type)<<endl; 
 }
@@ -127,7 +145,7 @@ void TreeNode::printSpecialInfo() {
                 cout << "pointer of: ";
                 //if_exists_print_special(this->sibling);
             }else if (this->type == TYPE_STRING){
-                cout << "string";
+                cout << " : "<<this->str_val;
             }else if (this->type == TYPE_SIGNED){
                 cout << "signed";
             }else if (this->type == TYPE_UNSIGNED){
@@ -493,6 +511,8 @@ void TreeNode::funcTypeDump(){
         func_ret_type = dcl_and_paras->child->sibling->NODE_PARA_LIST_Dump(func_ret_type);
         cout <<funcname<< func_ret_type << " func set\n"; 
         this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
+        this->sysType = (_Type)func_ret_type;
+
         return;
     }
     TreeNode* c = this->child;
@@ -539,4 +559,56 @@ void TreeNode::domain_dump(){
         //return;
     }
     return;
+}
+void TreeNode::typeCheck(){
+    if(!this->nodeType == NODE_PROG){
+        cout << "only root node can call typeCheck\n";
+        exit(1);
+    }
+    //check all EXTERN_DECLs 
+    TreeNode* son = this->child;
+    while(son){
+        if(son->nodeType == NODE_EXTERN_DECL)
+        {
+            //son->tyCheckGlobalDeclaration();
+        }
+        else if (son->nodeType == NODE_EXTERN_FUNC_DECL)
+        {
+            //son->tyCheckFunction();
+        }
+        else{
+            cout << "root node inner error, expected extern (func) delarations" << endl;
+        }
+        son = son->sibling;
+    }
+}
+
+void TreeNode::tyCheckGlobalDeclaration(){
+
+}
+
+bool CanAssign(TreeNode* initializer, _Type ty);
+void TreeNode::CheckInitializerInternal(TreeNode* initializer, _Type ty){
+    //ty is one of CHAR, UCHAR, INT, UINT, DOUBLE
+    assert(initializer->nodeType == NODE_DECL_INIT);
+    if (IsScalarType(ty)){
+        //if initilizer is like  { x, x, ...} it has braces on both side
+        if(initializer->child && initializer->child->nodeType == NODE_DECL_INIT){
+            warning("CheckInitializerInternal", initializer->lineno, "braces around scalar initializer");
+        }
+        
+        if(!tyCheckExpression(initializer->child)){
+            error("CheckInitializerInternal", initializer->lineno, "Wrong initializer, braces around scalar");
+            return;
+        }
+        
+        if (!CanAssign(initializer->child,ty)){
+            error("CheckInitializerInternal", initializer->lineno, "Wrong initializer"); 
+        }
+    }
+}
+
+
+bool CanAssign(TreeNode* initializer, _Type ty){
+
 }

@@ -93,6 +93,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     //cout << "lex TYPE_INT"<< TYPE_INT << endl;
     //cout << "lex node->type"<< node->type << endl;
     node->int_val = atoi(yytext);
+    node->sysType = T(INT);
     yylval = node;
     return INTEGER;
 }
@@ -101,10 +102,22 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_CHAR;
     node->int_val = yytext[1];
+    node->sysType = T(CCHAR);
     yylval = node;
     return CHAR;
 }
 
+{STRING} {
+    TreeNode* node = new TreeNode(lineno, NODE_CONST);
+    node->type = TYPE_STRING;
+    node->str_val = yytext;
+    node->str_val = node->str_val.substr(1);
+    int len = node->str_val.size();
+    node->str_val = node->str_val.substr(0, len-1);
+    node->sysType = ArrayOf(node->str_val.size(), T(CCHAR));
+    yylval = node;
+    return STRING;
+}
 {IDENTIFIER} {
     TreeNode* node = new TreeNode(lineno, NODE_VAR);
     node->var_name = string(yytext);

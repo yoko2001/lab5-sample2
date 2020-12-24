@@ -376,3 +376,61 @@ void SetupTypeSystem(void){
 		T(i)->align = T(i)->size;
 	}
 }
+
+int TypeCode(_Type ty)
+{
+	/***************************************************************************
+		see type.h
+		enum
+		{
+			CCHAR, UCHAR, INT, UINT, DOUBLE,POINTER ,VOID,
+    		STRUCT,UNION,  ARRAY, FUNCTION,
+		};
+	 ***************************************************************************/
+	static int optypes[] = {I1, U1, I4, U4, F8, U4, V, B, B, B};
+
+	// Mapping CHAR ...  to  I1 ....
+	return optypes[ty->categ];
+}
+
+_Type CommonRealType(_Type ty1, _Type ty2){
+	if(ty1->categ == DOUBLE || ty2->categ == DOUBLE)
+		return T(DOUBLE);
+	
+	// neither ty1 nor ty2 is floating number.
+	ty1 = ty1->categ < INT ? T(INT) : ty1;
+	ty2 = ty2->categ < INT ? T(INT) : ty2;
+
+	if (ty1->categ == ty2->categ)
+		return ty1;
+	else{
+		return T(INT);
+	}
+}
+
+int IsCompatibleType(_Type ty1, _Type ty2){
+	if(ty1 == ty2){
+		return 1;
+	}
+	if(ty1->qual != ty2->qual){
+		return 0;
+	}
+	ty1 = UnQualify(ty1);
+	ty2 = UnQualify(ty2);
+
+	if(ty1->categ != ty2->categ){
+		return 0;
+	}
+
+	switch(ty1->categ){
+		case POINTER:
+			return IsCompatibleType(ty1->bty, ty2->bty);
+		case ARRAY:
+			printf("havn't emply array relation operator check\n");
+			exit(0);
+		case FUNCTION:
+			printf("havn't emply function relation operator check\n");
+		default:
+			return ty1==ty2;
+	}
+}

@@ -21,6 +21,7 @@ enum{
     CCHAR, UCHAR, INT, UINT, DOUBLE,POINTER ,VOID,
     STRUCT,UNION,  ARRAY, FUNCTION,
 };
+enum {I1, U1, I2, U2, I4, U4, F4, F8, V, B};
 extern struct type Types[VOID - CCHAR + 1];
 
 #define T(categ) (Types + categ)
@@ -30,7 +31,10 @@ extern struct type Types[VOID - CCHAR + 1];
 #define IsIncompletePtr(ty) (ty->categ == POINTER && ty->bty->size == 0)
 #define IsVoidPtr(ty)       (ty->categ == POINTER && ty->bty->categ == VOID)
 #define NotFunctionPtr(ty)  (ty->categ == POINTER && ty->bty->categ != FUNCTION)
-
+#define IsScalarType(ty)   (ty->categ < POINTER)
+#define ISObjevtPtr(ty)    (ty->categ == POINTER)
+#define IsArithType(ty) (ty->categ <= DOUBLE)
+#define IsIntType(ty) (ty->categ <= UINT)
 const char * GetCategName(int categ);
 
 
@@ -112,18 +116,20 @@ typedef struct functionType
     int hasProto;
     std::vector<_Type> param_types; 
 } *_FunctionType;
-
+_Type CommonRealType(_Type ty1, _Type ty2);
 
 _Type Qualify(int qual, _Type ty);
 _Type UnQualify(_Type ty);
 _Type PointerTo(_Type ty);
 _Type ArrayOf(int len, _Type ty);
 _Type FunctionReturn(_Type ty,  int argu, int proto, std::vector<_Type> p);
-
+int IsCompatibleType(_Type ty1, _Type ty2);
 _Type  StartRecord(char *id, int categ);
 _Field AddField(_Type ty, char *id, _Type fty, int bits);
 _Field LookupField(_Type ty, char *id);
 void EndRecord(_Type ty);
 void SetupTypeSystem(void);
+
+int TypeCode(_Type ty);
 
 #endif
