@@ -157,6 +157,7 @@ void TreeNode::printSpecialInfo() {
             }
             break;
         case NODE_EXPR:
+            print_expr_info();
             break;
         case NODE_STMT:
             print_stme_info();
@@ -218,6 +219,24 @@ void TreeNode::print_stme_info(){
         break;
     }
 }
+void TreeNode::print_expr_info(){
+    if(!this->nodeType == NODE_EXPR) return;
+
+    switch (this->optype)
+    {
+    case OP_ASSIGN:
+        cout << "=";
+        break;
+    case OP_OFFSET_ACCESS:
+        cout << "[]";
+        break;
+    case OP_ADD:
+        cout << "+";
+    default:
+        break;
+    }
+}
+
 void TreeNode::print_type_info(){
     if(!(this->nodeType == NODE_TYPE)) return;
    
@@ -229,6 +248,7 @@ void TreeNode::print_type_info(){
 string TreeNode::sType2String(StmtType type) {
     return "?";
 }
+
 
 
 string TreeNode::nodeType2String (NodeType type){
@@ -310,8 +330,10 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
     if (this->nodeType == NODE_TYPE &&
     this->type->type == VALUE_ARRAY){
         //递归
-        cout << "got array \n";
-        retType = ArrayOf(5, typeSp);
+        int len = this->child->sibling->int_val;
+        
+        cout << "got array len" << len << "of size: " << typeSp->size<<endl;
+        retType = ArrayOf(len, typeSp);
         return this->child->NODE_DECL_Dump(retType, func_name);
     }
 
@@ -587,7 +609,6 @@ void TreeNode::tyCheckGlobalDeclaration(){
 
 }
 
-bool CanAssign(TreeNode* initializer, _Type ty);
 void TreeNode::CheckInitializerInternal(TreeNode* initializer, _Type ty){
     //ty is one of CHAR, UCHAR, INT, UINT, DOUBLE
     assert(initializer->nodeType == NODE_DECL_INIT);
@@ -608,7 +629,38 @@ void TreeNode::CheckInitializerInternal(TreeNode* initializer, _Type ty){
     }
 }
 
+/**
+ * whether "a = b;" is legal.
+ * we guarantee that a is not qualified by const
+ * [IMPORTANT] call CanModify() before calling CanAssign()
+ */
+bool CanAssign(TreeNode* expr, _Type lty){
+    _Type rty = expr->sysType;
+    lty = UnQualify(lty);
+    rty = UnQualify(rty);
+    /**
+     * record type
+     */
+    if(lty == rty){
+        return 1;
+    }
+    /**
+     *  arithmetic type;
+     */
+    if(IsArithType(lty) && IsArithType(rty)){
+        return 1;
+    }
 
-bool CanAssign(TreeNode* initializer, _Type ty){
+    if(IsPtrType(lty) && IsPtrType(rty)){
+        return 1;
+    }
 
+    if((IsPtrType(lty) && IsIntType(rty) || IsPtrType(rty) && IsIntType(lty)) &&
+    (lty->size == rty->size)){
+        printf("[warning] conversion between int and pointer with no explicit cast\n");
+        return 1;
+    }
+
+
+    return 0;
 }

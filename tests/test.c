@@ -5,7 +5,7 @@ const int c = 1;
 int f(int a, int b){
     return a+b;
 }
-int bb[5][5];
+int bb[10][5];
 int name[2*10] = {2, {3}, 4, 5};//could be hard
 char* str = "abcde";
 char str[10] = "qwert";
@@ -18,7 +18,9 @@ int main(int){
         a= b + c - 12 * 8;
         int jj = b + c - 1;
     }
+    b[0][1] = 1;
     for(i = 0; i < 25; i++){
+        
         a = f(i, 1);
         continue;
     }//串层

@@ -2029,8 +2029,8 @@ yyreduce:
     TreeNode* node = new TreeNode((yyvsp[-2])->lineno, NODE_EXPR);
     node-> optype = (yyvsp[-1])->optype;
     node-> addChild((yyvsp[-2]));
-    node-> addChild((yyvsp[-1]));
     node-> addChild((yyvsp[0]));
+    //node-> addChild($2);
     (yyval) = node;
 }
 #line 2037 "src/main.tab.cpp" /* yacc.c:1646  */

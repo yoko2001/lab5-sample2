@@ -130,7 +130,7 @@ public:
     
     void printNodeInfo();
     void printChildrenId();
-
+    void print_expr_info();
     void printAST(); // 先输出自己 + 孩子们的id；再依次让每个孩子输出AST。
     void printSpecialInfo();
     void print_stme_info();
@@ -191,6 +191,6 @@ public:
 } TreeNode;
 
 extern struct TreeNode* null_node;
-
+bool CanAssign(TreeNode* initializer, _Type ty);
 
 #endif

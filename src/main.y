@@ -322,8 +322,8 @@ assignment-expression
     TreeNode* node = new TreeNode($1->lineno, NODE_EXPR);
     node-> optype = $2->optype;
     node-> addChild($1);
-    node-> addChild($2);
     node-> addChild($3);
+    //node-> addChild($2);
     $$ = node;
 }
 ;

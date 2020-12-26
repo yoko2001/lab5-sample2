@@ -7,6 +7,7 @@ inline void ARITH_CONVERSION(TreeNode* expr){
     expr->sysType = CommonRealType(ln->sysType, rn->sysType);
     Cast(ln, expr->sysType);
     Cast(rn, expr->sysType);
+
 }
 void DoIntegerPromotion(TreeNode* n);
 
@@ -24,7 +25,10 @@ bool tyCheckLogicalOP(TreeNode* expr);
 bool tyCheckConditionalExpression(TreeNode*expr);
 bool tyCheckPrimaryExpression(TreeNode*expr);
 bool tyTransformIncrement(TreeNode*expr);
-bool tyCheckPostfixExpression(TreeNode*expr);
+TreeNode* tyCheckPostfixExpression(TreeNode*expr);
+
+static int CanModify(TreeNode* expr);
+static TreeNode* ScalePointerOffset(TreeNode* expr, int scale);
 /**
  * Check a NODE_EXPR or a NODE_CONST
  */
@@ -82,7 +86,8 @@ bool tyCheckExpression(TreeNode* init){
             case OP_AC_MEMBER:
             case OP_PTAC_MEMBER:
             case OP_FUNC_CALL:
-                return tyCheckPostfixExpression(init);
+                init = tyCheckPostfixExpression(init);
+                return true;
                 break;
             case OP_REL_G:
             case OP_REL_GE:
@@ -116,6 +121,12 @@ bool tyCheckExpression(TreeNode* init){
     }
 }
 
+static void create_expr_for_assign(TreeNode* expr, int lineno, OperatorType op,  TreeNode* c1, TreeNode* c2){
+    expr = new TreeNode(lineno, NODE_EXPR);
+    expr->optype = op;
+    expr->addChild(c1);
+    expr->addChild(c2);
+}
 /**
  * ID or Function name or Const
  */
@@ -167,7 +178,45 @@ bool tyCheckPrimaryExpression(TreeNode*expr){
 }
 
 bool tyCheckAssignmentExpression(TreeNode* expr){
+    _Type ty;
+    TreeNode *lnode, *rnode;
+    lnode = expr->child;
+    rnode = expr->child->sibling;
+    /**
+     * pre check child,
+     * lnode-> rvalue, rnode->rvalue
+     */
+    tyCheckExpression(lnode);
+    tyAdjust(lnode, 1);
+    tyCheckExpression(rnode);
+    tyAdjust(rnode, 1);
 
+    if(!CanModify(lnode)){
+        cout << "The left operand cannot be modified\n";
+    }
+
+    TreeNode* lopr;
+    switch (expr->optype)
+    {
+    
+    case OP_AS_ADDEQ:
+        create_expr_for_assign(lopr, expr->lineno, OP_ADD, lnode, rnode);
+        tyCheckAddOP(lopr);
+        expr->child->sibling = lopr;
+        break;
+    default:
+        cout << "only has += for now\n";
+        break;
+    }
+    ty = expr->child->sysType;
+    if(!CanAssign(expr->child->sibling, ty)){
+        cout << "Wrong Assignment\n";
+    }
+    else{
+        Cast(expr->child->sibling, ty); 
+    }
+    expr->sysType = ty;
+    return true;
 }
 
 bool tyCheckEqualityOP(TreeNode* expr){
@@ -197,7 +246,7 @@ bool tyCheckEqualityOP(TreeNode* expr){
         return true;
     }
     else{
-        printf("pointer doesn't support in tyCheckEqualityOP\n");
+        cout << "Error or pointer doesn't support in tyCheckEqualityOP\n";
         exit(0);
     }
 }
@@ -221,7 +270,7 @@ bool tyCheckMultiplicativeOP(TreeNode* expr){
     if(expr->optype == OP_MOD &&IsIntType(ln->sysType) && IsIntType(rn->sysType)){
         goto ok;
     }
-    printf("inner bug in tyCheckMultiplicativeOP\n");
+    cout << "error or inner bug in tyCheckMultiplicativeOP\n";
     exit(1);
 ok:
     ARITH_CONVERSION(expr);
@@ -262,11 +311,11 @@ bool tyCheckAddOP(TreeNode* expr){
     }
     if(ISObjevtPtr(ty1) &&  IsIntType(ty2)){
 left_is_ptr:
-        printf("not implemented yet Check line 884\n");
+        cout << "not implemented yet Check line 884\n";
         exit(1);
     }
 
-    printf("inner error in tyCheckAddOP \n");
+    cout << "inner error in tyCheckAddOP \n";
     exit(1);
 }
 
@@ -318,7 +367,7 @@ bool tyCheckShiftOP(TreeNode* expr){
         return true;
     }
 
-    printf("inner error of tyCheckShiftOP\n");
+    cout << "inner error of tyCheckShiftOP\n";
     exit(1);
 }
 
@@ -351,8 +400,8 @@ bool tyCheckRelationalOP(TreeNode* expr){
         return true;
     }
     
-    printf("didn't implemented relation op check between ptrs of incomplete type\n");
-    printf("error in tyCheckRelationalOP\n");
+    cout << "didn't implemented relation op check between ptrs of incomplete type\n";
+    cout << "error in tyCheckRelationalOP\n";
 }
 
 /**
@@ -375,7 +424,7 @@ bool tyCheckBitwiseOP(TreeNode* expr){
         //FoldConstant(expr);
         return true;
     }
-    printf("inner error in tyCheckBitwiseOP\n");
+    cout << "inner error in tyCheckBitwiseOP\n";
     exit(1);
 }
 
@@ -398,12 +447,12 @@ bool tyCheckLogicalOP(TreeNode* expr){
         //FoldConstant(expr);
         return true;
     }
-    printf("inner error in tyCheckLogicalOP\n");
+    cout << "inner error in tyCheckLogicalOP\n";
     exit(1);
 }
 
 bool tyCheckConditionalExpression(TreeNode*expr){
-    printf("not implemented yet\n");
+    cout << "not implemented yet\n";
     exit(1);
 }
 
@@ -449,7 +498,7 @@ bool tyTransformIncrement(TreeNode*expr){
 void CastExpression(TreeNode* expr, _Type ty){
     TreeNode* orinode = new TreeNode(0, NODE_EXPR);
     expr->copyto(orinode);
-
+    orinode->father = expr;
     expr->child = orinode;
     expr->nodeType = NODE_EXPR;
     expr->optype = OP_CAST;
@@ -507,8 +556,51 @@ void Cast(TreeNode* expr, _Type ty){
     return;
 }
 
-bool tyCheckPostfixExpression(TreeNode*expr){
+TreeNode* tyCheckPostfixExpression(TreeNode*expr){
+    TreeNode* ln, *rn;
+    ln = expr->child;
+    rn = ln->sibling;
+    
+    switch (expr->optype)
+    {
+    case OP_OFFSET_ACCESS:
 
+        tyCheckExpression(ln);
+        tyAdjust(ln, 1);
+        tyCheckExpression(rn);
+        tyAdjust(rn, 1);
+
+        if (ISObjevtPtr(ln->sysType) && IsIntType(rn->sysType)){
+            expr->sysType = ln->sysType->bty;
+            expr->l_value = 1;
+            DoIntegerPromotion(rn);
+            ln->sibling = rn = ScalePointerOffset(rn, expr->sysType->size);
+            if(!sysTyIsArr(ln->typeMark) && ln->sysType->categ != ARRAY){
+                TreeNode *deref, *addexpr;
+                deref = new TreeNode(ln->lineno, NODE_EXPR);
+                addexpr = new TreeNode(ln->lineno, NODE_EXPR);
+                deref->optype = OP_UNA_DEREF;
+                deref->sysType = ln->sysType->bty;
+                deref->addChild(addexpr);
+
+                addexpr->optype = OP_ADD;
+                addexpr->sysType = ln->sysType;
+                addexpr->addChild(ln);
+                addexpr->addChild(rn);
+                expr->child = 0;
+                return deref;
+            }
+        }
+        return expr;
+
+    case OP_POSTSELFDEC:
+    case OP_POSTSELFINC:
+        tyTransformIncrement(expr);
+        return expr;
+    default:
+        cout << "haven't made record member operators\n";
+        break;
+    }
 }
 
 
@@ -541,7 +633,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
         n->typeMark = sysTyClear(n->typeMark);
         n->typeMark = sysTyIsArr(n->typeMark);
     }
-    return true;
+    return n;
 }
 
 void DoIntegerPromotion(TreeNode* n){
@@ -555,4 +647,24 @@ inline void TreeNode::swapchild(){
     TreeNode* t = child;
     child = child->sibling;
     child->sibling = t;
+    t->sibling = 0;
+}
+
+static TreeNode* ScalePointerOffset(TreeNode* offset, int scale){
+    TreeNode* expr = new TreeNode(offset->lineno, NODE_EXPR);
+    expr->sysType = offset->sysType;
+    expr->optype = OP_MUL;
+    expr->addChild(offset);
+    TreeNode* sn = new TreeNode(offset->lineno, NODE_CONST);
+    sn->sysType = offset->sysType;
+    sn->optype = OP_CONST;
+    sn->int_val = scale;
+
+    expr->addChild(sn);
+
+    return expr;
+}
+
+static int CanModify(TreeNode* expr){
+    return (expr->l_value && !(expr->sysType->qual & SHIFT_CONST));
 }
