@@ -114,7 +114,7 @@ _Type FunctionReturn(_Type ty,  int argu, int proto, std::vector<_Type> p){
 	fty->qual = 0;
 	fty->size = T(POINTER)->size;
 	fty->align = T(POINTER)->align;
-	fty->hasArgu = argu;
+	fty->Ellipsis = argu;
     fty->hasProto = proto;
     fty->param_types = p;
 	fty->bty = ty;
@@ -433,4 +433,27 @@ int IsCompatibleType(_Type ty1, _Type ty2){
 		default:
 			return ty1==ty2;
 	}
+}
+
+bool SameType(_Type ty1, _Type ty2){
+	if(ty1 == ty2){
+		return true;
+	}
+	if(ty1->categ == ty2->categ && ty1->size == ty2->size){
+		switch (ty1->categ)
+		{
+		case ARRAY:
+			return SameType(ty1->bty, ty2->bty);
+			/* code */
+			break;
+		case FUNCTION:
+			if (SameType(ty1->bty, ty2->bty)){
+
+			}
+		default:
+			std::cout << "haven't realize this kind of type compare" << std::endl;
+			break;
+		}
+	}
+	return false;
 }

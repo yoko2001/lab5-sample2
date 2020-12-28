@@ -10,7 +10,7 @@ inline void ARITH_CONVERSION(TreeNode* expr){
 
 }
 void DoIntegerPromotion(TreeNode* n);
-
+_Type Promote(_Type ty);
 bool tyAdjust(TreeNode* n, int rvalue);
 bool tyCheckAssignmentExpression(TreeNode* expr);
 bool tyCheckEqualityOP(TreeNode* expr);
@@ -26,7 +26,8 @@ bool tyCheckConditionalExpression(TreeNode*expr);
 bool tyCheckPrimaryExpression(TreeNode*expr);
 bool tyTransformIncrement(TreeNode*expr);
 TreeNode* tyCheckPostfixExpression(TreeNode*expr);
-
+bool tyCheckFunctionCall(TreeNode*expr);
+bool tyCheckArgument(TreeNode* expr, _FunctionType ty, int argNo, bool* argFull);
 static int CanModify(TreeNode* expr);
 static TreeNode* ScalePointerOffset(TreeNode* expr, int scale);
 /**
@@ -597,6 +598,9 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
     case OP_POSTSELFINC:
         tyTransformIncrement(expr);
         return expr;
+    case OP_FUNC_CALL:
+        tyCheckFunctionCall(expr);
+        return expr;
     default:
         cout << "haven't made record member operators\n";
         break;
@@ -617,7 +621,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
         n->sysType = PointerTo(n->sysType);
 
         n->typeMark = sysTyClear(n->typeMark);
-        n->typeMark = sysTyIsFunc(n->typeMark);
+        n->typeMark = sysTySetFunc(n->typeMark);
     }
     else if(n->sysType->categ == ARRAY){
         n->sysType = PointerTo(Qualify(qual, n->sysType));
@@ -633,7 +637,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
         n->typeMark = sysTyClear(n->typeMark);
         n->typeMark = sysTyIsArr(n->typeMark);
     }
-    return n;
+    return true;
 }
 
 void DoIntegerPromotion(TreeNode* n){
@@ -667,4 +671,115 @@ static TreeNode* ScalePointerOffset(TreeNode* offset, int scale){
 
 static int CanModify(TreeNode* expr){
     return (expr->l_value && !(expr->sysType->qual & SHIFT_CONST));
+}
+
+void printUndefFunc(TreeNode* expr){
+    cout << "undefined function call "<< expr->var_name <<", line: " << expr->lineno << endl;
+}
+
+bool tyCheckFunctionCall(TreeNode*expr){
+    TreeNode* func = expr->child;
+    TreeNode* auges = func->sibling;
+    
+    
+    if(func->nodeType != NODE_VAR){
+        cout << "syntax design error\n";
+        exit(1);
+    }
+    if(auges->nodeType != NODE_ARGUMENT_LIST){
+        cout << "main.y error caused tyCheckFunctionCall error\n";
+        exit(1);
+    }
+    //check if func is defined
+    if(!func->sysType){
+        printUndefFunc(expr);
+    }
+    else{
+        tyAdjust(func, 1);
+    }
+
+    _Type ty;
+    if(!(IsPtrType(func->sysType)&&IsFunctionType(func->sysType->bty)) ){
+        cout <<"line: " <<expr->lineno  <<", The left op must be function or function ptr" <<endl;
+        exit(1);
+    }else{
+        ty = func->sysType->bty;
+    }
+
+    //now ty is FUNCTION
+    int argNo = 0;
+    bool argfull = false;
+    
+    TreeNode* arg = auges->child;
+    while(arg != NULL && !argfull){
+        tyCheckArgument(arg, (_FunctionType)ty, argNo, &argfull);
+        arg = arg->sibling;
+        argNo++;
+    }
+
+    while(arg != NULL){
+        tyCheckExpression(arg);
+        arg = arg->sibling;
+    }
+
+    argNo--;
+    if(argNo > ((_FunctionType)ty)->param_types.size()){
+        if (!((_FunctionType)ty)->Ellipsis){
+            cout << "function receives too many arguments, line" << expr->lineno << endl;
+        }
+    }
+    else if (argNo < ((_FunctionType)ty)->param_types.size()){
+        cout << "function receives too few arguments, line" << expr->lineno << endl;
+    }
+
+    expr->sysType = ty->bty;
+
+    return expr;
+}
+
+
+bool tyCheckArgument(TreeNode* arg, _FunctionType fty, int argNo, bool* argFull){
+    int parLen = fty->param_types.size();
+    
+    tyCheckExpression(arg);
+    tyAdjust(arg, 1);
+
+
+    if(fty->hasProto && parLen == 0){
+        *argFull = 1;
+        return true;
+    }
+
+    if(argNo == parLen && !fty->Ellipsis){
+        *argFull = 1;
+    }
+    else if (!fty->hasProto){
+        _Type pty = Promote(arg->sysType);
+        Cast(arg, pty);
+        *argFull = 0;
+        return true;
+    }
+    else if(argNo <= parLen){
+        _Type param_ty = fty->param_types[argNo-1];
+        if(!CanAssign(arg, param_ty))goto err;
+
+        if(param_ty->categ < INT){
+            Cast(arg, T(INT));
+        }
+        else{
+            Cast(arg, param_ty);
+        }   
+        return true;
+    }
+    else{
+        cout << "other situations, should't get here\n";
+        exit(1);
+    }
+err:
+    cout << arg->lineno << " Incompatible argument \n";
+    return false;
+}
+
+_Type Promote(_Type ty){
+    return ty->categ < INT ? T(INT) : ty;
 }

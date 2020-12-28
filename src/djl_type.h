@@ -112,7 +112,7 @@ typedef struct recordType
 typedef struct functionType
 {
 	TYPE_COMMON
-	int hasArgu;
+	int Ellipsis;
     int hasProto;
     std::vector<_Type> param_types; 
 } *_FunctionType;
@@ -129,7 +129,7 @@ _Field AddField(_Type ty, char *id, _Type fty, int bits);
 _Field LookupField(_Type ty, char *id);
 void EndRecord(_Type ty);
 void SetupTypeSystem(void);
-
+bool SameType(_Type ty1, _Type ty2);
 int TypeCode(_Type ty);
 
 #endif

@@ -45,6 +45,12 @@ void TreeNode::addChild(TreeNode* child) {
         this->child = child;
         child->father = this;
     }
+
+    TreeNode* c = child;
+    while(c){
+        c->father = this;
+        c = c->sibling;
+    }
     
 }
 
@@ -313,6 +319,8 @@ string TreeNode::nodeType2String (NodeType type){
 }
 
 _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
+    
+    //parameters
     if(typeSp && (this->nodeType == NODE_DECLARATOR)){
         if (this->child->nodeType == NODE_VAR){ 
             strcpy(func_name, (child->var_name).c_str());
@@ -331,8 +339,11 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
     this->type->type == VALUE_ARRAY){
         //递归
         int len = this->child->sibling->int_val;
-        
-        cout << "got array len" << len << "of size: " << typeSp->size<<endl;
+        if (this->child->sibling->nodeType != NODE_CONST){
+            cout << "havn't implement const fold, calculate it yourself";
+            exit(1);
+        }
+        cout << "got array len " << len << "of size: " << typeSp->size<<endl;
         retType = ArrayOf(len, typeSp);
         return this->child->NODE_DECL_Dump(retType, func_name);
     }
@@ -511,6 +522,7 @@ void TreeNode::funcTypeDump(){
     if((this->nodeType == NODE_EXTERN_FUNC_DECL)){
         TreeNode* spcf = this->child;
         TreeNode* dcl_and_paras = spcf->sibling->child->child;
+        TreeNode* cmpd = this->child->sibling->sibling;
 
         _FunctionType func_ret_type = (_FunctionType)malloc(sizeof(struct functionType));
         memset(func_ret_type, 0, sizeof(struct functionType));
@@ -531,10 +543,12 @@ void TreeNode::funcTypeDump(){
         char funcname[MAX_ID_LEN] ="";
         func_ret_type->bty = dcl_and_paras->child->NODE_DECL_Dump(func_ret_type->bty, funcname);
         func_ret_type = dcl_and_paras->child->sibling->NODE_PARA_LIST_Dump(func_ret_type);
+        if (func_ret_type->param_types.size() > 0) func_ret_type->hasProto = true;
         cout <<funcname<< func_ret_type << " func set\n"; 
         this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
         this->sysType = (_Type)func_ret_type;
 
+        //cmpd->typeDump();
         return;
     }
     TreeNode* c = this->child;
@@ -547,8 +561,14 @@ void TreeNode::funcTypeDump(){
 #define isKWNODE(nt) ((nt == NODE_CONST) || (nt == NODE_BREAK))
 void TreeNode::domain_dump(){
     if ((this->nodeType == NODE_CONST || this->nodeType == NODE_VAR) || 
-        this->nodeType == NODE_DECL_INIT ||(this->nodeType == NODE_TYPE)
-        || isKWNODE(this->nodeType)) return;
+        isKWNODE(this->nodeType)) {
+            if(!father){
+                cout << "no father" << nodeID << endl;
+                return;
+            }
+            domain = father->domain;
+            return;
+        }
     if (!this->father) {
         
         if (!(this->nodeType == NODE_PROG)){
@@ -556,10 +576,9 @@ void TreeNode::domain_dump(){
             return;
         }
     }
-    if (this->nodeType == NODE_STMT && this->stype == STMT_COMPOUND){
+    if (this->nodeType == NODE_STMT && this->stype == STMT_COMPOUND && (this->father->nodeType != NODE_EXTERN_FUNC_DECL)){
         cout << "born_son_domain STMT_COMPOUND\n";
         this->domain = born_son_domain(this->father->domain);
-        
     }
     else if (this->nodeType == NODE_EXTERN_FUNC_DECL){
         cout << "born_son_domain NODE_EXTERN_FUNC_DECL\n";
@@ -583,7 +602,7 @@ void TreeNode::domain_dump(){
     return;
 }
 void TreeNode::typeCheck(){
-    if(!this->nodeType == NODE_PROG){
+    if(!(this->nodeType == NODE_PROG)){
         cout << "only root node can call typeCheck\n";
         exit(1);
     }
@@ -663,4 +682,86 @@ bool CanAssign(TreeNode* expr, _Type lty){
 
 
     return 0;
+}
+void __redefCheck(TreeNode* node);
+
+
+void TreeNode::redefCheck(){
+    if(father){
+        if(domain != father->domain){
+            __redefCheck(this);
+        }
+    }else{
+        __redefCheck(this);
+    }
+    TreeNode* son = child;
+    while(son){
+        son->redefCheck();
+        son = son->sibling;
+    }
+}
+
+static bool has_redef_error = false;
+void printRedefError(domain_elem e1, domain_elem e2){
+    cout << "redefination detected, " << e1.s <<endl;
+    cout << "first defined here: " << e1.pos << " , then defined here: " << e2.pos << endl;
+}
+void __redefCheck(TreeNode* node){
+    domain* dm = node->domain;
+    if(!dm){ 
+        cout << "node " << node->nodeID << "has no domain" << endl;
+        return;
+    }
+    int len = dm->elements.size();
+    for(int i = 0; i < len; i++){
+        cout << dm->elements[i].s << endl;
+        for(int j = i+1; j < len; j++){
+            if (!(dm->elements[i].s == dm->elements[j].s))continue;
+            printRedefError(dm->elements[i], dm->elements[j]);
+            has_redef_error = true;
+        }
+    }
+}
+
+void __check_undef(TreeNode* node);
+void TreeNode::tyCheckUndef(){
+    if(nodeType == NODE_VAR){
+        __check_undef(this);
+    }
+
+    TreeNode* son = child;
+    while(son){
+        son->tyCheckUndef();
+        son = son->sibling;
+    }
+}
+void print_undef_error(TreeNode* var){
+    cout << "undefined variable: " << var->var_name << endl;
+}
+void __check_undef(TreeNode* node){
+    assert(node->nodeType == NODE_VAR);
+    domain* dm = node->domain;
+    if(!dm){
+        cout << "node "<<node->nodeID << " has no domain" << endl;
+        return;
+    }
+    
+    bool found = false;
+    while(dm){
+        //cout << "now check domain " << dm->domainid << "size" <<dm->elements.size()<<endl;
+        int len = dm->elements.size();
+        for(int i = 0; i < len; i++){
+            if (node->var_name == dm->elements[i].s){
+                found = true;
+                node->sysType = dm->elements[i].ty;
+                cout <<node->var_name  << " pos: "<<node->lineno << " sysType: " << node->sysType << " dm: " << dm->domainid << endl;
+                break;
+            }
+        }
+        if (found) break;
+        dm = dm->father_domain;
+    }
+    if(!found){
+        print_undef_error(node);
+    }
 }

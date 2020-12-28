@@ -169,6 +169,8 @@ public:
     void typeDump(); //DUMP ALL BASE TYPES (called by root)
     void funcTypeDump();    //DUMP ALL FUNC TYPES (called by root)
     void typeCheck();
+    void redefCheck();
+    void idTypeDump();
     inline void swapchild();
 private:
     _Type NODE_STMT_Dump();
@@ -178,7 +180,7 @@ private:
     _FunctionType NODE_PARA_LIST_Dump(_FunctionType);
     void __printNodeId(TreeNode* tn);
     void __addSibling(TreeNode* tn);
-
+public:
     //type check
     void tyCheckUndef();
     void tyCheckFunction();

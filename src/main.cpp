@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
     SetupTypeSystem();
     root->typeDump();
     root->funcTypeDump();
-    
+    root->redefCheck();
+    root->tyCheckUndef();
     return 0;
 }

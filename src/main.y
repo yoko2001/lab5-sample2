@@ -615,10 +615,17 @@ postfix-expression:
 }
 |   postfix-expression L_BRACKET  argument-expression-list R_BRACKET{
     TreeNode* node = new TreeNode(lineno, NODE_EXPR);
-    cout << "postfix func\n";
+    //cout << "postfix func\n";
     node->optype = OP_FUNC_CALL;
     node->addChild($1);
     node->addChild($3);
+    $$ = node;
+}
+|   postfix-expression L_BRACKET R_BRACKET{
+    TreeNode* node = new TreeNode(lineno, NODE_EXPR);
+    TreeNode* augs = new TreeNode(lineno, NODE_ARGUMENT_LIST);
+    node->addChild($1);
+    node->addChild(augs);
     $$ = node;
 }
 ;
@@ -755,6 +762,15 @@ IDENTIFIER{
     TreeNode* node = new TreeNode(lineno, NODE_DECL_FUNC);
     node->addChild($1);
     node->addChild($3);
+    fnode->addChild(node);
+    $$ = fnode;
+}
+|   direct-declarator L_BRACKET  R_BRACKET{
+    TreeNode* fnode = new TreeNode(lineno, NODE_DECL);
+    TreeNode* node = new TreeNode(lineno, NODE_DECL_FUNC);
+    node->addChild($1);
+    TreeNode* listnode = new TreeNode(lineno, NODE_PARA_DECL_LIST);
+    node->addChild(listnode);
     fnode->addChild(node);
     $$ = fnode;
 }
