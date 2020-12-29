@@ -1,6 +1,7 @@
 #include "tree.h"
 #include "error.h"
 #include "exprchck.h"
+#include "stmtchck.h"
 extern TreeNode* null_node;
 
 int TreeNode::_now_id = 0;
@@ -175,21 +176,21 @@ void TreeNode::printSpecialInfo() {
         case NODE_DECL_INIT:
             cout << "[initializer]";
             break;
-        case NODE_FOR:
-            cout << "[iteration for]";
-            break;
-        case NODE_WHILE:
-            cout << "[iteration while]";
-            break;
-        case NODE_DO_WHILE:
-            cout << "[iteration do while]";
-            break;
-        case NODE_BREAK:
-            cout << "[BREAK]";
-            break;
-        case NODE_CONTINUE:
-            cout << "[CONTINUE]";
-            break;
+        // case NODE_FOR:
+        //     cout << "[iteration for]";
+        //     break;
+        // case NODE_WHILE:
+        //     cout << "[iteration while]";
+        //     break;
+        // case NODE_DO_WHILE:
+        //     cout << "[iteration do while]";
+        //     break;
+        // case NODE_BREAK:
+        //     cout << "[BREAK]";
+        //     break;
+        // case NODE_CONTINUE:
+        //     cout << "[CONTINUE]";
+        //     break;
         case NODE_OP:
             cout << "[operator]";
             break;
@@ -210,9 +211,6 @@ void TreeNode::print_stme_info(){
     case STMT_SELECT:
         cout << "select";
         break;
-    case STMT_BLOCK:
-        cout << "block";
-        break;
     case STMT_SKIP:
         cout << "skip";
         break;
@@ -221,12 +219,37 @@ void TreeNode::print_stme_info(){
         break;
     case STMT_COMPOUND:
         cout << "compound";
+        break;
+    case STMT_WHILE:
+        cout << "while";
+        break;
+    case STMT_DO_WHILE:
+        cout << "do while";
+        break;
+    case STMT_FOR:
+        cout << "for";
+        break;
+    case STMT_FOR_NONE:
+        cout << "for NULL";
+        break;
+    case STMT_BREAK:
+        cout << "[BREAK]";
+        break;
+    case STMT_RETURN:
+        cout << "[RETURN]";
+        break;
+    case STMT_CONTINUE:
+        cout << "[CONTINUE]";
+        break; 
+    case STMT_EXPRESSION:
+        cout<< "EXPRESSION";
+        break;
     default:
         break;
     }
 }
 void TreeNode::print_expr_info(){
-    if(!this->nodeType == NODE_EXPR) return;
+    if(this->nodeType != NODE_EXPR) return;
 
     switch (this->optype)
     {
@@ -349,7 +372,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
     }
 
     if (this->nodeType == NODE_VAR){
-        cout << this->var_name<< " return type set to type @" << typeSp << endl; 
+        //cout << this->var_name<< " return type set to type @" << typeSp << endl; 
         //cout << "ckpt2\n";
         if (!func_name) cout << "???\n";
         strcpy(func_name, (this->var_name).c_str());
@@ -424,6 +447,16 @@ _Type TreeNode::NODE_DECL_SPCT_Dump(_Type typeSp){
         }
         if (specifier->type->type == VALUE_SIGNED){
             _unsigned = 0;
+        }
+        if (specifier->type->type == VALUE_VOID){
+            if (retType) {
+                cout << "ERROR more than one type\n";
+                return retType; //
+            }
+            int mark = 0;
+            if (_const) mark+=SHIFT_CONST;
+            retType = T(VOID);
+            retType = Qualify(mark, retType); 
         }
         if (specifier->type->type == VALUE_INT){
             if (retType) {
@@ -558,7 +591,7 @@ void TreeNode::funcTypeDump(){
     }
     return;
 }
-#define isKWNODE(nt) ((nt == NODE_CONST) || (nt == NODE_BREAK))
+#define isKWNODE(nt) ((nt == NODE_CONST) || 0)
 void TreeNode::domain_dump(){
     if ((this->nodeType == NODE_CONST || this->nodeType == NODE_VAR) || 
         isKWNODE(this->nodeType)) {
@@ -601,6 +634,7 @@ void TreeNode::domain_dump(){
     }
     return;
 }
+
 void TreeNode::typeCheck(){
     if(!(this->nodeType == NODE_PROG)){
         cout << "only root node can call typeCheck\n";
@@ -612,10 +646,12 @@ void TreeNode::typeCheck(){
         if(son->nodeType == NODE_EXTERN_DECL)
         {
             //son->tyCheckGlobalDeclaration();
+            //already checked, do nothing
         }
         else if (son->nodeType == NODE_EXTERN_FUNC_DECL)
         {
-            //son->tyCheckFunction();
+            currentfty = (_FunctionType)son->sysType;
+            assert(currentfty != NULL);
         }
         else{
             cout << "root node inner error, expected extern (func) delarations" << endl;
@@ -674,7 +710,7 @@ bool CanAssign(TreeNode* expr, _Type lty){
         return 1;
     }
 
-    if((IsPtrType(lty) && IsIntType(rty) || IsPtrType(rty) && IsIntType(lty)) &&
+    if(((IsPtrType(lty) && IsIntType(rty)) || (IsPtrType(rty) && IsIntType(lty))) &&
     (lty->size == rty->size)){
         printf("[warning] conversion between int and pointer with no explicit cast\n");
         return 1;
@@ -714,7 +750,7 @@ void __redefCheck(TreeNode* node){
     }
     int len = dm->elements.size();
     for(int i = 0; i < len; i++){
-        cout << dm->elements[i].s << endl;
+        //cout << dm->elements[i].s << endl;
         for(int j = i+1; j < len; j++){
             if (!(dm->elements[i].s == dm->elements[j].s))continue;
             printRedefError(dm->elements[i], dm->elements[j]);

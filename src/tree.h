@@ -39,12 +39,12 @@ enum NodeType
     NODE_DECLARATOR,    //a
     NODE_PARA_DECL_LIST,
     NODE_PARA_DECL,
-    NODE_WHILE,
-    NODE_DO_WHILE,
-    NODE_FOR,
-    NODE_CONTINUE,
-    NODE_BREAK,
-    NODE_RET,
+    //NODE_WHILE,       //replaced by STMT_WHILE
+    //NODE_DO_WHILE,    
+    //NODE_FOR,
+    //NODE_CONTINUE,
+    //NODE_BREAK,
+    //NODE_RET,
     NODE_NULL,          //for null node
     NODE_EXTERN_DECL,   //toppest below translation unit
     NODE_EXTERN_FUNC_DECL,
@@ -108,8 +108,15 @@ enum StmtType {
     STMT_SKIP,
     STMT_DECL,
     STMT_COMPOUND,
-    STMT_BLOCK,
     STMT_SELECT,
+    STMT_DO_WHILE,
+    STMT_WHILE,
+    STMT_FOR,
+    STMT_FOR_NONE,
+    STMT_RETURN,
+    STMT_BREAK,
+    STMT_CONTINUE,
+    STMT_EXPRESSION,
 }
 ;
 
@@ -194,5 +201,5 @@ public:
 
 extern struct TreeNode* null_node;
 bool CanAssign(TreeNode* initializer, _Type ty);
-
+static _FunctionType currentfty = NULL;
 #endif
