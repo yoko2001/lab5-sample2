@@ -65,6 +65,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "int"   return T_INT;
 "bool"  return T_BOOL;
 "char"  return T_CHAR;
+"void"  return T_VOID;
 
 "if"        return KW_IF;
 "else"      return KW_ELSE;

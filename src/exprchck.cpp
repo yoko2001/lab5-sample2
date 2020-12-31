@@ -4,14 +4,17 @@ inline void ARITH_CONVERSION(TreeNode* expr){
     TreeNode* ln, *rn;
     ln = expr->child;
     rn = ln->sibling;
+    assert(ln->sysType!=NULL);
+    assert(rn->sysType != NULL);
+    //cout << expr->nodeID<<endl;
     expr->sysType = CommonRealType(ln->sysType, rn->sysType);
+    //cout << "CommonRealType return\n";
     Cast(ln, expr->sysType);
     Cast(rn, expr->sysType);
 
 }
 void DoIntegerPromotion(TreeNode* n);
 _Type Promote(_Type ty);
-bool tyAdjust(TreeNode* n, int rvalue);
 bool tyCheckAssignmentExpression(TreeNode* expr);
 bool tyCheckEqualityOP(TreeNode* expr);
 bool tyCheckUnaryExpression(TreeNode* expr);
@@ -40,6 +43,7 @@ bool tyCheckExpression(TreeNode* init){
     }
     else if(init->nodeType == NODE_EXPR)
     {
+        //cout << "tyCheckExpression : " << init->nodeID <<" " << init->optype << endl;
         switch(init->optype){
             case OP_ASSIGN:
             case OP_AS_ADDEQ:
@@ -94,6 +98,7 @@ bool tyCheckExpression(TreeNode* init){
             case OP_REL_GE:
             case OP_REL_L:
             case OP_REL_LE:
+                //cout << "check realtion expression" << endl;
                 return tyCheckRelationalOP(init);
                 break;
             case OP_BIT_AND:
@@ -108,7 +113,12 @@ bool tyCheckExpression(TreeNode* init){
             case OP_CONDITION:
                 return tyCheckConditionalExpression(init);
                 break;
+            case 0:
+                tyCheckExpression(init->child);
+                init->sysType = init->child->sysType;
+                break;
             default:
+                cout << "problem nodeid: " << init->nodeID<< endl;
                 error("tyCheckExpression", init->lineno, "haven't realize exprchck of this kind of operator");
         }   
     }
@@ -118,6 +128,7 @@ bool tyCheckExpression(TreeNode* init){
     }
     else 
     {
+        cout << "problem nodeid: " << init->nodeID<< endl;
         error("tyCheckExpression", init->lineno, "unexpected node type");
     }
 }
@@ -132,10 +143,16 @@ static void create_expr_for_assign(TreeNode* expr, int lineno, OperatorType op, 
  * ID or Function name or Const
  */
 bool tyCheckPrimaryExpression(TreeNode*expr){
+    //cout << "enter tyCheckPrimaryExpression " << expr->nodeID << endl;
+    
     if(expr->nodeType == NODE_CONST){
-        if(expr->type == TYPE_INT || expr->type == TYPE_CHAR){
+        //assert(expr->nodeID != 123);
+        //cout << expr->nodeType << " " << expr->type->type << endl;   
+        if((expr->sysType == T(INT)) || (expr->sysType == T(CCHAR))){
             expr->optype = OP_CONST;
             expr->l_value = 0;
+            //assert((expr->sysType == T(INT)) || (expr->sysType == T(CCHAR)));
+            //cout << "checked const int or const char\n";
             return true;
         }
         else if(expr->type == TYPE_STRING){
@@ -188,7 +205,7 @@ bool tyCheckAssignmentExpression(TreeNode* expr){
      * lnode-> rvalue, rnode->rvalue
      */
     tyCheckExpression(lnode);
-    tyAdjust(lnode, 1);
+    tyAdjust(lnode, 0);
     tyCheckExpression(rnode);
     tyAdjust(rnode, 1);
 
@@ -204,6 +221,8 @@ bool tyCheckAssignmentExpression(TreeNode* expr){
         create_expr_for_assign(lopr, expr->lineno, OP_ADD, lnode, rnode);
         tyCheckAddOP(lopr);
         expr->child->sibling = lopr;
+        break;
+    case OP_ASSIGN:
         break;
     default:
         cout << "only has += for now\n";
@@ -368,28 +387,32 @@ bool tyCheckShiftOP(TreeNode* expr){
         return true;
     }
 
-    cout << "inner error of tyCheckShiftOP\n";
+    cout << "inner error of tyCheckShiftOP" << endl;
     exit(1);
 }
 
 bool tyCheckRelationalOP(TreeNode* expr){
     TreeNode* ln, *rn;
     ln = expr->child;
+    assert(ln != NULL);
     rn = ln->sibling;
+    assert(rn != NULL);
     
     tyCheckExpression(ln);
     tyAdjust(ln, 1);
     tyCheckExpression(rn);
     tyAdjust(rn, 1);
 
+    
     _Type ty1, ty2;
     ty1 = ln->sysType;
     ty2 = rn->sysType;
     //default
     expr->sysType = T(INT);
-
+    //cout << "both side checked\n";
     if(IsArithType(ty1) && IsArithType(ty2)){
         ARITH_CONVERSION(expr);
+        //cout << "ARITH_CONVERSION return" << endl;
         //SET AGAIN BECAUSE ARITH_CONVERSION MAY CHANGE IT
         expr->sysType = T(INT);
         //FoldConstant(expr);
@@ -402,7 +425,7 @@ bool tyCheckRelationalOP(TreeNode* expr){
     }
     
     cout << "didn't implemented relation op check between ptrs of incomplete type\n";
-    cout << "error in tyCheckRelationalOP\n";
+    cout << "error in tyCheckRelationalOP" << endl;
 }
 
 /**
@@ -509,7 +532,7 @@ void CastExpression(TreeNode* expr, _Type ty){
 void Cast(TreeNode* expr, _Type ty){
     int scode = TypeCode(expr->sysType);
 	int dcode = TypeCode(ty);
-
+    //cout << "casting nodeID " << expr->nodeID << "  from " << scode << " to " << dcode <<endl;
     //void 
     if (dcode == V){
         CastExpression(expr, ty);
@@ -520,9 +543,11 @@ void Cast(TreeNode* expr, _Type ty){
         int scateg = expr->sysType->categ;
         int dcateg = ty->categ;
         if(scateg != dcateg && scateg >= INT && scateg < DOUBLE){
+            cout << "adding cast node\n"<<endl;
+            assert(expr->nodeID != 123);
             CastExpression(expr, ty);
         }
-
+        //cout << "adding / no adding cast node" << endl;
         /**
          * etc. CHAR => UNSIGNED CHAR
          */
@@ -545,7 +570,12 @@ void Cast(TreeNode* expr, _Type ty){
         把 s >>1 结点的类型当作有符号数 int,从而在代码生成时选用算术右移指令 sar,这会产生
         错误的结果。
      */
+
+    cout << "bigger change in cast\n";
+    exit(0);
+
     if(scode < I4){
+        
         CastExpression(expr, T(INT));
     }
     if(!scode == dcode){
@@ -565,14 +595,16 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
     switch (expr->optype)
     {
     case OP_OFFSET_ACCESS:
-
+        
         tyCheckExpression(ln);
         tyAdjust(ln, 1);
         tyCheckExpression(rn);
         tyAdjust(rn, 1);
-
+        //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
         if (ISObjevtPtr(ln->sysType) && IsIntType(rn->sysType)){
+            //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
             expr->sysType = ln->sysType->bty;
+            //if(expr->sysType == T(INT)) cout << "??????" << endl;
             expr->l_value = 1;
             DoIntegerPromotion(rn);
             ln->sibling = rn = ScalePointerOffset(rn, expr->sysType->size);
@@ -589,6 +621,7 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
                 addexpr->addChild(ln);
                 addexpr->addChild(rn);
                 expr->child = 0;
+                cout << "Arr access add deref" << endl;
                 return deref;
             }
         }
@@ -599,6 +632,7 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
         tyTransformIncrement(expr);
         return expr;
     case OP_FUNC_CALL:
+        //cout << "enter func call" << endl;
         tyCheckFunctionCall(expr);
         return expr;
     default:
@@ -624,7 +658,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
         n->typeMark = sysTySetFunc(n->typeMark);
     }
     else if(n->sysType->categ == ARRAY){
-        n->sysType = PointerTo(Qualify(qual, n->sysType));
+        n->sysType = PointerTo(Qualify(qual, n->sysType->bty));
         n->l_value = 0;
         /*************************************
 			"abc" = "123";		// illegal
@@ -636,6 +670,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
 		 *************************************/
         n->typeMark = sysTyClear(n->typeMark);
         n->typeMark = sysTyIsArr(n->typeMark);
+        //cout << "NodeId: " << n->nodeID << " point to array" << endl;
     }
     return true;
 }
@@ -680,16 +715,17 @@ void printUndefFunc(TreeNode* expr){
 bool tyCheckFunctionCall(TreeNode*expr){
     TreeNode* func = expr->child;
     TreeNode* auges = func->sibling;
-    
+    //cout << "enter tyCheckFunctionCall" << endl;
     
     if(func->nodeType != NODE_VAR){
-        cout << "syntax design error\n";
+        cout << "syntax design error" << endl;
         exit(1);
     }
     if(auges->nodeType != NODE_ARGUMENT_LIST){
-        cout << "main.y error caused tyCheckFunctionCall error\n";
+        cout << "main.y error caused tyCheckFunctionCall error" << endl;
         exit(1);
     }
+    
     //check if func is defined
     if(!func->sysType){
         printUndefFunc(expr);
@@ -697,7 +733,7 @@ bool tyCheckFunctionCall(TreeNode*expr){
     else{
         tyAdjust(func, 1);
     }
-
+    
     _Type ty;
     if(!(IsPtrType(func->sysType)&&IsFunctionType(func->sysType->bty)) ){
         cout <<"line: " <<expr->lineno  <<", The left op must be function or function ptr" <<endl;
@@ -705,21 +741,21 @@ bool tyCheckFunctionCall(TreeNode*expr){
     }else{
         ty = func->sysType->bty;
     }
-
     //now ty is FUNCTION
-    int argNo = 0;
+    int argNo = 1;
     bool argfull = false;
     
     TreeNode* arg = auges->child;
     while(arg != NULL && !argfull){
         tyCheckArgument(arg, (_FunctionType)ty, argNo, &argfull);
         arg = arg->sibling;
+        //cout << argfull << endl;
         argNo++;
     }
-
     while(arg != NULL){
         tyCheckExpression(arg);
         arg = arg->sibling;
+        argNo++;
     }
 
     argNo--;
@@ -743,26 +779,29 @@ bool tyCheckArgument(TreeNode* arg, _FunctionType fty, int argNo, bool* argFull)
     
     tyCheckExpression(arg);
     tyAdjust(arg, 1);
-
+    //cout << "enter tyCheckArgument, argno: "<<argNo << ", of total: " << parLen<< endl;
 
     if(fty->hasProto && parLen == 0){
         *argFull = 1;
         return true;
     }
-
-    if(argNo == parLen && !fty->Ellipsis){
+    if((argNo == parLen) && (!fty->Ellipsis)){
+        //cout << "full now" << endl;
         *argFull = 1;
     }
-    else if (!fty->hasProto){
+    
+    if (!fty->hasProto){
         _Type pty = Promote(arg->sysType);
         Cast(arg, pty);
         *argFull = 0;
         return true;
     }
     else if(argNo <= parLen){
+       // cout << "testing next argu" << endl;
         _Type param_ty = fty->param_types[argNo-1];
-        if(!CanAssign(arg, param_ty))goto err;
-
+        assert(param_ty != NULL);
+        if(!CanAssign(arg, param_ty)) goto err;
+        //cout << param_ty << endl;
         if(param_ty->categ < INT){
             Cast(arg, T(INT));
         }
@@ -776,7 +815,7 @@ bool tyCheckArgument(TreeNode* arg, _FunctionType fty, int argNo, bool* argFull)
         exit(1);
     }
 err:
-    cout << arg->lineno << " Incompatible argument \n";
+    cout << arg->lineno << " id:"<<arg->nodeID << " Incompatible argument \n";
     return false;
 }
 

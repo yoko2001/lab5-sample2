@@ -394,6 +394,7 @@ int TypeCode(_Type ty)
 }
 
 _Type CommonRealType(_Type ty1, _Type ty2){
+	//std::cout << ty1->categ << " "<< ty2->categ << std::endl;
 	if(ty1->categ == DOUBLE || ty2->categ == DOUBLE)
 		return T(DOUBLE);
 	
@@ -401,9 +402,12 @@ _Type CommonRealType(_Type ty1, _Type ty2){
 	ty1 = ty1->categ < INT ? T(INT) : ty1;
 	ty2 = ty2->categ < INT ? T(INT) : ty2;
 
-	if (ty1->categ == ty2->categ)
+	if (ty1->categ == ty2->categ){
+		//std::cout << "same type \n";
 		return ty1;
+	}
 	else{
+		std::cout << "diff type \n";
 		return T(INT);
 	}
 }

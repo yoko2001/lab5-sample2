@@ -8,6 +8,7 @@ enum ValueType
     VALUE_BOOL,
     VALUE_INT,
     VALUE_CHAR,
+    VALUE_VOID,
     VALUE_STRING,
     COMPOSE_STRUCT,
     COMPOSE_UNION,
@@ -59,6 +60,7 @@ extern Type* TYPE_CONST;
 extern Type* TYPE_POINTER;
 extern Type* TYPE_ARRAY;
 extern Type* TYPE_INT;
+extern Type* TYPE_VOID;
 #endif
 int getSize(Type* type);
 

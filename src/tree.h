@@ -54,7 +54,7 @@ enum NodeType
 
 enum OperatorType
 {
-    OP_EQ,          // ==
+    OP_EQ = 1,          // ==
     OP_N_EQ,        //  !=
     OP_ASSIGN,      // =
     OP_AS_ADDEQ,    // |=
@@ -201,5 +201,4 @@ public:
 
 extern struct TreeNode* null_node;
 bool CanAssign(TreeNode* initializer, _Type ty);
-static _FunctionType currentfty = NULL;
 #endif

@@ -24,6 +24,8 @@ string Type::getTypeInfo() {
             return "unsigned";
         case VALUE_CONST:
             return "const";
+        case VALUE_VOID:
+            return "void";
         default:
             cerr << "shouldn't reach here, typeinfo";
             assert(0);

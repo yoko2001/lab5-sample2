@@ -3,7 +3,7 @@
 #include "exprchck.h"
 #include "stmtchck.h"
 extern TreeNode* null_node;
-
+_FunctionType currentfty;
 int TreeNode::_now_id = 0;
 #define func_all_children(childptr, func) \
     if(!childptr) cout << "none"; \
@@ -576,7 +576,7 @@ void TreeNode::funcTypeDump(){
         char funcname[MAX_ID_LEN] ="";
         func_ret_type->bty = dcl_and_paras->child->NODE_DECL_Dump(func_ret_type->bty, funcname);
         func_ret_type = dcl_and_paras->child->sibling->NODE_PARA_LIST_Dump(func_ret_type);
-        if (func_ret_type->param_types.size() > 0) func_ret_type->hasProto = true;
+        if (func_ret_type->param_types.size() >= 0) func_ret_type->hasProto = true;
         cout <<funcname<< func_ret_type << " func set\n"; 
         this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
         this->sysType = (_Type)func_ret_type;
@@ -645,13 +645,19 @@ void TreeNode::typeCheck(){
     while(son){
         if(son->nodeType == NODE_EXTERN_DECL)
         {
-            //son->tyCheckGlobalDeclaration();
-            //already checked, do nothing
+            if(son->child->nodeType == NODE_EXTERN_FUNC_DECL){
+                //cout << "2checking func: lno@" << son->lineno << endl; 
+                currentfty = (_FunctionType)son->child->sysType;
+                assert(currentfty != NULL);
+                tyCheckStatement(son->child->child->sibling->sibling);
+            }
         }
         else if (son->nodeType == NODE_EXTERN_FUNC_DECL)
         {
+            //cout << "1checking func: lno@" << son->lineno << endl; 
             currentfty = (_FunctionType)son->sysType;
             assert(currentfty != NULL);
+            tyCheckStatement(son->child->sibling->sibling);
         }
         else{
             cout << "root node inner error, expected extern (func) delarations" << endl;
@@ -693,10 +699,13 @@ bool CanAssign(TreeNode* expr, _Type lty){
     _Type rty = expr->sysType;
     lty = UnQualify(lty);
     rty = UnQualify(rty);
+    assert((lty != NULL) &&(rty != NULL));
+    //cout<<expr->nodeID<<"assign "<< lty <<rty << endl;
     /**
      * record type
      */
     if(lty == rty){
+        //cout << expr->nodeID << " same" << endl;
         return 1;
     }
     /**
@@ -712,6 +721,7 @@ bool CanAssign(TreeNode* expr, _Type lty){
 
     if(((IsPtrType(lty) && IsIntType(rty)) || (IsPtrType(rty) && IsIntType(lty))) &&
     (lty->size == rty->size)){
+        cout << "[warning]nodeid " << expr->nodeID << endl;
         printf("[warning] conversion between int and pointer with no explicit cast\n");
         return 1;
     }

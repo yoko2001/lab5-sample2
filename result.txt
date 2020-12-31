@@ -1,260 +1,247 @@
 entering yyparse
 parsed
-lno@:   0  @22      NODE_PROG[ @21 @33 @45 @70 @83 @104 @117 @128 @139 @264  ]
-lno@:   1  @21NODE_EXTERN_DECL[ @19  ]
-lno@:   1  @19      NODE_STMT[ @20 @18  ]declaration
-lno@:   1  @20 NODE_DECL_SPCF[ @1  ]
-lno@:   1  @1               int
-lno@:   1  @18 NODE_DECL_LIST[ @16  ]
-lno@:   1  @16    FATHER_DECL[ @17  ]
-lno@:   1  @17NODE_INIT_DECL_VARS[ @3 @15  ]
-lno@:   1  @3direct DECLARATOR[ @2  ]
-lno@:   1  @2       NODE_VAR variable: a
-lno@:   1  @15               [ @14  ][initializer]
-lno@:   1  @14      NODE_EXPR[ @9 @13  ]
-lno@:   1  @9      NODE_EXPR[ @8  ]
-lno@:   1  @8      NODE_EXPR[ @6 @7  ]
-lno@:   1  @6      NODE_EXPR[ @4 @5  ]+
-lno@:   1  @4     NODE_CONST val: 0
-lno@:   1  @5     NODE_CONST val: 1
-lno@:   1  @7     NODE_CONST val: 2
-lno@:   1  @13      NODE_EXPR[ @12  ]
-lno@:   1  @12      NODE_EXPR[ @10 @11  ]
-lno@:   1  @10     NODE_CONST val: 5
-lno@:   1  @11     NODE_CONST val: 6
-lno@:   2  @33NODE_EXTERN_DECL[ @31  ]
-lno@:   2  @31      NODE_STMT[ @32 @30  ]declaration
-lno@:   2  @32 NODE_DECL_SPCF[ @23  ]
-lno@:   2  @23               int
-lno@:   2  @30 NODE_DECL_LIST[ @28  ]
-lno@:   2  @28    FATHER_DECL[ @29  ]
-lno@:   2  @29NODE_INIT_DECL_VARS[ @25 @27  ]
-lno@:   2  @25direct DECLARATOR[ @24  ]
-lno@:   2  @24       NODE_VAR variable: b
-lno@:   2  @27               [ @26  ][initializer]
-lno@:   2  @26     NODE_CONST val: 1
-lno@:   3  @45NODE_EXTERN_DECL[ @43  ]
-lno@:   3  @43      NODE_STMT[ @44 @42  ]declaration
-lno@:   3  @44 NODE_DECL_SPCF[ @34 @35  ]
-lno@:   3  @34               const
-lno@:   3  @35               int
-lno@:   3  @42 NODE_DECL_LIST[ @40  ]
-lno@:   3  @40    FATHER_DECL[ @41  ]
-lno@:   3  @41NODE_INIT_DECL_VARS[ @37 @39  ]
-lno@:   3  @37direct DECLARATOR[ @36  ]
-lno@:   3  @36       NODE_VAR variable: c
-lno@:   3  @39               [ @38  ][initializer]
-lno@:   3  @38     NODE_CONST val: 1
-lno@:   9  @70NODE_EXTERN_DECL[ @68  ]
-lno@:   9  @68NODE_EXTERN_FUNC_DECL[ @69 @61 @67  ]
-lno@:   9  @69 NODE_DECL_SPCF[ @46  ]
-lno@:   5  @46               int
-lno@:   5  @61direct DECLARATOR[ @59  ]
-lno@:   5  @59    FATHER_DECL[ @60  ]
-lno@:   5  @60 NODE_DECL_FUNC[ @47 @53  ]
-lno@:   5  @47       NODE_VAR variable: f
-lno@:   5  @53 PARA_LIST_NODE[ @51 @57  ]
-lno@:   5  @51      PARA_NODE[ @52 @50  ]
-lno@:   5  @52 NODE_DECL_SPCF[ @48  ]
-lno@:   5  @48               int
-lno@:   5  @50direct DECLARATOR[ @49  ]
-lno@:   5  @49       NODE_VAR variable: a
-lno@:   5  @57      PARA_NODE[ @58 @56  ]
-lno@:   5  @58 NODE_DECL_SPCF[ @54  ]
-lno@:   5  @54               int
-lno@:   5  @56direct DECLARATOR[ @55  ]
-lno@:   5  @55       NODE_VAR variable: b
-lno@:   9  @67      NODE_STMT[ @66  ]compound
-lno@:   8  @66               [ @65  ]
-lno@:   8  @65               [ @64  ]
-lno@:   8  @64      NODE_EXPR[ @62 @63  ]+
-lno@:   8  @62       NODE_VAR variable: a
-lno@:   8  @63       NODE_VAR variable: b
-lno@:  10  @83NODE_EXTERN_DECL[ @81  ]
-lno@:  10  @81      NODE_STMT[ @82 @80  ]declaration
-lno@:  10  @82 NODE_DECL_SPCF[ @71  ]
-lno@:  10  @71               int
-lno@:  10  @80 NODE_DECL_LIST[ @78  ]
-lno@:  10  @78    FATHER_DECL[ @79  ]
-lno@:  10  @79 NODE_DECL_VARS[ @77  ]
-lno@:  10  @77direct DECLARATOR[ @76  ]
-lno@:  10  @76               [ @74 @75  ]array ofarray of
-lno@:  10  @74               [ @72 @73  ]array of
-lno@:  10  @72       NODE_VAR variable: bb
-lno@:  10  @73     NODE_CONST val: 10
-lno@:  10  @75     NODE_CONST val: 5
+lno@:   0  @21      NODE_PROG[ @20 @32 @44 @69 @82 @93 @104 @251  ]
+lno@:   1  @20NODE_EXTERN_DECL[ @18  ]
+lno@:   1  @18      NODE_STMT[ @19 @17  ]declaration
+lno@:   1  @19 NODE_DECL_SPCF[ @0  ]
+lno@:   1  @0               int
+lno@:   1  @17 NODE_DECL_LIST[ @15  ]
+lno@:   1  @15    FATHER_DECL[ @16  ]
+lno@:   1  @16NODE_INIT_DECL_VARS[ @2 @14  ]
+lno@:   1  @2direct DECLARATOR[ @1  ]
+lno@:   1  @1       NODE_VAR variable: a
+lno@:   1  @14               [ @13  ][initializer]
+lno@:   1  @13      NODE_EXPR[ @8 @12  ]
+lno@:   1  @8      NODE_EXPR[ @7  ]
+lno@:   1  @7      NODE_EXPR[ @5 @6  ]
+lno@:   1  @5      NODE_EXPR[ @3 @4  ]+
+lno@:   1  @3     NODE_CONST val: 0
+lno@:   1  @4     NODE_CONST val: 1
+lno@:   1  @6     NODE_CONST val: 2
+lno@:   1  @12      NODE_EXPR[ @11  ]
+lno@:   1  @11      NODE_EXPR[ @9 @10  ]
+lno@:   1  @9     NODE_CONST val: 5
+lno@:   1  @10     NODE_CONST val: 6
+lno@:   2  @32NODE_EXTERN_DECL[ @30  ]
+lno@:   2  @30      NODE_STMT[ @31 @29  ]declaration
+lno@:   2  @31 NODE_DECL_SPCF[ @22  ]
+lno@:   2  @22               int
+lno@:   2  @29 NODE_DECL_LIST[ @27  ]
+lno@:   2  @27    FATHER_DECL[ @28  ]
+lno@:   2  @28NODE_INIT_DECL_VARS[ @24 @26  ]
+lno@:   2  @24direct DECLARATOR[ @23  ]
+lno@:   2  @23       NODE_VAR variable: b
+lno@:   2  @26               [ @25  ][initializer]
+lno@:   2  @25     NODE_CONST val: 1
+lno@:   3  @44NODE_EXTERN_DECL[ @42  ]
+lno@:   3  @42      NODE_STMT[ @43 @41  ]declaration
+lno@:   3  @43 NODE_DECL_SPCF[ @33 @34  ]
+lno@:   3  @33               const
+lno@:   3  @34               int
+lno@:   3  @41 NODE_DECL_LIST[ @39  ]
+lno@:   3  @39    FATHER_DECL[ @40  ]
+lno@:   3  @40NODE_INIT_DECL_VARS[ @36 @38  ]
+lno@:   3  @36direct DECLARATOR[ @35  ]
+lno@:   3  @35       NODE_VAR variable: c
+lno@:   3  @38               [ @37  ][initializer]
+lno@:   3  @37     NODE_CONST val: 1
+lno@:   8  @69NODE_EXTERN_DECL[ @67  ]
+lno@:   8  @67NODE_EXTERN_FUNC_DECL[ @68 @60 @66  ]
+lno@:   8  @68 NODE_DECL_SPCF[ @45  ]
+lno@:   4  @45               int
+lno@:   4  @60direct DECLARATOR[ @58  ]
+lno@:   4  @58    FATHER_DECL[ @59  ]
+lno@:   4  @59 NODE_DECL_FUNC[ @46 @52  ]
+lno@:   4  @46       NODE_VAR variable: f
+lno@:   4  @52 PARA_LIST_NODE[ @50 @56  ]
+lno@:   4  @50      PARA_NODE[ @51 @49  ]
+lno@:   4  @51 NODE_DECL_SPCF[ @47  ]
+lno@:   4  @47               int
+lno@:   4  @49direct DECLARATOR[ @48  ]
+lno@:   4  @48       NODE_VAR variable: a
+lno@:   4  @56      PARA_NODE[ @57 @55  ]
+lno@:   4  @57 NODE_DECL_SPCF[ @53  ]
+lno@:   4  @53               int
+lno@:   4  @55direct DECLARATOR[ @54  ]
+lno@:   4  @54       NODE_VAR variable: b
+lno@:   8  @66      NODE_STMT[ @65  ]compound
+lno@:   7  @65               [ @64  ]
+lno@:   7  @64      NODE_STMT[ @63  ][RETURN]
+lno@:   7  @63      NODE_EXPR[ @61 @62  ]+
+lno@:   7  @61       NODE_VAR variable: a
+lno@:   7  @62       NODE_VAR variable: b
+lno@:   9  @82NODE_EXTERN_DECL[ @80  ]
+lno@:   9  @80      NODE_STMT[ @81 @79  ]declaration
+lno@:   9  @81 NODE_DECL_SPCF[ @70  ]
+lno@:   9  @70               int
+lno@:   9  @79 NODE_DECL_LIST[ @77  ]
+lno@:   9  @77    FATHER_DECL[ @78  ]
+lno@:   9  @78 NODE_DECL_VARS[ @76  ]
+lno@:   9  @76direct DECLARATOR[ @75  ]
+lno@:   9  @75               [ @73 @74  ]array ofarray of
+lno@:   9  @73               [ @71 @72  ]array of
+lno@:   9  @71       NODE_VAR variable: bb
+lno@:   9  @72     NODE_CONST val: 10
+lno@:   9  @74     NODE_CONST val: 5
+lno@:  10  @93NODE_EXTERN_DECL[ @91  ]
+lno@:  10  @91      NODE_STMT[ @92 @90  ]declaration
+lno@:  10  @92 NODE_DECL_SPCF[ @83  ]
+lno@:  10  @83               int
+lno@:  10  @90 NODE_DECL_LIST[ @88  ]
+lno@:  10  @88    FATHER_DECL[ @89  ]
+lno@:  10  @89 NODE_DECL_VARS[ @87  ]
+lno@:  10  @87   PT_DECL_NODE[ @86  ]
+lno@:  10  @86direct DECLARATOR[ @84  ]
+lno@:  10  @84       NODE_VAR variable: pt
 lno@:  11  @104NODE_EXTERN_DECL[ @102  ]
 lno@:  11  @102      NODE_STMT[ @103 @101  ]declaration
-lno@:  11  @103 NODE_DECL_SPCF[ @84  ]
-lno@:  11  @84               int
+lno@:  11  @103 NODE_DECL_SPCF[ @94  ]
+lno@:  11  @94               int
 lno@:  11  @101 NODE_DECL_LIST[ @99  ]
 lno@:  11  @99    FATHER_DECL[ @100  ]
-lno@:  11  @100NODE_INIT_DECL_VARS[ @88 @98  ]
-lno@:  11  @88direct DECLARATOR[ @87  ]
-lno@:  11  @87               [ @85 @86  ]array of
-lno@:  11  @85       NODE_VAR variable: name
-lno@:  11  @86     NODE_CONST val: 20
-lno@:  11  @98               [ @90 @93 @95 @97  ][initializer]
-lno@:  11  @90               [ @89  ][initializer]
-lno@:  11  @89     NODE_CONST val: 2
-lno@:  11  @93               [ @92  ][initializer]
-lno@:  11  @92               [ @91  ][initializer]
-lno@:  11  @91     NODE_CONST val: 3
-lno@:  11  @95               [ @94  ][initializer]
-lno@:  11  @94     NODE_CONST val: 4
-lno@:  11  @97               [ @96  ][initializer]
-lno@:  11  @96     NODE_CONST val: 5
-lno@:  12  @117NODE_EXTERN_DECL[ @115  ]
-lno@:  12  @115      NODE_STMT[ @116 @114  ]declaration
-lno@:  12  @116 NODE_DECL_SPCF[ @105  ]
-lno@:  12  @105               char
-lno@:  12  @114 NODE_DECL_LIST[ @112  ]
-lno@:  12  @112    FATHER_DECL[ @113  ]
-lno@:  12  @113NODE_INIT_DECL_VARS[ @109 @111  ]
-lno@:  12  @109direct DECLARATOR[ @108  ]
-lno@:  12  @108               [ @106 @107  ]array of
-lno@:  12  @106       NODE_VAR variable: str
-lno@:  12  @107     NODE_CONST val: 10
-lno@:  12  @111               [ @110  ][initializer]
-lno@:  12  @110     NODE_CONST : qwert
-lno@:  13  @128NODE_EXTERN_DECL[ @126  ]
-lno@:  13  @126      NODE_STMT[ @127 @125  ]declaration
-lno@:  13  @127 NODE_DECL_SPCF[ @118  ]
-lno@:  13  @118               int
-lno@:  13  @125 NODE_DECL_LIST[ @123  ]
-lno@:  13  @123    FATHER_DECL[ @124  ]
-lno@:  13  @124 NODE_DECL_VARS[ @122  ]
-lno@:  13  @122   PT_DECL_NODE[ @121  ]
-lno@:  13  @121direct DECLARATOR[ @119  ]
-lno@:  13  @119       NODE_VAR variable: pt
-lno@:  14  @139NODE_EXTERN_DECL[ @137  ]
-lno@:  14  @137      NODE_STMT[ @138 @136  ]declaration
-lno@:  14  @138 NODE_DECL_SPCF[ @129  ]
-lno@:  14  @129               int
-lno@:  14  @136 NODE_DECL_LIST[ @134  ]
-lno@:  14  @134    FATHER_DECL[ @135  ]
-lno@:  14  @135NODE_INIT_DECL_VARS[ @131 @133  ]
-lno@:  14  @131direct DECLARATOR[ @130  ]
-lno@:  14  @130       NODE_VAR variable: i
-lno@:  14  @133               [ @132  ][initializer]
-lno@:  14  @132     NODE_CONST val: 0
-lno@:  38  @264NODE_EXTERN_DECL[ @262  ]
-lno@:  38  @262NODE_EXTERN_FUNC_DECL[ @263 @145 @261  ]
-lno@:  38  @263 NODE_DECL_SPCF[ @140  ]
-lno@:  16  @140               int
-lno@:  16  @145direct DECLARATOR[ @142  ]
-lno@:  16  @142    FATHER_DECL[ @143  ]
-lno@:  16  @143 NODE_DECL_FUNC[ @141 @144  ]
-lno@:  16  @141       NODE_VAR variable: main
-lno@:  16  @144 PARA_LIST_NODE
-lno@:  38  @261      NODE_STMT[ @154  ]compound
-lno@:  17  @154               [ @152 @202 @212 @217 @249 @260  ]
-lno@:  17  @152      NODE_STMT[ @153 @151  ]declaration
-lno@:  17  @153 NODE_DECL_SPCF[ @146  ]
-lno@:  17  @146               int
-lno@:  17  @151 NODE_DECL_LIST[ @149  ]
-lno@:  17  @149    FATHER_DECL[ @150  ]
-lno@:  17  @150 NODE_DECL_VARS[ @148  ]
-lno@:  17  @148direct DECLARATOR[ @147  ]
-lno@:  17  @147       NODE_VAR variable: i
-lno@:  24  @202      NODE_STMT[ @162 @200  ]select
-lno@:  18  @162      NODE_EXPR[ @161  ]
-lno@:  18  @161      NODE_EXPR[ @155 @160  ]=
-lno@:  18  @155       NODE_VAR variable: a
-lno@:  18  @160      NODE_EXPR[ @159  ]
-lno@:  18  @159      NODE_EXPR[ @157 @158  ]
-lno@:  18  @157       NODE_VAR variable: c
-lno@:  18  @158     NODE_CONST val: 1
-lno@:  23  @200      NODE_STMT[ @172  ]compound
-lno@:  19  @172               [ @170 @185 @198  ]
-lno@:  19  @170      NODE_STMT[ @171 @169  ]declaration
-lno@:  19  @171 NODE_DECL_SPCF[ @163 @164  ]
-lno@:  19  @163               unsigned
-lno@:  19  @164               int
-lno@:  19  @169 NODE_DECL_LIST[ @167  ]
-lno@:  19  @167    FATHER_DECL[ @168  ]
-lno@:  19  @168 NODE_DECL_VARS[ @166  ]
-lno@:  19  @166direct DECLARATOR[ @165  ]
-lno@:  19  @165       NODE_VAR variable: h
-lno@:  21  @185      NODE_EXPR[ @184  ]
-lno@:  21  @184      NODE_EXPR[ @173 @183  ]=
-lno@:  21  @173       NODE_VAR variable: h
-lno@:  21  @183      NODE_EXPR[ @179 @182  ]
-lno@:  21  @179      NODE_EXPR[ @175 @177  ]
-lno@:  21  @175       NODE_VAR variable: f
-lno@:  21  @177               [ @176 @178  ]
-lno@:  21  @176       NODE_VAR variable: b
-lno@:  21  @178       NODE_VAR variable: c
-lno@:  21  @182      NODE_EXPR[ @180 @181  ]
-lno@:  21  @180     NODE_CONST val: 12
-lno@:  21  @181     NODE_CONST val: 8
-lno@:  22  @198      NODE_STMT[ @199 @197  ]declaration
-lno@:  22  @199 NODE_DECL_SPCF[ @186  ]
-lno@:  22  @186               int
-lno@:  22  @197 NODE_DECL_LIST[ @195  ]
-lno@:  22  @195    FATHER_DECL[ @196  ]
-lno@:  22  @196NODE_INIT_DECL_VARS[ @188 @194  ]
-lno@:  22  @188direct DECLARATOR[ @187  ]
-lno@:  22  @187       NODE_VAR variable: jj
-lno@:  22  @194               [ @193  ][initializer]
-lno@:  22  @193      NODE_EXPR[ @191 @192  ]
-lno@:  22  @191      NODE_EXPR[ @189 @190  ]+
-lno@:  22  @189       NODE_VAR variable: b
-lno@:  22  @190       NODE_VAR variable: c
-lno@:  22  @192     NODE_CONST val: 1
-lno@:  24  @212      NODE_EXPR[ @211  ]
-lno@:  24  @211      NODE_EXPR[ @208 @210  ]=
-lno@:  24  @208      NODE_EXPR[ @205 @207  ][]
-lno@:  24  @205      NODE_EXPR[ @201 @204  ][]
-lno@:  24  @201       NODE_VAR variable: b
-lno@:  24  @204      NODE_EXPR[ @203  ]
-lno@:  24  @203     NODE_CONST val: 0
-lno@:  24  @207      NODE_EXPR[ @206  ]
-lno@:  24  @206     NODE_CONST val: 1
-lno@:  24  @210     NODE_CONST val: 1
-lno@:  26  @217      NODE_EXPR[ @216  ]
-lno@:  26  @216      NODE_EXPR[ @213 @215  ]=
-lno@:  26  @213       NODE_VAR variable: pt
-lno@:  26  @215     NODE_CONST val: 0
-lno@:  32  @249               [ @222 @226 @229 @248  ][iteration for]
-lno@:  27  @222      NODE_EXPR[ @221  ]
-lno@:  27  @221      NODE_EXPR[ @218 @220  ]=
-lno@:  27  @218       NODE_VAR variable: i
-lno@:  27  @220     NODE_CONST val: 0
-lno@:  27  @226      NODE_EXPR[ @225  ]
-lno@:  27  @225      NODE_EXPR[ @223 @224  ]
-lno@:  27  @223       NODE_VAR variable: i
-lno@:  27  @224     NODE_CONST val: 25
-lno@:  27  @229      NODE_EXPR[ @228  ]
-lno@:  27  @228      NODE_EXPR[ @227  ]
-lno@:  27  @227       NODE_VAR variable: i
-lno@:  32  @248      NODE_STMT[ @239  ]compound
-lno@:  29  @239               [ @238 @246 @247  ]
-lno@:  29  @238      NODE_EXPR[ @237  ]
-lno@:  29  @237      NODE_EXPR[ @230 @236  ]=
-lno@:  29  @230       NODE_VAR variable: a
-lno@:  29  @236      NODE_EXPR[ @232 @234  ]
-lno@:  29  @232       NODE_VAR variable: f
-lno@:  29  @234               [ @233 @235  ]
-lno@:  29  @233       NODE_VAR variable: i
-lno@:  29  @235     NODE_CONST val: 1
-lno@:  30  @246      NODE_EXPR[ @245  ]
-lno@:  30  @245      NODE_EXPR[ @240 @243  ]=
-lno@:  30  @240       NODE_VAR variable: b
-lno@:  30  @243      NODE_EXPR[ @242 @244  ]
-lno@:  30  @242       NODE_VAR variable: f
-lno@:  30  @244               
-lno@:  31  @247               [CONTINUE]
-lno@:  37  @260               [ @251 @259  ][iteration while]
-lno@:  34  @251      NODE_EXPR[ @250  ]
-lno@:  34  @250       NODE_VAR variable: i
-lno@:  37  @259      NODE_STMT[ @257  ]compound
-lno@:  35  @257               [ @256 @258  ]
-lno@:  35  @256      NODE_EXPR[ @255  ]
-lno@:  35  @255      NODE_EXPR[ @252 @254  ]=
-lno@:  35  @252       NODE_VAR variable: a
-lno@:  35  @254     NODE_CONST val: 0
-lno@:  36  @258               [BREAK]
+lno@:  11  @100NODE_INIT_DECL_VARS[ @96 @98  ]
+lno@:  11  @96direct DECLARATOR[ @95  ]
+lno@:  11  @95       NODE_VAR variable: i
+lno@:  11  @98               [ @97  ][initializer]
+lno@:  11  @97     NODE_CONST val: 0
+lno@:  38  @251NODE_EXTERN_DECL[ @249  ]
+lno@:  38  @249NODE_EXTERN_FUNC_DECL[ @250 @110 @248  ]
+lno@:  38  @250 NODE_DECL_SPCF[ @105  ]
+lno@:  13  @105               int
+lno@:  13  @110direct DECLARATOR[ @107  ]
+lno@:  13  @107    FATHER_DECL[ @108  ]
+lno@:  13  @108 NODE_DECL_FUNC[ @106 @109  ]
+lno@:  13  @106       NODE_VAR variable: main
+lno@:  13  @109 PARA_LIST_NODE
+lno@:  38  @248      NODE_STMT[ @119  ]compound
+lno@:  14  @119               [ @117 @181 @183 @198 @235 @247  ]
+lno@:  14  @117      NODE_STMT[ @118 @116  ]declaration
+lno@:  14  @118 NODE_DECL_SPCF[ @111  ]
+lno@:  14  @111               int
+lno@:  14  @116 NODE_DECL_LIST[ @114  ]
+lno@:  14  @114    FATHER_DECL[ @115  ]
+lno@:  14  @115 NODE_DECL_VARS[ @113  ]
+lno@:  14  @113direct DECLARATOR[ @112  ]
+lno@:  14  @112       NODE_VAR variable: i
+lno@:  22  @181      NODE_STMT[ @127 @166 @180  ]select
+lno@:  15  @127      NODE_EXPR[ @126  ]
+lno@:  15  @126      NODE_EXPR[ @120 @125  ]=
+lno@:  15  @120       NODE_VAR variable: a
+lno@:  15  @125      NODE_EXPR[ @124  ]
+lno@:  15  @124      NODE_EXPR[ @122 @123  ]
+lno@:  15  @122       NODE_VAR variable: c
+lno@:  15  @123     NODE_CONST val: 1
+lno@:  20  @166      NODE_STMT[ @137  ]compound
+lno@:  16  @137               [ @135 @151 @164  ]
+lno@:  16  @135      NODE_STMT[ @136 @134  ]declaration
+lno@:  16  @136 NODE_DECL_SPCF[ @128 @129  ]
+lno@:  16  @128               unsigned
+lno@:  16  @129               int
+lno@:  16  @134 NODE_DECL_LIST[ @132  ]
+lno@:  16  @132    FATHER_DECL[ @133  ]
+lno@:  16  @133 NODE_DECL_VARS[ @131  ]
+lno@:  16  @131direct DECLARATOR[ @130  ]
+lno@:  16  @130       NODE_VAR variable: h
+lno@:  18  @151      NODE_STMT[ @150  ]EXPRESSION
+lno@:  18  @150      NODE_EXPR[ @149  ]
+lno@:  18  @149      NODE_EXPR[ @138 @148  ]=
+lno@:  18  @138       NODE_VAR variable: h
+lno@:  18  @148      NODE_EXPR[ @144 @147  ]
+lno@:  18  @144      NODE_EXPR[ @140 @142  ]
+lno@:  18  @140       NODE_VAR variable: f
+lno@:  18  @142               [ @141 @143  ]
+lno@:  18  @141       NODE_VAR variable: b
+lno@:  18  @143       NODE_VAR variable: c
+lno@:  18  @147      NODE_EXPR[ @145 @146  ]
+lno@:  18  @145     NODE_CONST val: 12
+lno@:  18  @146     NODE_CONST val: 8
+lno@:  19  @164      NODE_STMT[ @165 @163  ]declaration
+lno@:  19  @165 NODE_DECL_SPCF[ @152  ]
+lno@:  19  @152               int
+lno@:  19  @163 NODE_DECL_LIST[ @161  ]
+lno@:  19  @161    FATHER_DECL[ @162  ]
+lno@:  19  @162NODE_INIT_DECL_VARS[ @154 @160  ]
+lno@:  19  @154direct DECLARATOR[ @153  ]
+lno@:  19  @153       NODE_VAR variable: jj
+lno@:  19  @160               [ @159  ][initializer]
+lno@:  19  @159      NODE_EXPR[ @157 @158  ]
+lno@:  19  @157      NODE_EXPR[ @155 @156  ]+
+lno@:  19  @155       NODE_VAR variable: b
+lno@:  19  @156       NODE_VAR variable: c
+lno@:  19  @158     NODE_CONST val: 1
+lno@:  22  @180      NODE_STMT[ @179  ]compound
+lno@:  21  @179               [ @178  ]
+lno@:  21  @178      NODE_STMT[ @177  ]EXPRESSION
+lno@:  21  @177      NODE_EXPR[ @176  ]
+lno@:  21  @176      NODE_EXPR[ @167 @175  ]=
+lno@:  21  @167       NODE_VAR variable: i
+lno@:  21  @175      NODE_EXPR[ @173 @174  ]
+lno@:  21  @173      NODE_EXPR[ @169 @171  ]
+lno@:  21  @169       NODE_VAR variable: f
+lno@:  21  @171               [ @170 @172  ]
+lno@:  21  @170       NODE_VAR variable: b
+lno@:  21  @172       NODE_VAR variable: c
+lno@:  21  @174     NODE_CONST val: 1
+lno@:  23  @183      NODE_STMT[ @184 @185 @186  ]for NULL
+lno@:  -1  @184               
+lno@:  -1  @185               
+lno@:  -1  @186               
+lno@:  24  @198      NODE_STMT[ @197  ]EXPRESSION
+lno@:  24  @197      NODE_EXPR[ @196  ]
+lno@:  24  @196      NODE_EXPR[ @193 @195  ]=
+lno@:  24  @193      NODE_EXPR[ @190 @192  ][]
+lno@:  24  @190      NODE_EXPR[ @187 @189  ][]
+lno@:  24  @187       NODE_VAR variable: bb
+lno@:  24  @189      NODE_EXPR[ @188  ]
+lno@:  24  @188     NODE_CONST val: 0
+lno@:  24  @192      NODE_EXPR[ @191  ]
+lno@:  24  @191     NODE_CONST val: 1
+lno@:  24  @195     NODE_CONST val: 1
+lno@:  32  @235      NODE_STMT[ @203 @207 @210 @234  ]for
+lno@:  27  @203      NODE_EXPR[ @202  ]
+lno@:  27  @202      NODE_EXPR[ @199 @201  ]=
+lno@:  27  @199       NODE_VAR variable: i
+lno@:  27  @201     NODE_CONST val: 0
+lno@:  27  @207      NODE_EXPR[ @206  ]
+lno@:  27  @206      NODE_EXPR[ @204 @205  ]
+lno@:  27  @204       NODE_VAR variable: i
+lno@:  27  @205     NODE_CONST val: 25
+lno@:  27  @210      NODE_EXPR[ @209  ]
+lno@:  27  @209      NODE_EXPR[ @208  ]
+lno@:  27  @208       NODE_VAR variable: i
+lno@:  32  @234      NODE_STMT[ @221  ]compound
+lno@:  29  @221               [ @220 @232 @233  ]
+lno@:  29  @220      NODE_STMT[ @219  ]EXPRESSION
+lno@:  29  @219      NODE_EXPR[ @218  ]
+lno@:  29  @218      NODE_EXPR[ @211 @217  ]=
+lno@:  29  @211       NODE_VAR variable: a
+lno@:  29  @217      NODE_EXPR[ @213 @215  ]
+lno@:  29  @213       NODE_VAR variable: f
+lno@:  29  @215               [ @214 @216  ]
+lno@:  29  @214       NODE_VAR variable: i
+lno@:  29  @216     NODE_CONST val: 1
+lno@:  30  @232      NODE_STMT[ @231  ]EXPRESSION
+lno@:  30  @231      NODE_EXPR[ @230  ]
+lno@:  30  @230      NODE_EXPR[ @222 @229  ]=
+lno@:  30  @222       NODE_VAR variable: b
+lno@:  30  @229      NODE_EXPR[ @224 @226  ]
+lno@:  30  @224       NODE_VAR variable: f
+lno@:  30  @226               [ @225 @227 @228  ]
+lno@:  30  @225     NODE_CONST val: 1
+lno@:  30  @227     NODE_CONST val: 2
+lno@:  30  @228     NODE_CONST val: 3
+lno@:  31  @233      NODE_STMT[CONTINUE]
+lno@:  37  @247      NODE_STMT[ @237 @246  ]while
+lno@:  34  @237      NODE_EXPR[ @236  ]
+lno@:  34  @236       NODE_VAR variable: i
+lno@:  37  @246      NODE_STMT[ @244  ]compound
+lno@:  35  @244               [ @243 @245  ]
+lno@:  35  @243      NODE_STMT[ @242  ]EXPRESSION
+lno@:  35  @242      NODE_EXPR[ @241  ]
+lno@:  35  @241      NODE_EXPR[ @238 @240  ]=
+lno@:  35  @238       NODE_VAR variable: a
+lno@:  35  @240     NODE_CONST val: 0
+lno@:  36  @245      NODE_STMT[BREAK]
 setting up type system
 start domain dump
 born_son_domain NODE_EXTERN_FUNC_DECL
@@ -262,135 +249,100 @@ born_son_domain NODE_EXTERN_FUNC_DECL
 born_son_domain STMT_COMPOUND
 born_son_domain STMT_COMPOUND
 born_son_domain STMT_COMPOUND
+born_son_domain STMT_COMPOUND
 basic size of type is: 4
-16
+15
 NODE_INIT_DECL_VARS
-a return type set to type @0x6174e0
 domain: 0, added element: a pos: 1
 decl node's size of type is: 4
 basic size of type is: 4
-28
+27
 NODE_INIT_DECL_VARS
-b return type set to type @0x6174e0
 domain: 0, added element: b pos: 2
 decl node's size of type is: 4
 basic size of type is: 4
-40
+39
 NODE_INIT_DECL_VARS
-c return type set to type @0x89e9d0
 domain: 0, added element: c pos: 3
 decl node's size of type is: 4
 basic size of type is: 4
-78
+77
 NODE_DECL_VARS
 got array len 5of size: 4
 got array len 10of size: 20
-bb return type set to type @0x89ed40
-domain: 0, added element: bb pos: 10
+domain: 0, added element: bb pos: 9
 decl node's size of type is: 200
+basic size of type is: 4
+88
+NODE_DECL_VARS
+pointer
+domain: 0, added element: pt pos: 10
+decl node's size of type is: 4
 basic size of type is: 4
 99
 NODE_INIT_DECL_VARS
-got array len 20of size: 4
-name return type set to type @0x89edb0
-domain: 0, added element: name pos: 11
-decl node's size of type is: 80
-basic size of type is: 1
-112
-NODE_INIT_DECL_VARS
-got array len 10of size: 1
-str return type set to type @0x89ec50
-domain: 0, added element: str pos: 12
-decl node's size of type is: 10
+domain: 0, added element: i pos: 11
+decl node's size of type is: 4
 basic size of type is: 4
-123
+114
 NODE_DECL_VARS
-pointer
-domain: 0, added element: pt pos: 13
+domain: 2, added element: i pos: 14
 decl node's size of type is: 4
 basic size of type is: 4
-134
-NODE_INIT_DECL_VARS
-i return type set to type @0x6174e0
-domain: 0, added element: i pos: 14
-decl node's size of type is: 4
-basic size of type is: 4
-149
+132
 NODE_DECL_VARS
-i return type set to type @0x6174e0
-domain: 2, added element: i pos: 17
+domain: 3, added element: h pos: 16
 decl node's size of type is: 4
 basic size of type is: 4
-167
-NODE_DECL_VARS
-h return type set to type @0x6174f0
-domain: 3, added element: h pos: 19
-decl node's size of type is: 4
-basic size of type is: 4
-195
+161
 NODE_INIT_DECL_VARS
-jj return type set to type @0x6174e0
-domain: 3, added element: jj pos: 22
+domain: 3, added element: jj pos: 19
 decl node's size of type is: 4
-f return type set to type @0x6174e0
-domain: 1, added element: a pos: 5
+domain: 1, added element: a pos: 4
 para size: 4
-domain: 1, added element: b pos: 5
+domain: 1, added element: b pos: 4
 para size: 4
-f0x89f090 func set
-domain: 0, added element: f pos: 9
-main return type set to type @0x6174e0
-main0x89f120 func set
+f0x8aa5c0 func set
+domain: 0, added element: f pos: 8
+main0x8aab10 func set
 domain: 0, added element: main pos: 38
-a
-b
-c
-bb
-name
-str
-pt
-i
-f
-main
-a
-b
-i
-h
-jj
-a pos: 1 sysType: 0x6174e0 dm: 0
-b pos: 2 sysType: 0x6174e0 dm: 0
-c pos: 3 sysType: 0x89e9d0 dm: 0
-f pos: 5 sysType: 0x89f090 dm: 0
-a pos: 5 sysType: 0x6174e0 dm: 1
-b pos: 5 sysType: 0x6174e0 dm: 1
-a pos: 8 sysType: 0x6174e0 dm: 1
-b pos: 8 sysType: 0x6174e0 dm: 1
-bb pos: 10 sysType: 0x89ed40 dm: 0
-name pos: 11 sysType: 0x89edb0 dm: 0
-str pos: 12 sysType: 0x89ec50 dm: 0
-pt pos: 13 sysType: 0x89ecc0 dm: 0
-i pos: 14 sysType: 0x6174e0 dm: 0
-main pos: 16 sysType: 0x89f120 dm: 0
-i pos: 17 sysType: 0x6174e0 dm: 2
-a pos: 18 sysType: 0x6174e0 dm: 0
-c pos: 18 sysType: 0x89e9d0 dm: 0
-h pos: 19 sysType: 0x6174f0 dm: 3
-h pos: 21 sysType: 0x6174f0 dm: 3
-f pos: 21 sysType: 0x89f090 dm: 0
-b pos: 21 sysType: 0x6174e0 dm: 0
-c pos: 21 sysType: 0x89e9d0 dm: 0
-jj pos: 22 sysType: 0x6174e0 dm: 3
-b pos: 22 sysType: 0x6174e0 dm: 0
-c pos: 22 sysType: 0x89e9d0 dm: 0
-b pos: 24 sysType: 0x6174e0 dm: 0
-pt pos: 26 sysType: 0x89ecc0 dm: 0
-i pos: 27 sysType: 0x6174e0 dm: 2
-i pos: 27 sysType: 0x6174e0 dm: 2
-i pos: 27 sysType: 0x6174e0 dm: 2
-a pos: 29 sysType: 0x6174e0 dm: 0
-f pos: 29 sysType: 0x89f090 dm: 0
-i pos: 29 sysType: 0x6174e0 dm: 2
-b pos: 30 sysType: 0x6174e0 dm: 0
-f pos: 30 sysType: 0x89f090 dm: 0
-i pos: 34 sysType: 0x6174e0 dm: 2
-a pos: 35 sysType: 0x6174e0 dm: 0
+a pos: 1 sysType: 0x61b500 dm: 0
+b pos: 2 sysType: 0x61b500 dm: 0
+c pos: 3 sysType: 0x8aa260 dm: 0
+f pos: 4 sysType: 0x8aa5c0 dm: 0
+a pos: 4 sysType: 0x61b500 dm: 1
+b pos: 4 sysType: 0x61b500 dm: 1
+a pos: 7 sysType: 0x61b500 dm: 1
+b pos: 7 sysType: 0x61b500 dm: 1
+bb pos: 9 sysType: 0x8aa480 dm: 0
+pt pos: 10 sysType: 0x8aa4a0 dm: 0
+i pos: 11 sysType: 0x61b500 dm: 0
+main pos: 13 sysType: 0x8aab10 dm: 0
+i pos: 14 sysType: 0x61b500 dm: 2
+a pos: 15 sysType: 0x61b500 dm: 0
+c pos: 15 sysType: 0x8aa260 dm: 0
+h pos: 16 sysType: 0x61b510 dm: 3
+h pos: 18 sysType: 0x61b510 dm: 3
+f pos: 18 sysType: 0x8aa5c0 dm: 0
+b pos: 18 sysType: 0x61b500 dm: 0
+c pos: 18 sysType: 0x8aa260 dm: 0
+jj pos: 19 sysType: 0x61b500 dm: 3
+b pos: 19 sysType: 0x61b500 dm: 0
+c pos: 19 sysType: 0x8aa260 dm: 0
+i pos: 21 sysType: 0x61b500 dm: 2
+f pos: 21 sysType: 0x8aa5c0 dm: 0
+b pos: 21 sysType: 0x61b500 dm: 0
+c pos: 21 sysType: 0x8aa260 dm: 0
+bb pos: 24 sysType: 0x8aa480 dm: 0
+i pos: 27 sysType: 0x61b500 dm: 2
+i pos: 27 sysType: 0x61b500 dm: 2
+i pos: 27 sysType: 0x61b500 dm: 2
+a pos: 29 sysType: 0x61b500 dm: 0
+f pos: 29 sysType: 0x8aa5c0 dm: 0
+i pos: 29 sysType: 0x61b500 dm: 2
+b pos: 30 sysType: 0x61b500 dm: 0
+f pos: 30 sysType: 0x8aa5c0 dm: 0
+i pos: 34 sysType: 0x61b500 dm: 2
+a pos: 35 sysType: 0x61b500 dm: 0
+final type Check:
+function receives too many arguments, line30

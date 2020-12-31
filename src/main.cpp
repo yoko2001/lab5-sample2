@@ -1,6 +1,6 @@
 #include "common.h"
 #include <fstream>
-
+ofstream iro;
 extern TreeNode *root;
 extern FILE *yyin;
 extern int yyparse();
@@ -14,10 +14,12 @@ Type* TYPE_UNSIGNED = new Type(VALUE_UNSIGNED);
 Type* TYPE_CONST = new Type(VALUE_CONST);
 Type* TYPE_POINTER = new Type(VALUE_POINTER);
 Type* TYPE_ARRAY = new Type(VALUE_ARRAY);
-TreeNode* null_node = new TreeNode(-1, NODE_NULL);
+Type* TYPE_VOID = new Type(VALUE_VOID);
+
 _domain *d_root;
 int main(int argc, char *argv[])
 {
+    iro.open("ir.out", ios::out | ios::trunc);
     d_root = new _domain();
     if (argc == 2)
     {
@@ -42,10 +44,22 @@ int main(int argc, char *argv[])
     root->domain = d_root;
     //if (root->domain->type == global) cout << "ok\n";
     root->domain_dump();
+
+    //declaration check
     SetupTypeSystem();
     root->typeDump();
     root->funcTypeDump();
+    
+    //identifier check and link
     root->redefCheck();
     root->tyCheckUndef();
+
+    cout << "final type Check:\n";
+    //expression & statements check
+    root->typeCheck();
+
+
+    //close
+    iro.close();
     return 0;
 }

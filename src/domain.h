@@ -3,10 +3,19 @@
 #include<vector>
 #include<iostream>
 #include "djl_type.h"
+
+//domain element kind
+enum {
+    DEK_Tag, DEK_Constant, DEK_variable, DEK_Temp, DEK_Offset, 
+    DEK_String, DEK_label, DEK_function, DEK_Register,
+};
+
 typedef struct _domain_elem{
     std::string s;  //name
     int pos;        //lineno
     _Type ty;       //sysType
+    int kind;
+    struct _domain* dm;
     bool defined;   //if just declared or already defined
     _domain_elem(std::string s, int p, _Type ty):s(s), pos(p), ty(ty){}
 } domain_elem;

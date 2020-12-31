@@ -6,4 +6,5 @@
 #include"error.h"
 bool tyCheckExpression(TreeNode* init);
 void Cast(TreeNode* expr, _Type ty);
+bool tyAdjust(TreeNode* n, int rvalue);
 #endif

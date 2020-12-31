@@ -2,15 +2,17 @@
     #include "common.h"
     #include "tree.h"
     #include "domain.h"
+    #include "inter.h"
     #define YYSTYPE TreeNode *  
     TreeNode* root;
+    BBlock currentBB;
     extern int lineno;
     extern domain* d_root;
     int yylex();
     int yyerror( char const * );
     
 %}
-%token T_CHAR T_INT T_STRING T_BOOL 
+%token T_CHAR T_INT T_STRING T_BOOL T_VOID
 
 %token LO_EQ LO_N_EQ RO_AS_ADDEQ RO_AS_SUBEQ RO_AS_MULEQ RO_AS_DIVEQ RO_AS_SFTL_EQ
 
@@ -86,19 +88,23 @@ statement:
 
 jump-statement:
     KW_BREAK SEMICOLON{
-    TreeNode* node = new TreeNode(lineno, NODE_BREAK);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_BREAK;
     $$ = node;
 }
 |   KW_CONTINUE SEMICOLON{
-    TreeNode* node = new TreeNode(lineno, NODE_CONTINUE);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_CONTINUE;
     $$ = node; 
 }
 |   KW_RET SEMICOLON{
-    TreeNode* node = new TreeNode(lineno, NODE_RET);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_RETURN;
     $$ = node;
 }
 |   KW_RET  assignment-expression SEMICOLON{
-    TreeNode* node = new TreeNode(lineno, NODE_RET);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_RETURN;
     $$ = node;
     $$->addChild($2);
 }
@@ -106,26 +112,33 @@ jump-statement:
 
 iteration-statement
 :   KW_WHILE L_BRACKET expression R_BRACKET statement{
-    TreeNode* node = new TreeNode(lineno, NODE_WHILE);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_WHILE;
     node->addChild($3);
     node->addChild($5);
     $$ = node;
 }
 |   KW_DO statement KW_WHILE  L_BRACKET expression R_BRACKET{
-    TreeNode* node = new TreeNode(lineno, NODE_DO_WHILE);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_DO_WHILE;
     node->addChild($5);
     node->addChild($2);
     $$ = node;
 }
 |   KW_FOR L_BRACKET SEMICOLON SEMICOLON R_BRACKET statement{
-    TreeNode* node = new TreeNode(lineno, NODE_FOR);
-    node->addChild(null_node);
-    node->addChild(null_node);
-    node->addChild(null_node);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_FOR_NONE;
+    TreeNode* node1 = new TreeNode(-1, NODE_NULL);
+    TreeNode* node2 = new TreeNode(-1, NODE_NULL);
+    TreeNode* node3 = new TreeNode(-1, NODE_NULL);
+    node->addChild(node1);
+    node->addChild(node2);
+    node->addChild(node3);
     $$ = node;
 }
 |   KW_FOR L_BRACKET expression SEMICOLON expression SEMICOLON expression R_BRACKET statement{
-    TreeNode* node = new TreeNode(lineno, NODE_FOR);
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_FOR;
     node->addChild($3);
     node->addChild($5);
     node->addChild($7);
@@ -157,7 +170,10 @@ selection-statement
 expression-statement
 :   SEMICOLON{$$ = new TreeNode(lineno, NODE_STMT); $$->stype = STMT_SKIP;}
 |   expression SEMICOLON{
-    $$ = $1;
+    TreeNode* node = new TreeNode(lineno, NODE_STMT);
+    node->stype = STMT_EXPRESSION;
+    node->addChild($1);
+    $$ = node;
 }
 
 compound-statement
@@ -624,6 +640,7 @@ postfix-expression:
 |   postfix-expression L_BRACKET R_BRACKET{
     TreeNode* node = new TreeNode(lineno, NODE_EXPR);
     TreeNode* augs = new TreeNode(lineno, NODE_ARGUMENT_LIST);
+    node->optype = OP_FUNC_CALL;
     node->addChild($1);
     node->addChild(augs);
     $$ = node;
@@ -682,6 +699,7 @@ type-specifier
 : T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT; } 
 | T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
 | T_BOOL {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_BOOL;}
+| T_VOID {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_VOID;}
 | T_SIGNED {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_SIGNED;}
 | T_UNSIGNED {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_UNSIGNED;}
 | struct-or-union-specifier {$$ = $1;}
