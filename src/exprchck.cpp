@@ -185,11 +185,13 @@ bool tyCheckPrimaryExpression(TreeNode*expr){
             expr->domain->add_element(name, expr->lineno, T(INT));
 
             expr->sysType = T(INT);
+            expr->p_val = (void*)&expr->domain->elements.back();
             expr->l_value = 1;
         }
         else{
             //ID or function designator
             expr->sysType = e->ty;
+            expr->p_val = e;
             expr->l_value = expr->sysType->categ != FUNCTION;
         }
     }
@@ -602,12 +604,15 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
         tyAdjust(rn, 1);
         //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
         if (ISObjevtPtr(ln->sysType) && IsIntType(rn->sysType)){
-            //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
+            cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
             expr->sysType = ln->sysType->bty;
             //if(expr->sysType == T(INT)) cout << "??????" << endl;
             expr->l_value = 1;
             DoIntegerPromotion(rn);
+            //cout << expr->sysType->size<<endl;
+            cout << rn << endl;
             ln->sibling = rn = ScalePointerOffset(rn, expr->sysType->size);
+            cout << rn << endl;
             if(!sysTyIsArr(ln->typeMark) && ln->sysType->categ != ARRAY){
                 TreeNode *deref, *addexpr;
                 deref = new TreeNode(ln->lineno, NODE_EXPR);
@@ -625,6 +630,8 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
                 return deref;
             }
         }
+        //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
+        //cout << expr->sysType->size<<endl;
         return expr;
 
     case OP_POSTSELFDEC:
@@ -700,7 +707,7 @@ static TreeNode* ScalePointerOffset(TreeNode* offset, int scale){
     sn->int_val = scale;
 
     expr->addChild(sn);
-
+    expr->printAST();
     return expr;
 }
 
@@ -746,6 +753,7 @@ bool tyCheckFunctionCall(TreeNode*expr){
     bool argfull = false;
     
     TreeNode* arg = auges->child;
+
     while(arg != NULL && !argfull){
         tyCheckArgument(arg, (_FunctionType)ty, argNo, &argfull);
         arg = arg->sibling;

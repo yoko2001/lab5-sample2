@@ -130,11 +130,15 @@ void TreeNode::printAST() {
 void TreeNode::printSpecialInfo() {
     switch(this->nodeType){
         case NODE_VAR:
-            cout << " variable: "<< this->var_name;
+            cout << " variable: "<< this->var_name << " de: " <<this->p_val;
             break;
         
         case NODE_CONST:
-            if (!this->type){
+            if(this->sysType){
+                cout << this->int_val;
+                break;
+            }
+            if (!this->type && !this->sysType){
                 cout << "[error]";
             }
             else if (this->type == TYPE_INT){
@@ -257,10 +261,15 @@ void TreeNode::print_expr_info(){
         cout << "=";
         break;
     case OP_OFFSET_ACCESS:
-        cout << "[]";
+        cout << "[] ";
+        if (this->sysType) cout << this->sysType->size << " sysType" << this->sysType;
         break;
     case OP_ADD:
-        cout << "+";
+        cout << "ADD";
+        break;
+    case OP_MUL:
+        cout << "MUL";
+        break;
     default:
         break;
     }
@@ -348,8 +357,13 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
         if (this->child->nodeType == NODE_VAR){ 
             strcpy(func_name, (child->var_name).c_str());
             //cout << child->var_name.c_str() << endl;
-            if (this->father->domain)
-                this->father->domain->add_element(func_name, this->lineno, typeSp);
+            if (this->father->domain){
+                domain_elem* e = new domain_elem();
+                e->pos = this->lineno;
+                e->s = func_name;
+                e->ty = typeSp;
+                this->father->domain->add_element(e);
+            }
             //cout << func_name << " is set to type @" << typeSp << endl; 
             //cout << this->father->domain->domainid << " " << this->nodeID <<" " <<this->lineno<<" ckpt1\n";
         }
@@ -377,7 +391,12 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
         if (!func_name) cout << "???\n";
         strcpy(func_name, (this->var_name).c_str());
         if(this->father->domain && !(this->father->nodeType == NODE_DECL_FUNC)){
-            this->father->domain->add_element(func_name, this->lineno, typeSp);
+            domain_elem* e = new domain_elem();
+            e->s = func_name;
+            e->pos = this->lineno;
+            e->kind = DEK_variable;
+            e->ty = typeSp;
+            this->father->domain->add_element(e);//(func_name, this->lineno, typeSp);
             //cout << "XXX" << endl;
         }
         return typeSp;
@@ -578,7 +597,13 @@ void TreeNode::funcTypeDump(){
         func_ret_type = dcl_and_paras->child->sibling->NODE_PARA_LIST_Dump(func_ret_type);
         if (func_ret_type->param_types.size() >= 0) func_ret_type->hasProto = true;
         cout <<funcname<< func_ret_type << " func set\n"; 
-        this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
+        domain_elem* e = new domain_elem();
+        e->s = funcname;
+        e->pos = this->lineno;
+        e->ty = (_Type)func_ret_type;
+        e->kind = DEK_function;
+        this->domain->father_domain->add_element(e);
+        //this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
         this->sysType = (_Type)func_ret_type;
 
         //cmpd->typeDump();
@@ -800,6 +825,7 @@ void __check_undef(TreeNode* node){
             if (node->var_name == dm->elements[i].s){
                 found = true;
                 node->sysType = dm->elements[i].ty;
+                node->p_val = (void*)&dm->elements[i];
                 cout <<node->var_name  << " pos: "<<node->lineno << " sysType: " << node->sysType << " dm: " << dm->domainid << endl;
                 break;
             }

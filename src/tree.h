@@ -5,6 +5,7 @@
 #include "type.h"
 #include "djl_type.h"
 #include "domain.h"
+#include "inter.h"
 
 #define BsysTypeArray 0
 #define BsysTypeFunc  1
@@ -165,6 +166,11 @@ public:
     struct _domain* domain;
     _Type sysType; 
     uint typeMark;
+    vector<domain_elem*>*func_args;
+    BBlock loopBB;
+    BBlock contBB;      
+    BBlock nextBB;
+    BBlock testBB;
 
 public:
     static string nodeType2String (NodeType type);

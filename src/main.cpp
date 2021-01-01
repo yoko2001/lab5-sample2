@@ -1,6 +1,7 @@
 #include "common.h"
 #include <fstream>
 ofstream iro;
+_domain* FSYM;
 extern TreeNode *root;
 extern FILE *yyin;
 extern int yyparse();
@@ -58,6 +59,9 @@ int main(int argc, char *argv[])
     //expression & statements check
     root->typeCheck();
 
+
+    cout << "AST after type CHECK \n"; 
+    root->printAST();
 
     //close
     iro.close();

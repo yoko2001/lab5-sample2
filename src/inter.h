@@ -1,9 +1,11 @@
 #ifndef __INTER__
 #define __INTER__
-#include"tree.h"
 #include<fstream>
+#include"domain.h"
+//we run into a new function and gets its Function symbol vec
+extern _domain* FSYM;
 
-extern ofstream iro;
+extern std::ofstream iro;
 //diffrent from tree.h's op, these are for assamble language
 enum Opcode{
 //assign
@@ -56,7 +58,7 @@ enum Opcode{
 
 //Mov
     MOV,     //"=",                    Move)
-    //IMOV,    //"*=",                   IndirectMove)
+    IMOV,    //"*=",                   IndirectMove)
 //Func
     CALL,    //"call"
     RET,     //"ret"
@@ -70,7 +72,7 @@ typedef struct irinst{
     struct irinst *next;
     _Type ty;
     int opcode;
-    domain_elem opds[3];
+    domain_elem* opds[3];
 }*IRInst;
 
 typedef struct cfgedge

@@ -15,9 +15,20 @@ typedef struct _domain_elem{
     int pos;        //lineno
     _Type ty;       //sysType
     int kind;
+
+    int ref;
+
+    int intval;
+    char ch_val;
+    //bool b_val;
+    std::string str_val;
+
     struct _domain* dm;
+
+
     bool defined;   //if just declared or already defined
     _domain_elem(std::string s, int p, _Type ty):s(s), pos(p), ty(ty){}
+    _domain_elem(){}
 } domain_elem;
 enum domain_type{
     global = 0,
@@ -41,6 +52,11 @@ typedef struct _domain{
         elements.push_back(domain_elem(std::string(s), line, ty));
         //std::string tab(4*depth, ' ');
         std::cout<<"domain: " <<domainid << ", added element: " << std::string(s) << " pos: " << line << std::endl;
+    }
+    void add_element(domain_elem* e){
+       elements.push_back(*e);
+       e->dm = this;
+       std::cout<<"domain: " <<domainid << ", added element: " << std::string(e->s) << " pos: " << e->pos << std::endl;
     }
    
 } domain;
