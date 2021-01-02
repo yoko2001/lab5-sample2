@@ -37,6 +37,7 @@ static TreeNode* ScalePointerOffset(TreeNode* expr, int scale);
  * Check a NODE_EXPR or a NODE_CONST
  */
 bool tyCheckExpression(TreeNode* init){
+  //  assert(init->nodeID != 144 && init->nodeID != 148 && init->nodeID != 149 && init->nodeID != 150);
     if(init->nodeType == NODE_DECL_INIT)
     {
         return false;
@@ -194,6 +195,7 @@ bool tyCheckPrimaryExpression(TreeNode*expr){
             expr->p_val = e;
             expr->l_value = expr->sysType->categ != FUNCTION;
         }
+        return true;
     }
 }
 
@@ -210,6 +212,7 @@ bool tyCheckAssignmentExpression(TreeNode* expr){
     tyAdjust(lnode, 0);
     tyCheckExpression(rnode);
     tyAdjust(rnode, 1);
+    cout << "assign from: " << rnode->nodeID << " to " << lnode->nodeID << endl; 
 
     if(!CanModify(lnode)){
         cout << "The left operand cannot be modified\n";
@@ -342,6 +345,7 @@ left_is_ptr:
 }
 
 bool tyCheckSubOP(TreeNode* expr){
+    //assert(expr->nodeID != 148);
     TreeNode* ln, *rn;
     ln = expr->child;
     rn = ln->sibling;
@@ -354,6 +358,7 @@ bool tyCheckSubOP(TreeNode* expr){
     _Type ty1, ty2;
 
     if(ln->optype == OP_CONST){
+        cout << "SWAP" << endl;
         expr->swapchild();
     }
     //get childs again, because sequence may change
@@ -522,7 +527,7 @@ bool tyTransformIncrement(TreeNode*expr){
 	Create a AstExpression Node whose op is OP_CAST.
  ************************************************************/
 void CastExpression(TreeNode* expr, _Type ty){
-    TreeNode* orinode = new TreeNode(0, NODE_EXPR);
+    TreeNode* orinode = new TreeNode(expr->nodeID, NODE_EXPR);
     expr->copyto(orinode);
     orinode->father = expr;
     expr->child = orinode;
@@ -537,6 +542,7 @@ void Cast(TreeNode* expr, _Type ty){
     //cout << "casting nodeID " << expr->nodeID << "  from " << scode << " to " << dcode <<endl;
     //void 
     if (dcode == V){
+        cout << "VVVV" << endl;
         CastExpression(expr, ty);
         return;
     }
@@ -545,8 +551,7 @@ void Cast(TreeNode* expr, _Type ty){
         int scateg = expr->sysType->categ;
         int dcateg = ty->categ;
         if(scateg != dcateg && scateg >= INT && scateg < DOUBLE){
-            cout << "adding cast node\n"<<endl;
-            assert(expr->nodeID != 123);
+            cout << "adding cast node" <<endl;
             CastExpression(expr, ty);
         }
         //cout << "adding / no adding cast node" << endl;
@@ -639,7 +644,7 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
         tyTransformIncrement(expr);
         return expr;
     case OP_FUNC_CALL:
-        //cout << "enter func call" << endl;
+        if(expr->nodeID == 144) cout << "XXXX" << endl;
         tyCheckFunctionCall(expr);
         return expr;
     default:
@@ -663,6 +668,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
 
         n->typeMark = sysTyClear(n->typeMark);
         n->typeMark = sysTySetFunc(n->typeMark);
+        cout << "adjust to func ptr id: " << n->nodeID << endl;
     }
     else if(n->sysType->categ == ARRAY){
         n->sysType = PointerTo(Qualify(qual, n->sysType->bty));
@@ -722,7 +728,7 @@ void printUndefFunc(TreeNode* expr){
 bool tyCheckFunctionCall(TreeNode*expr){
     TreeNode* func = expr->child;
     TreeNode* auges = func->sibling;
-    //cout << "enter tyCheckFunctionCall" << endl;
+    cout << "enter tyCheckFunctionCall nodeid:"<<expr->nodeID << endl;
     
     if(func->nodeType != NODE_VAR){
         cout << "syntax design error" << endl;

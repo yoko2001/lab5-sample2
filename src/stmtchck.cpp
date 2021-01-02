@@ -41,6 +41,7 @@ bool tyCheckStatement(TreeNode* stmt){
                 tyCheckSelectStatement(stmt);
                 break;
             case STMT_EXPRESSION:
+                cout << "ckpt expr stmt" << endl;
                 tyCheckExpressionStatement(stmt);
                 break;
             default:
@@ -56,10 +57,11 @@ bool tyCheckStatement(TreeNode* stmt){
 
 bool tyCheckCompoundStatement(TreeNode* stmt){
     TreeNode* compound = stmt->child;
-    //cout << compound->nodeID;
+    //cout <<"compound "<< stmt->nodeID << endl;
     TreeNode* ch = compound->child;
     //return 0;
     while(ch){
+        //cout << "compound's son " << ch->nodeID << endl;
         tyCheckStatement(ch);
         ch = ch->sibling;
     }
@@ -68,7 +70,6 @@ bool tyCheckCompoundStatement(TreeNode* stmt){
 
 bool tyCheckForStatement(TreeNode* stmt){
     assert((stmt->nodeType == NODE_STMT) && ((stmt->stype == STMT_FOR) || (stmt->stype == STMT_FOR_NONE)));
-
     CURRENTST.breakable.push_back(stmt);
     CURRENTST.loops.push_back(stmt);
 
@@ -78,6 +79,7 @@ bool tyCheckForStatement(TreeNode* stmt){
     incexpr = condexpr->sibling;
 
     if(initexpr->nodeType == NODE_EXPR){
+        cout << "initexpr "<< initexpr->nodeID << endl;
         tyCheckExpression(initexpr);
     }
     if(condexpr->nodeType == NODE_EXPR){
@@ -92,6 +94,7 @@ bool tyCheckForStatement(TreeNode* stmt){
     }
     TreeNode* lpstmt = incexpr->sibling;
     if(lpstmt){
+        cout << "loop part " <<lpstmt->nodeID << endl;
         tyCheckStatement(lpstmt);
     }
 
@@ -184,16 +187,15 @@ bool tyCheckSelectStatement(TreeNode* stmt){
     expr = stmt->child;
     tstmt = expr->sibling;
     fstmt = tstmt->sibling;
-    
+    cout << "expr: "<< expr->nodeID << " t: " << tstmt->nodeID << " f: " << fstmt->nodeID << endl;
     tyCheckExpression(expr);
     tyAdjust(expr, 1);
-    return false;
     if(!IsScalarType(expr->sysType)){
         cout << stmt->lineno << " error tyCheckLoopStatement: The expression in if statement shall be scalar type." << endl;
     }
 
     tyCheckStatement(tstmt);
-    if(fstmt){
+    if(fstmt != NULL){
         tyCheckStatement(fstmt);
     }
 

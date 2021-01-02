@@ -186,6 +186,17 @@ void genIMOV(_Type ty, domain_elem* dst, domain_elem* src){
 
 //void genAssign 这个在这里省略了，我用不到，我太菜了
 
+void genReturn(_Type ty, domain_elem* src){
+    IRInst inst;
+    inst = (IRInst)malloc(sizeof(irinst));
+
+    src->ref++;
+    inst->ty = ty;
+    inst->opcode = RET;
+    inst->opds[0] = src;
+    inst->opds[1] = inst->opds[2] = NULL;
+    AppendInst(inst, currentBB);    
+}
 
 
 /*************************************************************************
@@ -684,7 +695,7 @@ static domain_elem* TranslateArrayIndex(TreeNode* expr){
             voff = TranslateExpression(rch);
         }
         else{
-            voff = Simplyfy(voff->ty, ADD, voff, TranslateExpression(voff));
+            voff = Simplyfy(voff->ty, ADD, voff, TranslateExpression(rch));
         }
         n = lch;
     }while(n->optype == OP_OFFSET_ACCESS);
@@ -693,7 +704,10 @@ static domain_elem* TranslateArrayIndex(TreeNode* expr){
 
 }
 
-static domain_elem* TranslateFunctionCall(TreeNode* expr){}
+static domain_elem* TranslateFunctionCall(TreeNode* expr){
+    TreeNode *func, *params;
+    domain_elem* faddr, *recv;
+}
 
 static domain_elem* TranslatePostfixExpression(TreeNode* expr){
     switch (expr->optype)
@@ -754,6 +768,9 @@ domain_elem* TranslateExpression(TreeNode* expr){
 
 
 //part2 translate statements
+static void TranslateStatement(TreeNode* stmt);
+
+
 /**
  * continue is translate into:
  *    goto loop's contBB
@@ -768,4 +785,178 @@ static void TranslateContinueStatement(TreeNode* stmt){
     //the treenode we are returning to is in stmt->p_val;
     genJump(((TreeNode*)stmt->p_val)->contBB);
     StartBBlock(CreateBBlock());
+}
+
+static void TranslateReturnStatement(TreeNode* stmt){
+    assert((stmt->nodeType == NODE_STMT)
+    && (stmt->stype == STMT_RETURN));
+
+    if(stmt->child){
+        genReturn(stmt->child->sysType, TranslateExpression(stmt->child));
+    }
+    genJump((BBlock)FSYM->exitBB);
+    StartBBlock(CreateBBlock());
+}
+
+
+/**
+ * This function translates a while statement.
+ *
+ * while (expr) stmt is translated into:
+ * goto contBB
+ * loopBB:
+ *     stmt
+ * contBB:
+ *     if (expr) goto loopBB
+ * nextBB:
+ *     ...
+ */
+static void TranslateWhileStatement(TreeNode* stmt){
+    assert((stmt->nodeType == NODE_STMT)
+    && (stmt->stype == STMT_WHILE));
+
+    stmt->loopBB = CreateBBlock();
+    stmt->contBB = CreateBBlock();
+    stmt->nextBB = CreateBBlock();
+
+    TreeNode *expr, *lpstmt;
+    expr = stmt->child;
+    lpstmt = expr->sibling;
+
+    genJump(stmt->loopBB);
+    
+    StartBBlock(stmt->loopBB);
+    TranslateStatement(lpstmt);
+
+    StartBBlock(stmt->contBB);
+    TranslateBranch(stmt, stmt->loopBB, stmt->nextBB);
+
+    StartBBlock(stmt->nextBB);
+}
+
+static void TranslateDoWhileStatement(TreeNode* stmt){
+    iro << "ir doesn't support TranslateDoWhileStatement for now" << endl;
+    exit(0);
+}
+
+static void TranslateExpressionStatement(TreeNode* stmt){
+    assert((stmt->nodeType == NODE_STMT)
+    && (stmt->stype == STMT_EXPRESSION));
+    TreeNode* expr = stmt->child;
+    if(expr){
+        TranslateExpression(expr);
+    }
+}
+
+/**
+ * This function translates a for statement.
+ *
+ * for (expr1; expr2; expr3) stmt is translated into
+ *     expr1
+ *     goto testBB
+ * loopBB:
+ *     stmt
+ * contBB:
+ *     expr3
+ * testBB:
+ *     if expr2 goto loopBB (goto loopBB if expr2 is NULL)
+ * nextBB:
+ *     ...
+ */
+static void TranslateForStatement(TreeNode* stmt){
+    TreeNode* initexpr, *condexpr, *incexpr, *lpstmt;
+    stmt->loopBB = CreateBBlock();
+    stmt->contBB = CreateBBlock();
+    stmt->nextBB = CreateBBlock();
+    stmt->testBB = CreateBBlock();
+
+    initexpr = stmt->child;
+    if(initexpr) condexpr = initexpr->sibling;
+    if(condexpr) incexpr = condexpr->sibling;
+    if(incexpr) lpstmt = incexpr->sibling;
+
+    if(initexpr){
+        TranslateExpression(initexpr);
+    }
+    genJump(stmt->testBB);
+
+    StartBBlock(stmt->loopBB);
+    TranslateStatement(lpstmt);
+
+    StartBBlock(stmt->contBB);
+    if(incexpr){
+        TranslateExpression(incexpr);
+    }
+
+    StartBBlock(stmt->testBB);
+    if(condexpr){
+        TranslateBranch(condexpr, stmt->loopBB, stmt->nextBB);
+    }else{
+        genJump(stmt->loopBB);
+    }
+
+    StartBBlock(stmt->nextBB);
+}
+
+static void TranslateBreakStatement(TreeNode* stmt){
+    assert(stmt->stype == STMT_BREAK);
+    genJump(((TreeNode*) stmt->p_val)->nextBB);
+    StartBBlock(CreateBBlock());
+}
+
+static void TranslateIfStatement(TreeNode* stmt){
+    assert(stmt->stype == STMT_SELECT);
+    BBlock nextBB;
+    BBlock trueBB;
+    BBlock falseBB;
+    TreeNode* expr, *truestmt, *falsestmt;
+    nextBB = CreateBBlock();
+    trueBB = CreateBBlock();
+
+    expr = stmt->child;
+    if(expr) truestmt = expr->sibling;
+    if(truestmt) falsestmt = truestmt->sibling;
+
+    if(falsestmt==NULL){
+        TranslateBranch(NOT(expr), nextBB, trueBB);
+        StartBBlock(trueBB);
+        TranslateStatement(truestmt);
+    }else{
+        falseBB = CreateBBlock();
+        TranslateBranch(NOT(expr), falseBB, trueBB);
+        StartBBlock(trueBB);
+        TranslateStatement(truestmt);
+        genJump(nextBB);
+
+        StartBBlock(falseBB);
+        TranslateStatement(falsestmt);
+    }
+    StartBBlock(nextBB);
+}
+
+static void TranslateStatement(TreeNode* stmt){
+    switch(stmt->stype){
+    case STMT_RETURN:
+        TranslateReturnStatement(stmt);
+        break;
+    case STMT_CONTINUE:
+        TranslateContinueStatement(stmt);
+        break;
+    case STMT_WHILE:
+        TranslateWhileStatement(stmt);
+        break;
+    case STMT_DO_WHILE:
+        TranslateDoWhileStatement(stmt);
+        break;
+    case STMT_FOR:
+        TranslateForStatement(stmt);
+        break;
+    case STMT_BREAK:
+        TranslateBreakStatement(stmt);
+        break;
+    case STMT_SELECT:
+        TranslateIfStatement(stmt);
+    default:
+        iro << "TranslateStatement doesn't support this stype: " << stmt->stype << " nodeid: " << stmt->nodeID<<endl;
+    }
 }

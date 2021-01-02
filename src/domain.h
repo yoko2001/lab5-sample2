@@ -2,6 +2,7 @@
 #define __DOMAIN__H__
 #include<vector>
 #include<iostream>
+//#include"inter.h"
 #include "djl_type.h"
 
 //domain element kind
@@ -39,7 +40,8 @@ typedef struct _domain{
     int startline, endline, domainid, depth;
     domain_type type;
     _domain* father_domain;
-
+    void* entryBB;
+    void* exitBB;
     std::vector<_domain*> child_domain;
     _domain(){startline = -1; endline = -1; type = global; domainid = domain_id++; depth = 0;}
     _domain(int s, int e, domain_type t):startline(s), endline(e), type(t){domainid = domain_id++;}

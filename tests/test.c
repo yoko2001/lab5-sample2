@@ -18,7 +18,7 @@ int main(){
         h= f(b, c) - 12 * 8;
         int jj = b + c - 1;
     }else{
-        i = f(b, c) - 1;
+        i = f(b, c);
     }
     for(;;)break;
     bb[0][1] = 1;

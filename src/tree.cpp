@@ -74,11 +74,11 @@ void TreeNode::copyto(TreeNode* nn){
     nn->type = type;
     nn->typeMark = typeMark;
     nn->var_name = var_name;
-    nn->nodeID = nodeID;
     nn->nodeType = nodeType;
     nn->optype = optype;
     nn->p_val = p_val;
     nn->sibling = sibling;
+    nn->child = child;
     nn->str_val = str_val;
     nn->stype = stype;
     nn->lineno = lineno;
@@ -257,19 +257,39 @@ void TreeNode::print_expr_info(){
 
     switch (this->optype)
     {
+    case OP_FUNC_CALL:
+        cout << "func call";
+        if(sysTyIsFunc(this->child->typeMark)){
+            cout << " (ptr) ";
+        }
+        break;
+    case OP_CAST:
+        cout << "CAST";
+        break;
     case OP_ASSIGN:
         cout << "=";
         break;
     case OP_OFFSET_ACCESS:
         cout << "[] ";
-        if (this->sysType) cout << this->sysType->size << " sysType" << this->sysType;
+        if (this->sysType){
+            if(ISObjevtPtr(this->sysType)) cout << "ptr ";
+            if(sysTyIsArr(this->typeMark) && ISObjevtPtr(this->sysType)){
+                cout << "emit ptr " <<this->sysType->bty->size << " sysType" << this->sysType;
+            }else{
+                cout << this->sysType->size << " sysType" << this->sysType;
+            }
+        }
         break;
     case OP_ADD:
         cout << "ADD";
         break;
+    case OP_SUB:
+        cout << "SUB";
+        break;
     case OP_MUL:
         cout << "MUL";
         break;
+
     default:
         break;
     }
