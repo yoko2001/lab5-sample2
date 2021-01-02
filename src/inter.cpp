@@ -707,6 +707,26 @@ static domain_elem* TranslateArrayIndex(TreeNode* expr){
 static domain_elem* TranslateFunctionCall(TreeNode* expr){
     TreeNode *func, *params;
     domain_elem* faddr, *recv;
+
+    func = expr->child;
+    params = func->sibling;
+
+    faddr = TranslateExpression(func);
+    TreeNode* param;
+    if(params) {
+        param = params->child;
+        params->func_args = new vector<domain_elem*>();
+    }
+    while (param){
+        params->func_args->push_back(TranslateExpression(param));
+        param = param->sibling;
+    }
+
+    recv = NULL;
+    if(expr->sysType->categ != VOID){
+        recv = AddTemp(expr->sysType);
+    }
+    genFuncCall(expr->sysType, recv, faddr, params);
 }
 
 static domain_elem* TranslatePostfixExpression(TreeNode* expr){
@@ -729,7 +749,9 @@ static domain_elem* TranslatePostfixExpression(TreeNode* expr){
 }
 
 domain_elem* TranslateExpression(TreeNode* expr){
-    assert(expr->nodeType == NODE_EXPR);
+    if(expr->nodeType == NODE_VAR && expr->father->optype == OP_FUNC_CALL){
+        return TranslatePrimaryExpression(expr);
+    }
     switch (expr->optype)
     {
     case OP_ADD:
@@ -764,6 +786,7 @@ domain_elem* TranslateExpression(TreeNode* expr){
     default:
         break;
     }
+    return NULL;
 }
 
 
