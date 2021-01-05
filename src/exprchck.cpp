@@ -69,6 +69,7 @@ bool tyCheckExpression(TreeNode* init){
             case OP_LGC_NOT:
             case OP_PRESELFDEC:
             case OP_PRESELFINC:
+                cout << "tyCheckUnaryExpression " << init->nodeID << endl;
                 return tyCheckUnaryExpression(init);
                 break;
             case OP_MOD:
@@ -210,7 +211,8 @@ bool tyCheckAssignmentExpression(TreeNode* expr){
      */
     tyCheckExpression(lnode);
     tyAdjust(lnode, 0);
-    tyCheckExpression(rnode);
+    cout << "ass l "<< expr->child->nodeID <<lnode->nodeID << endl;
+    tyCheckExpression(rnode) ;
     tyAdjust(rnode, 1);
     cout << "assign from: " << rnode->nodeID << " to " << lnode->nodeID << endl; 
 
@@ -233,6 +235,7 @@ bool tyCheckAssignmentExpression(TreeNode* expr){
         cout << "only has += for now\n";
         break;
     }
+    cout << "assigning" << expr->nodeID << endl;
     ty = expr->child->sysType;
     if(!CanAssign(expr->child->sibling, ty)){
         cout << "Wrong Assignment\n";
@@ -241,6 +244,7 @@ bool tyCheckAssignmentExpression(TreeNode* expr){
         Cast(expr->child->sibling, ty); 
     }
     expr->sysType = ty;
+    cout << "assigned" << expr->nodeID << endl;
     return true;
 }
 
@@ -277,7 +281,101 @@ bool tyCheckEqualityOP(TreeNode* expr){
 }
 
 bool tyCheckUnaryExpression(TreeNode* expr){
+    TreeNode* ch;
+    _Type ty;
+    cout << "enter tyCheckUnaryExpression " << expr->optype << endl;
+    switch (expr->optype){
+    case OP_UNA_DEREF:  //*
+        ch = expr->child;
+        
+        tyCheckExpression(ch);
+        tyAdjust(ch, 1);
+        cout << "* child checked" <<endl;
+        ty = ch->sysType;
+        assert(ty != NULL);
+        if(ch->optype == OP_UNA_REF){
+            /**
+             * *&a = a;
+             */
+            expr->child->child->sysType = ty->bty;
+            expr->child->child->copyto(expr);
+            expr->child = NULL;
+            // cout << expr->child->child->nodeID << endl;
+            // //move up child child
+            // expr->father->child = expr->child->child;
+            // expr->father->child->father = expr->father;
+            // expr->father->child->sibling = expr->sibling;
+            //expr->father = NULL;
 
+            //delete expr
+            return true;
+        }
+        if(IsPtrType(ty)){
+            // The operand of the unary * operator shall have pointer type. 
+            expr->sysType = ty->bty;
+            if(IsFunctionType(expr->sysType)){
+                expr->child->child->copyto(expr);
+                expr->child = NULL;
+                //expr->father->child = expr->child;
+                // expr->father->child->father = expr->father;
+                // expr->father->child->sibling = expr->sibling;
+                // expr->father = NULL;
+                return true;
+            }
+
+            if(expr->sysType->categ == ARRAY || sysTyIsArr(expr->child->typeMark)){
+                TreeNode* one = new TreeNode(expr->lineno, NODE_CONST);
+                one->int_val = 1;
+                one->type = TYPE_INT;
+                one->sysType = T(INT);
+                tyCheckPrimaryExpression(one);
+                expr->addChild(one);
+                expr->optype = OP_OFFSET_ACCESS;
+            }
+            expr->l_value = 1;
+            return true;
+        }
+        cout << "unary * fail" << endl;
+        break;
+
+    case OP_UNA_REF:    //&
+        cout << "&" << expr->nodeID<< endl;
+        ch = expr->child;
+        tyCheckExpression(ch);
+        assert(ch->sysType != NULL);
+        //tyAdjust(ch, 1); //!!!no need for this
+
+        ty = ch->sysType;
+        if(ch->optype == OP_OFFSET_ACCESS){
+            /**
+             * &*a = a;
+             * !!! &*ptr not a lvalue.
+             */
+            //move up child child
+            expr->child->child->l_value = 0;
+            expr->father->child = expr->child->child;
+            expr->father->child->father = expr->father;
+            expr->father->child->sibling = expr->sibling;
+            expr->father = NULL;
+
+            //delete expr
+            return true;
+        }
+        if(IsFunctionType(ty) || (expr->child->l_value)){
+            expr->l_value = 0;
+            expr->sysType = PointerTo(ty);
+            cout << "& pointer set" << endl;
+            return true;
+        }
+        cout << "unary & fail" << endl;
+        break;
+    default:
+        cout << "暂不支持" <<endl;
+        return false;
+    }
+RETERROR:
+    cout << "error happend in tyCheckUnaryExpression" <<endl;
+    return false;
 }
 bool tyCheckMultiplicativeOP(TreeNode* expr){
     TreeNode *ln, *rn;
@@ -501,11 +599,18 @@ bool tyTransformIncrement(TreeNode*expr){
     one->sysType = T(INT);
     tyCheckPrimaryExpression(one);
     
-    // Node one is already checked
-    expr->addChild(one);
+    TreeNode* casgn = new TreeNode(expr->lineno, expr->nodeType);
+    casgn->addChild(expr->child);
+    expr->child = casgn;
+    casgn->father = expr;
 
+    casgn->optype = (expr->optype == OP_POSTSELFINC || expr->optype == OP_PRESELFINC) ? OP_AS_ADDEQ : OP_AS_SUB_EQ;
+    
+    // Node one is already checked
+    
+    casgn->addChild(one);
     // check "a"
-    if(!tyCheckExpression(expr->child))return false;
+    if(!tyCheckExpression(casgn->child))return false;
     expr->sysType = expr->child->sysType;
     return true;
 }
@@ -618,8 +723,17 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
             cout << rn << endl;
             ln->sibling = rn = ScalePointerOffset(rn, expr->sysType->size);
             cout << rn << endl;
+
+            /**
+             * int ptr**;
+             * int arr[2][2];
+             * ptr = arr;
+             * 
+             * ptr[0][0] = 1;  <== 此时会触发下面的条件，由于ptr经adjust后typemark无标记
+             **/
             if(!sysTyIsArr(ln->typeMark) && ln->sysType->categ != ARRAY){
                 TreeNode *deref, *addexpr;
+                cout << "ptr** checkpoint" << endl;
                 deref = new TreeNode(ln->lineno, NODE_EXPR);
                 addexpr = new TreeNode(ln->lineno, NODE_EXPR);
                 deref->optype = OP_UNA_DEREF;
@@ -657,12 +771,16 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
 bool tyAdjust(TreeNode* n, int rvalue){
     int qual = 0;
     //if this node is treated as rvalue
+    cout << "adjust  " << n->nodeID <<endl;
+    assert(n->sysType != NULL);
     if(rvalue){
         qual = n->sysType->qual;
         n->sysType = UnQualify(n->sysType);
+        cout << "set l_val" << endl;
         n->l_value = 0;
     }
-
+    //cout << "adjust 2" << endl;
+    //assert(n->nodeID != 138);
     if(n->sysType->categ == FUNCTION){
         n->sysType = PointerTo(n->sysType);
 
@@ -685,6 +803,7 @@ bool tyAdjust(TreeNode* n, int rvalue){
         n->typeMark = sysTyIsArr(n->typeMark);
         //cout << "NodeId: " << n->nodeID << " point to array" << endl;
     }
+    //cout << "adjust 3" << endl;
     return true;
 }
 

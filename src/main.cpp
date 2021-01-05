@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     yyparse();
     cout << "parsed" << endl;
     if(root != NULL) {
-        //root->genNodeId();
+        root->genNodeId();
         root->printAST();
     }
     cout << "setting up type system\n";
@@ -63,6 +63,9 @@ int main(int argc, char *argv[])
     cout << "AST after type CHECK \n"; 
     root->printAST();
 
+    root->IRGenerate();
+    iro << "=====IR======" << endl;
+    root->print_all_funcs_ir();
     //close
     iro.close();
     return 0;

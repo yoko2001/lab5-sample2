@@ -585,7 +585,7 @@ unary-expression
 |   unary-operator cast-expression{
     TreeNode* node = new TreeNode($1->lineno, NODE_EXPR);
     node -> optype = $1->optype;
-    node -> addChild($1);
+    //node -> addChild($1);
     node -> addChild($2);
     $$ = node;
 }

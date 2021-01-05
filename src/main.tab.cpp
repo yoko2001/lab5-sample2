@@ -2476,7 +2476,7 @@ yyreduce:
     {
     TreeNode* node = new TreeNode((yyvsp[-1])->lineno, NODE_EXPR);
     node -> optype = (yyvsp[-1])->optype;
-    node -> addChild((yyvsp[-1]));
+    //node -> addChild($1);
     node -> addChild((yyvsp[0]));
     (yyval) = node;
 }

@@ -65,6 +65,7 @@ _Type Qualify(int qual, _Type ty)
  */
 _Type UnQualify(_Type ty){
     if(ty->qual){
+		std::cout << "unqualified" << std::endl;
         ty = ty->bty;
     }
     return ty;

@@ -41,8 +41,9 @@ bool tyCheckStatement(TreeNode* stmt){
                 tyCheckSelectStatement(stmt);
                 break;
             case STMT_EXPRESSION:
-                cout << "ckpt expr stmt" << endl;
+                cout << "ckpt expr stmt " << stmt->nodeID << endl;
                 tyCheckExpressionStatement(stmt);
+                cout << "ckpt expr stmt finish" << stmt->nodeID << endl;
                 break;
             default:
                 cout << "this kind of statement check unrealized: nodeID: " << stmt->nodeID << endl;

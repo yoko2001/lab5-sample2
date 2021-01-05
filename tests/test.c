@@ -7,21 +7,25 @@ int f(int a, int b){
     return a+b;
 }
 int bb[10][5];
+int**ptr;
 int* pt;
 int i = 0;
 
-int main(){
+void main(){
     int i;
-    if (a = (c > 1)){
-        unsigned int h;
-        //h = 1;
-        h= f(b, c) - 12 * 8;
-        int jj = b + c - 1;
-    }else{
-        i = f(b, c);
-    }
-    for(;;)break;
+    // if (c > 1){
+    //     unsigned int h;
+    //     //h = 1;
+    //     h= f(b, c) - 12 * 8;
+    //     int jj = b + c - 1;
+    // }else{
+    //     i = f(b, c);
+    // }
+    //for(;;)break;
+    ptr = bb;
+    (*ptr)[1];// = 1;
     bb[0][1] = 1;
+    *&i=1;
     //notdef = 3 + 5;
     //pt = 0;
     for(i = 0; i < 25; i++){
@@ -31,7 +35,7 @@ int main(){
         continue;
     }//串层
    // for(;;;) a++;
-    while(i){
+    while(a = (i > 0)){
         a = 0;
         break;
     }

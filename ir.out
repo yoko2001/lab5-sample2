@@ -1,0 +1,419 @@
+handeling66
+handeling64
+ckpt1
+translating expr : 63
+translating expr : 61
+enter TranslatePrimaryExpression
+got var a
+binary translate 2nd expression 62
+translating expr : 62
+enter TranslatePrimaryExpression
+got var b
+l & r ok a b
+---Simplyfy---5
+src2 == NULL
+returining from simplify
+l & r ok a b
+add temp t0
+adter t l & r ok a b
+added temp, try genAssignab
+0x1d04bb0
+assigning op:5 src1: a
+genAssign success
+malloc ok
+genReturn before AppendInst
+pass  64
+64 cpd finished
+pass  66
+naming blocks
+0x1d05560 0x1d05a30
+new label: BB0
+copy fine
+0x1d05a30 0x1d05630
+new label: BB1
+copy fine
+0x1d05630 0
+new label: BB2
+copy fine
+finished function translation 67
+handeling213
+handeling129
+TranslateStatement doesn't support this stype: 1 nodeid: 129
+pass  129
+129 cpd finished
+handeling137
+translating expr : 137
+translating expr : 136
+translating expr : 135
+translating expr : 132
+enter TranslatePrimaryExpression
+got var ptr
+translating expr : 134
+enter TranslatePrimaryExpression
+got var bb
+pass  137
+137 cpd finished
+handeling146
+translating expr : 146
+translating expr : 145
+translating expr : 144
+coff += 1
+using node 144
+jiushizheli
+translating expr : 140
+enter TranslateUnaryExpression
+translating expr : 139
+enter TranslatePrimaryExpression
+got var ptr
+add temp t1
+???
+0x1d047e0
+0x1d047e0
+assigning op:25 src1: ptr
+???
+addr from node140
+ intconst created 1
+---Simplyfy---5
+simplify add
+returining from simplify
+l & r ok t1 1
+add temp t2
+adter t l & r ok t1 1
+added temp, try genAssignt11
+0x1d06020
+assigning op:5 src1: t1
+genAssign success
+add temp t3
+???
+0x1d06180
+0x1d06180
+assigning op:25 src1: t2
+???
+pass  146
+146 cpd finished
+handeling158
+translating expr : 158
+translating expr : 157
+translating expr : 156
+translating expr : 153
+translating expr : 220
+translating expr : 152
+translating expr : 151
+enter TranslatePrimaryExpression
+ intconst created 1
+add int const of ival: 1
+binary translate 2nd expression 221
+translating expr : 221
+enter TranslatePrimaryExpression
+ intconst created 4
+add int const of ival: 4
+l & r ok 1 4
+---Simplyfy---7
+simplify mul/div
+returining from simplify
+l & r ok 1 4
+add temp t4
+adter t l & r ok 1 4
+added temp, try genAssign14
+0x1d06320
+assigning op:7 src1: 1
+genAssign success
+using node 153
+translating expr : 218
+translating expr : 149
+translating expr : 148
+enter TranslatePrimaryExpression
+ intconst created 0
+add int const of ival: 0
+binary translate 2nd expression 219
+translating expr : 219
+enter TranslatePrimaryExpression
+ intconst created 20
+add int const of ival: 20
+l & r ok 0 20
+---Simplyfy---7
+simplify mul/div
+returining from simplify
+l & r ok 0 20
+add temp t5
+adter t l & r ok 0 20
+added temp, try genAssign020
+0x1d064e0
+assigning op:7 src1: 0
+genAssign success
+---Simplyfy---5
+src2 == NULL
+returining from simplify
+l & r ok t4 t5
+add temp t6
+adter t l & r ok t4 t5
+added temp, try genAssignt4t5
+0x1d06410
+assigning op:5 src1: t4
+genAssign success
+using node 150
+translating expr : 147
+enter TranslatePrimaryExpression
+got var bb
+addr from node147
+ intconst created 0
+---Simplyfy---5
+simplify add
+---Simplyfy---5
+src2 == NULL
+returining from simplify
+l & r ok bb t6
+add temp t7
+adter t l & r ok bb t6
+added temp, try genAssignbbt6
+0x1d046e0
+assigning op:5 src1: bb
+genAssign success
+add temp t8
+???
+0x1d06830
+0x1d06830
+assigning op:25 src1: t7
+???
+translating expr : 155
+enter TranslatePrimaryExpression
+ intconst created 1
+add int const of ival: 1
+pass  158
+158 cpd finished
+handeling168
+translating expr : 168
+translating expr : 167
+translating expr : 166
+translating expr : 163
+enter TranslatePrimaryExpression
+got var i
+translating expr : 165
+enter TranslatePrimaryExpression
+ intconst created 1
+add int const of ival: 1
+pass  168
+168 cpd finished
+handeling194
+translating expr : 173
+translating expr : 172
+translating expr : 169
+enter TranslatePrimaryExpression
+got var i
+translating expr : 171
+enter TranslatePrimaryExpression
+ intconst created 0
+add int const of ival: 0
+handeling193
+handeling190
+translating expr : 190
+translating expr : 189
+translating expr : 188
+translating expr : 181
+enter TranslatePrimaryExpression
+got var a
+translating expr : 187
+translating func call 187
+translating expr : 183
+enter TranslatePrimaryExpression
+got var f
+translating expr : 184
+enter TranslatePrimaryExpression
+got var i
+translating expr : 186
+enter TranslatePrimaryExpression
+ intconst created 1
+add int const of ival: 1
+TranslateFunctionCall 187
+f
+func has return
+add temp t9
+arg: 184
+arg: 186
+pass  190
+190 cpd finished
+handeling192
+pass  192
+192 cpd finished
+pass  193
+translating expr : 180
+translating expr : 179
+translating expr : 178
+enter TranslatePrimaryExpression
+got var i
+add temp t10
+translating expr : 223
+translating expr : 178
+enter TranslatePrimaryExpression
+got var i
+translating expr : 222
+enter TranslatePrimaryExpression
+ intconst created 1
+add int const of ival: 1
+translating expr : 177
+translating expr : 176
+add temp t11
+translating expr : 174
+enter TranslatePrimaryExpression
+got var i
+translating expr : 175
+enter TranslatePrimaryExpression
+ intconst created 25
+add int const of ival: 25
+ intconst created 0
+ intconst created 1
+176branch set
+test t11
+pass  194
+194 cpd finished
+handeling212
+handeling211
+handeling208
+translating expr : 208
+translating expr : 207
+translating expr : 206
+translating expr : 203
+enter TranslatePrimaryExpression
+got var a
+translating expr : 205
+enter TranslatePrimaryExpression
+ intconst created 0
+add int const of ival: 0
+pass  208
+208 cpd finished
+handeling210
+break translate ok
+pass  210
+210 cpd finished
+pass  211
+translating expr : 202
+translating expr : 201
+translating expr : 195
+enter TranslatePrimaryExpression
+got var a
+translating expr : 200
+translating expr : 199
+add temp t12
+translating expr : 197
+enter TranslatePrimaryExpression
+got var i
+translating expr : 198
+enter TranslatePrimaryExpression
+ intconst created 0
+add int const of ival: 0
+ intconst created 0
+ intconst created 1
+199branch set
+test a
+pass  212
+212 cpd finished
+pass  213
+naming blocks
+0x1d05e40 0x1d06c00
+new label: BB3
+copy fine
+0x1d06c00 0x1d07270
+new label: BB4
+copy fine
+0x1d07270 0x1d06cd0
+new label: BB5
+copy fine
+0x1d06cd0 0x1d06e70
+new label: BB6
+copy fine
+0x1d06e70 0x1d07770
+new label: BB7
+copy fine
+0x1d07770 0x1d076a0
+new label: BB8
+copy fine
+0x1d076a0 0x1d075d0
+new label: BB9
+copy fine
+0x1d075d0 0x1d06da0
+new label: BB10
+copy fine
+0x1d06da0 0x1d07c70
+new label: BB11
+copy fine
+0x1d07c70 0x1d08030
+new label: BB12
+copy fine
+0x1d08030 0x1d07d40
+new label: BB13
+copy fine
+0x1d07d40 0x1d08370
+new label: BB14
+copy fine
+0x1d08370 0x1d082a0
+new label: BB15
+copy fine
+0x1d082a0 0x1d081d0
+new label: BB16
+copy fine
+0x1d081d0 0x1d07e10
+new label: BB17
+copy fine
+0x1d07e10 0x1d05f10
+new label: BB18
+copy fine
+0x1d05f10 0
+new label: BB19
+copy fine
+finished function translation 214
+=====IR======
+====================================
+BB0:
+  ADD t0,a,b
+  RET t0
+  JMP BB2
+BB1:
+BB2:
+====================================
+BB3:
+  MOV ptr,bb
+  DEREF t1,ptr
+  ADD t2,t1,1
+  DEREF t3,t2
+  MUL t4,1,4
+  MUL t5,0,20
+  ADD t6,t4,t5
+  ADD t7,bb,t6
+  DEREF t8,t7
+  MOV t8,1
+  MOV i,1
+  MOV i,0
+  JMP BB7
+BB4:
+  CALL 0x1d07120,0x1d04d30,0x1d02560
+  MOV a,t9
+  JMP BB6
+BB5:
+BB6:
+  MOV t10,i
+  MOV i,1
+BB7:
+  JL BB9,i,25
+BB8:
+  MOV t11,0
+BB9:
+  MOV t11,1
+BB10:
+  JNZ BB4,t11
+BB11:
+  JMP BB12
+BB12:
+  MOV a,0
+  JMP BB18
+BB13:
+BB14:
+  JG BB16,i,0
+BB15:
+  MOV t12,0
+BB16:
+  MOV t12,1
+BB17:
+  MOV a,t12
+  JNZ BB12,a
+BB18:
+BB19:

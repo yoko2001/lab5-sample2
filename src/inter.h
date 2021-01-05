@@ -2,107 +2,107 @@
 #define __INTER__
 #include<fstream>
 #include"domain.h"
-//we run into a new function and gets its Function symbol vec
-extern _domain* FSYM;
+#include"tree.h"
+// //we run into a new function and gets its Function symbol vec
+// extern _domain* FSYM;
 
-extern std::ofstream iro;
-//diffrent from tree.h's op, these are for assamble language
-enum Opcode{
-//assign
-    BOR, //"|"
-    BXOR,//"^"
-    BAND,//"&"
-    LSH,//
-    RSH,//
-    ADD,//"+"
-    SUB,// "-"
-    MUL,//"*"
-    DIV,//"/"
-    MOD,//"%"
-    NEG,//"-"
-    BCOM,//"~"
-//branch
-    JZ,      //"",  
-    JNZ,     //"!", 
-    JE,      //"=="
-    JNE,     //"!="
-    JG,      //">"
-    JL,      //"<"
-    JGE,     //">="
-    JLE,     //"<="
+// extern std::ofstream iro;
+// //diffrent from tree.h's op, these are for assamble language
+// enum Opcode{
+// //assign
+//     BOR, //"|"
+//     BXOR,//"^"
+//     BAND,//"&"
+//     LSH,//
+//     RSH,//
+//     ADD,//"+"
+//     SUB,// "-"
+//     MUL,//"*"
+//     DIV,//"/"
+//     MOD,//"%"
+//     NEG,//"-"
+//     BCOM,//"~"
+// //branch
+//     JZ,      //"",  
+//     JNZ,     //"!", 
+//     JE,      //"=="
+//     JNE,     //"!="
+//     JG,      //">"
+//     JL,      //"<"
+//     JGE,     //">="
+//     JLE,     //"<="
 
-//jump
-    JMP,     //"jmp"
-    IJMP,    //"ijmp" IndirectJump
+// //jump
+//     JMP,     //"jmp"
+//     IJMP,    //"ijmp" IndirectJump
 
-    INC,     //"++",   Inc
-    DEC,     //"--",   Dec
+//     INC,     //"++",   Inc
+//     DEC,     //"--",   Dec
 
-    ADDR,    //"&"  Address
-    DEREF,   //"*"  Deref
+//     ADDR,    //"&"  Address
+//     DEREF,   //"*"  Deref
 
-//Cast
-//promote to size 4
-    EXTI1,   //"(int)(char)"
-    EXTU1,   //"(int)(unsigned char)"
-    EXTI2,   //"(int)(short)"
-    EXTU2,   //"(int)(unsigned short)"
-//shrink to lower size
-    TRUI1,   //"(char)(int)"
-    TRUI2,   //"(short)(int)"
-//real cast
-    CVTI4F8, //"(double)(int)"
-    CVTU4F8, //"(double)(unsigned)"
-    CVTF8I4, //"(int)(double)"
-    CVTF8U4,//"(unsigned)(double)"
+// //Cast
+// //promote to size 4
+//     EXTI1,   //"(int)(char)"
+//     EXTU1,   //"(int)(unsigned char)"
+//     EXTI2,   //"(int)(short)"
+//     EXTU2,   //"(int)(unsigned short)"
+// //shrink to lower size
+//     TRUI1,   //"(char)(int)"
+//     TRUI2,   //"(short)(int)"
+// //real cast
+//     CVTI4F8, //"(double)(int)"
+//     CVTU4F8, //"(double)(unsigned)"
+//     CVTF8I4, //"(int)(double)"
+//     CVTF8U4,//"(unsigned)(double)"
 
-//Mov
-    MOV,     //"=",                    Move)
-    IMOV,    //"*=",                   IndirectMove)
-//Func
-    CALL,    //"call"
-    RET,     //"ret"
-//    CLR,     //"",                     Clear)
+// //Mov
+//     MOV,     //"=",                    Move)
+//     IMOV,    //"*=",                   IndirectMove)
+// //Func
+//     CALL,    //"call"
+//     RET,     //"ret"
+// //    CLR,     //"",                     Clear)
     
-    NOP,     //占位符
-};
+//     NOP,     //占位符
+// };
 
-typedef struct irinst{
-    struct irinst *prev;
-    struct irinst *next;
-    _Type ty;
-    int opcode;
-    domain_elem* opds[3];
-}*IRInst;
+// typedef struct irinst{
+//     struct irinst *prev;
+//     struct irinst *next;
+//     _Type ty;
+//     int opcode;
+//     domain_elem* opds[3];
+// }*IRInst;
 
-typedef struct cfgedge
-{
-	struct bblock* bb;
-	struct cfgedge *next;
-} *CFGEdge;
+// typedef struct cfgedge
+// {
+// 	struct bblock* bb;
+// 	struct cfgedge *next;
+// } *CFGEdge;
 
-typedef struct bblock{
-    struct bblock *prev;
-	struct bblock *next;
+// typedef struct bblock{
+//     struct bblock *prev;
+// 	struct bblock *next;
 
-    domain_elem label;  //identifier of bb
-    CFGEdge succs;
-    CFGEdge preds;
+//     domain_elem* label;  //identifier of bb
+//     CFGEdge succs;
+//     CFGEdge preds;
 
-    struct irinst instlist;
+//     struct irinst instlist;
 
-    int ninst;
+//     int ninst;
 
-    int nsucc;
+//     int nsucc;
 
-    int npred;
-    int ref;
-}* BBlock;
+//     int npred;
+//     int ref;
+// }* BBlock;
+// BBlock CreateBBlock();
+// void StartBBlock(BBlock bb);
 
-BBlock CreateBBlock();
-void StartBBlock(BBlock bb);
+// void DrawCFGEdge(BBlock from, BBlock to);
 
-void DrawCFGEdge(BBlock from, BBlock to);
-
-extern BBlock currentBB;
+// extern BBlock currentBB;
 #endif

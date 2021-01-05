@@ -2,6 +2,7 @@
 #include "error.h"
 #include "exprchck.h"
 #include "stmtchck.h"
+#include "inter.h"
 extern TreeNode* null_node;
 _FunctionType currentfty;
 int TreeNode::_now_id = 0;
@@ -77,11 +78,12 @@ void TreeNode::copyto(TreeNode* nn){
     nn->nodeType = nodeType;
     nn->optype = optype;
     nn->p_val = p_val;
-    nn->sibling = sibling;
+    //nn->sibling = sibling;
     nn->child = child;
     nn->str_val = str_val;
     nn->stype = stype;
     nn->lineno = lineno;
+    nn->l_value = l_value;
 }
 
 TreeNode::TreeNode(int lineno, NodeType type):lineno(lineno), nodeType(type){
@@ -289,8 +291,26 @@ void TreeNode::print_expr_info(){
     case OP_MUL:
         cout << "MUL";
         break;
-
+    case OP_POSTSELFDEC:
+        cout << "POST--";
+        break;
+    case OP_POSTSELFINC:
+        cout << "POST++";
+        break;
+    case OP_AS_ADDEQ:
+        cout << "+=";
+        break;
+    case OP_UNA_DEREF:
+        cout << "*";
+        break;
+    case OP_UNA_REF:
+        cout << "&";
+        break;
+    case 0:
+        cout << "占位";
+        break;
     default:
+        cout << "？ "<<this->optype;
         break;
     }
 }
@@ -380,7 +400,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
             if (this->father->domain){
                 domain_elem* e = new domain_elem();
                 e->pos = this->lineno;
-                e->s = func_name;
+                e->s = new std::string(func_name);
                 e->ty = typeSp;
                 this->father->domain->add_element(e);
             }
@@ -412,7 +432,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
         strcpy(func_name, (this->var_name).c_str());
         if(this->father->domain && !(this->father->nodeType == NODE_DECL_FUNC)){
             domain_elem* e = new domain_elem();
-            e->s = func_name;
+            e->s = new string(func_name);
             e->pos = this->lineno;
             e->kind = DEK_variable;
             e->ty = typeSp;
@@ -618,10 +638,12 @@ void TreeNode::funcTypeDump(){
         if (func_ret_type->param_types.size() >= 0) func_ret_type->hasProto = true;
         cout <<funcname<< func_ret_type << " func set\n"; 
         domain_elem* e = new domain_elem();
-        e->s = funcname;
+        e->s = new string(funcname);
         e->pos = this->lineno;
         e->ty = (_Type)func_ret_type;
         e->kind = DEK_function;
+        cout << *e->s <<endl;
+        this->domain->add_element(e);
         this->domain->father_domain->add_element(e);
         //this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);
         this->sysType = (_Type)func_ret_type;
@@ -711,6 +733,34 @@ void TreeNode::typeCheck(){
     }
 }
 
+void TreeNode::IRGenerate(){
+    if(!(this->nodeType == NODE_PROG)){
+        cout << "only root node can call typeCheck\n";
+        exit(1);
+    }
+    TreeNode* son = this->child;
+    while(son){
+        if(son->nodeType == NODE_EXTERN_DECL)
+        {
+            if(son->child->nodeType == NODE_EXTERN_FUNC_DECL){
+                //cout << "2checking func: lno@" << son->lineno << endl; 
+                //currentfty = (_FunctionType)son->child->sysType;
+                //assert(currentfty != NULL);
+                //tyCheckStatement(son->child->child->sibling->sibling);
+                TranslateFunction(son->child);
+            }
+        }
+        else if (son->nodeType == NODE_EXTERN_FUNC_DECL)
+        {
+            TranslateFunction(son);
+        }
+        else{
+            cout << "root node inner error, expected extern (func) delarations" << endl;
+        }
+        son = son->sibling;
+    }
+}
+
 void TreeNode::tyCheckGlobalDeclaration(){
 
 }
@@ -741,11 +791,14 @@ void TreeNode::CheckInitializerInternal(TreeNode* initializer, _Type ty){
  * [IMPORTANT] call CanModify() before calling CanAssign()
  */
 bool CanAssign(TreeNode* expr, _Type lty){
+    assert(expr != NULL);
     _Type rty = expr->sysType;
+    cout << "enter canassign" << endl;
+    assert((lty != NULL) &&(rty != NULL));
     lty = UnQualify(lty);
     rty = UnQualify(rty);
-    assert((lty != NULL) &&(rty != NULL));
-    //cout<<expr->nodeID<<"assign "<< lty <<rty << endl;
+    
+    cout<<expr->nodeID<<"assign "<< lty <<rty << endl;
     /**
      * record type
      */
@@ -793,9 +846,9 @@ void TreeNode::redefCheck(){
 }
 
 static bool has_redef_error = false;
-void printRedefError(domain_elem e1, domain_elem e2){
-    cout << "redefination detected, " << e1.s <<endl;
-    cout << "first defined here: " << e1.pos << " , then defined here: " << e2.pos << endl;
+void printRedefError(domain_elem* e1, domain_elem* e2){
+    cout << "redefination detected, " << e1->s <<endl;
+    cout << "first defined here: " << e1->pos << " , then defined here: " << e2->pos << endl;
 }
 void __redefCheck(TreeNode* node){
     domain* dm = node->domain;
@@ -807,7 +860,7 @@ void __redefCheck(TreeNode* node){
     for(int i = 0; i < len; i++){
         //cout << dm->elements[i].s << endl;
         for(int j = i+1; j < len; j++){
-            if (!(dm->elements[i].s == dm->elements[j].s))continue;
+            if (!(dm->elements[i]->s == dm->elements[j]->s))continue;
             printRedefError(dm->elements[i], dm->elements[j]);
             has_redef_error = true;
         }
@@ -842,11 +895,11 @@ void __check_undef(TreeNode* node){
         //cout << "now check domain " << dm->domainid << "size" <<dm->elements.size()<<endl;
         int len = dm->elements.size();
         for(int i = 0; i < len; i++){
-            if (node->var_name == dm->elements[i].s){
+            if (node->var_name == *(dm->elements[i]->s)){
                 found = true;
-                node->sysType = dm->elements[i].ty;
-                node->p_val = (void*)&dm->elements[i];
-                cout <<node->var_name  << " pos: "<<node->lineno << " sysType: " << node->sysType << " dm: " << dm->domainid << endl;
+                node->sysType = dm->elements[i]->ty;
+                node->p_val = (void*)dm->elements[i];
+                cout <<"checked "<<node->var_name  << " pos: "<<node->lineno << " sysType: " << node->sysType << " dm: " << dm->domainid << endl;
                 break;
             }
         }
@@ -855,5 +908,18 @@ void __check_undef(TreeNode* node){
     }
     if(!found){
         print_undef_error(node);
+    }
+}
+
+void TreeNode::print_all_funcs_ir(){
+    //if(this->nodeType != NODE_PROG) return;
+    TreeNode* ch = this->child;
+    while(ch){
+        if(ch->nodeType == NODE_EXTERN_FUNC_DECL){
+            iro << "====================================" << endl;
+            print_bb_tree(ch->domain);  
+        }
+        ch->print_all_funcs_ir();   
+        ch = ch->sibling;
     }
 }

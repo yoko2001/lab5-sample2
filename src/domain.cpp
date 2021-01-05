@@ -1,4 +1,6 @@
 #include "domain.h"
+#include<assert.h>
+#include<sstream>
 int domain::domain_id = 0; //初始化
 
 domain* born_son_domain(domain* fa){
@@ -20,9 +22,9 @@ domain* born_son_domain(domain* fa){
 domain_elem* _LookupSymple(domain* dm, std::string name, bool searchOuter){
     domain* cur_dm = dm;
     while(cur_dm){
-        for(std::vector<domain_elem>::iterator iter = cur_dm->elements.begin(); iter != cur_dm->elements.end(); iter++){
-            if (iter->s == name){
-                return &(*iter);
+        for(std::vector<domain_elem*>::iterator iter = cur_dm->elements.begin(); iter != cur_dm->elements.end(); iter++){
+            if (*(*iter)->s == name){
+                return (*iter);
             }
         }
         // check if father domain has it
@@ -36,4 +38,17 @@ domain_elem* _LookupSymple(domain* dm, std::string name, bool searchOuter){
  */
 domain_elem* LookupID(domain* dm, std::string name){
     return _LookupSymple(dm, name, 1);
+}
+
+void copyfrom(domain_elem*src, domain_elem* dst){
+    assert(src != NULL);
+    std::cout << *(src->s) << std::endl;
+    assert((*src->s).size() >= 0);
+    std::stringstream ss;
+    ss << *(src->s);
+    
+    dst->s = new std::string();
+    ss >> *dst->s;
+    dst->kind = src->kind;
+    dst->pos = src->pos;
 }

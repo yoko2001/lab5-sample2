@@ -95,6 +95,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     //cout << "lex node->type"<< node->type << endl;
     node->int_val = atoi(yytext);
     node->sysType = T(INT);
+    node->optype = OP_CONST;
     yylval = node;
     return INTEGER;
 }

@@ -12,7 +12,7 @@ enum {
 };
 
 typedef struct _domain_elem{
-    std::string s;  //name
+    std::string *s;  //name
     int pos;        //lineno
     _Type ty;       //sysType
     int kind;
@@ -28,7 +28,9 @@ typedef struct _domain_elem{
 
 
     bool defined;   //if just declared or already defined
-    _domain_elem(std::string s, int p, _Type ty):s(s), pos(p), ty(ty){}
+    _domain_elem(std::string s, int p, _Type ty):pos(p), ty(ty){
+        this->s = new std::string(s);
+    }
     _domain_elem(){}
 } domain_elem;
 enum domain_type{
@@ -49,18 +51,17 @@ typedef struct _domain{
     void set_f_domain(_domain* f){father_domain = f;}
     void add_s_domain(_domain* s){child_domain.push_back(s);}
     std::vector<_domain*>::iterator get_childs_iter(){std::vector<_domain*>::iterator iter = child_domain.begin(); return iter;}
-    std::vector<domain_elem> elements;
+    std::vector<domain_elem*> elements;
     void add_element(char* s, int line, _Type ty = NULL){
-        elements.push_back(domain_elem(std::string(s), line, ty));
+        elements.push_back(new domain_elem(std::string(s), line, ty));
         //std::string tab(4*depth, ' ');
         std::cout<<"domain: " <<domainid << ", added element: " << std::string(s) << " pos: " << line << std::endl;
     }
     void add_element(domain_elem* e){
-       elements.push_back(*e);
+       elements.push_back(e);
        e->dm = this;
-       std::cout<<"domain: " <<domainid << ", added element: " << std::string(e->s) << " pos: " << e->pos << std::endl;
+       std::cout<<"domain: " <<domainid << ", added element: " << *(e->s) << " pos: " << e->pos << std::endl;
     }
-   
 } domain;
 /**
 return the new domain, which is a son of the given domain
@@ -69,4 +70,5 @@ domain* born_son_domain(domain* fa);
 
 domain_elem* LookupID(domain* dm, std::string name);
 
+void copyfrom(domain_elem*src, domain_elem* dst);
 #endif
