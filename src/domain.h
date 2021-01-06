@@ -13,6 +13,7 @@ enum {
 
 typedef struct _domain_elem{
     std::string *s;  //name
+    std::string *access_name;
     int pos;        //lineno
     _Type ty;       //sysType
     int kind;
@@ -21,9 +22,12 @@ typedef struct _domain_elem{
 
     int intval;
     char ch_val;
+    void* p_val;
     //bool b_val;
     std::string str_val;
-
+    struct _domain_elem* next;
+    struct _domain_elem* reg;
+    bool need_wb;
     struct _domain* dm;
 
 

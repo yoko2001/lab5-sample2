@@ -94,6 +94,7 @@ bool tyCheckExpression(TreeNode* init){
             case OP_PTAC_MEMBER:
             case OP_FUNC_CALL:
                 init = tyCheckPostfixExpression(init);
+                assert(init->sysType != NULL);
                 return true;
                 break;
             case OP_REL_G:
@@ -118,6 +119,8 @@ bool tyCheckExpression(TreeNode* init){
             case 0:
                 tyCheckExpression(init->child);
                 init->sysType = init->child->sysType;
+                cout << init->nodeID << endl;
+                assert(init->sysType != NULL);
                 break;
             default:
                 cout << "problem nodeid: " << init->nodeID<< endl;
@@ -287,7 +290,11 @@ bool tyCheckUnaryExpression(TreeNode* expr){
     switch (expr->optype){
     case OP_UNA_DEREF:  //*
         ch = expr->child;
-        
+        if(ch->nodeID == 140){
+            assert(ch->sysType != 0);
+            assert(IsPtrType(ch->sysType->bty));
+        }
+        cout << "* child cheking" <<endl;
         tyCheckExpression(ch);
         tyAdjust(ch, 1);
         cout << "* child checked" <<endl;
@@ -313,17 +320,20 @@ bool tyCheckUnaryExpression(TreeNode* expr){
         if(IsPtrType(ty)){
             // The operand of the unary * operator shall have pointer type. 
             expr->sysType = ty->bty;
+            assert(expr->sysType != NULL);
+            cout << expr->nodeID << " systype ok" << endl;
             if(IsFunctionType(expr->sysType)){
                 expr->child->child->copyto(expr);
                 expr->child = NULL;
+                assert(expr->sysType != NULL);
                 //expr->father->child = expr->child;
                 // expr->father->child->father = expr->father;
                 // expr->father->child->sibling = expr->sibling;
                 // expr->father = NULL;
                 return true;
             }
-
             if(expr->sysType->categ == ARRAY || sysTyIsArr(expr->child->typeMark)){
+                cout << "test5" << endl;
                 TreeNode* one = new TreeNode(expr->lineno, NODE_CONST);
                 one->int_val = 1;
                 one->type = TYPE_INT;
@@ -610,8 +620,15 @@ bool tyTransformIncrement(TreeNode*expr){
     
     casgn->addChild(one);
     // check "a"
-    if(!tyCheckExpression(casgn->child))return false;
+    //if(!tyCheckExpression(casgn))return false;
+    //TODO here are some problem
+    casgn->sysType = T(INT);
+    
+    cout << "casgn checked " << casgn->nodeID << endl;
+    assert(casgn->sysType != NULL);
+
     expr->sysType = expr->child->sysType;
+    assert(expr->sysType != NULL);
     return true;
 }
 
@@ -703,15 +720,20 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
     TreeNode* ln, *rn;
     ln = expr->child;
     rn = ln->sibling;
-    
+    cout << "enter tyCheckPostfixExpression"<< expr->nodeID << endl; 
     switch (expr->optype)
     {
     case OP_OFFSET_ACCESS:
         
         tyCheckExpression(ln);
+        if(ln->nodeID == 141){
+            assert(IsPtrType(ln->sysType));
+        }
         tyAdjust(ln, 1);
         tyCheckExpression(rn);
         tyAdjust(rn, 1);
+
+        cout << ln->nodeID << endl;
         //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
         if (ISObjevtPtr(ln->sysType) && IsIntType(rn->sysType)){
             cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
@@ -720,9 +742,9 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
             expr->l_value = 1;
             DoIntegerPromotion(rn);
             //cout << expr->sysType->size<<endl;
-            cout << rn << endl;
+            //cout << rn << endl;
             ln->sibling = rn = ScalePointerOffset(rn, expr->sysType->size);
-            cout << rn << endl;
+            //cout << rn << endl;
 
             /**
              * int ptr**;
@@ -748,9 +770,15 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
                 cout << "Arr access add deref" << endl;
                 return deref;
             }
+        }else{
+            cout << "problem node" << expr->nodeID << endl;
+            expr->printAST();
+            assert(0);
+            return NULL;
         }
         //cout << expr->nodeID << " tyCheckPostfixExpression OP_OFFSET_ACCESS" << endl;
         //cout << expr->sysType->size<<endl;
+        assert(expr->sysType != NULL);
         return expr;
 
     case OP_POSTSELFDEC:

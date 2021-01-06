@@ -394,6 +394,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
     
     //parameters
     if(typeSp && (this->nodeType == NODE_DECLARATOR)){
+        cout << "NODE_DECLARATOR " << this->nodeID;
         if (this->child->nodeType == NODE_VAR){ 
             strcpy(func_name, (child->var_name).c_str());
             //cout << child->var_name.c_str() << endl;
@@ -441,7 +442,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
         }
         return typeSp;
     }
-    if (((this->nodeType != NODE_DECL) || (typeSp == NULL) )){
+    if (((this->nodeType != NODE_DECL && this->nodeType != NODE_PT_DECLARATOR && this->nodeID != NODE_DECL_VARS) || (typeSp == NULL))){
         cout << "wrong call NODE_DECL_Dump" << this->nodeID <<" "<<typeSp<< endl;
         return typeSp;
     }
@@ -449,7 +450,7 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
     TreeNode* ExtendVarNode = NULL;
     
     retType = typeSp;
-    cout <<  this->nodeID <<endl;
+    cout << "here "<< this->nodeID <<endl;
 
     if (init_or_no_init_node){
         if (init_or_no_init_node->nodeType == NODE_INIT_DECL_VARS){
@@ -464,23 +465,40 @@ _Type TreeNode::NODE_DECL_Dump(_Type typeSp, char* func_name){
             }else if (ExtendVarNode->nodeType == NODE_PT_DECLARATOR){
                 _Type pointered = PointerTo(typeSp);
                 //递归
-                retType = ExtendVarNode->child->NODE_DECL_Dump(pointered, func_name);
+                while(ExtendVarNode->child->nodeType == NODE_PT_DECLARATOR){
+                    ExtendVarNode = ExtendVarNode->child;
+                    pointered = PointerTo(pointered);
+                }
+                retType = 
+                ExtendVarNode->child->NODE_DECL_Dump(pointered, func_name);
             }
         }
-        if (init_or_no_init_node->nodeType == NODE_DECL_VARS){
-            cout << "NODE_DECL_VARS\n";
+        if (init_or_no_init_node->nodeType == NODE_DECL_VARS || init_or_no_init_node->nodeType == NODE_PT_DECLARATOR){
+            
             ExtendVarNode = init_or_no_init_node->child;
-            if (!ExtendVarNode) return NULL;
+            cout << "NODE_DECL_VARS" << ExtendVarNode->nodeID << endl;;
+            if (!ExtendVarNode) {
+                cout << "麻了" << endl;
+                return NULL;
+            }
             if (ExtendVarNode->nodeType == NODE_DECLARATOR){
                 //这里找到了
                 retType = typeSp;
                 retType = ExtendVarNode->child->NODE_DECL_Dump(retType, func_name);
+                
             }
             else if (ExtendVarNode->nodeType == NODE_PT_DECLARATOR){
                 _Type pointered = PointerTo(typeSp);
-                printf("pointer\n");
+                printf("pointer");
+                cout << ExtendVarNode->nodeID << endl;
+                while(ExtendVarNode->child->nodeType == NODE_PT_DECLARATOR){
+                    ExtendVarNode = ExtendVarNode->child;
+                    pointered = PointerTo(pointered);
+                    assert(IsPtrType(pointered->bty));
+                }
                 //递归
-                retType = ExtendVarNode->child->NODE_DECL_Dump(pointered, func_name);
+                retType = 
+                ExtendVarNode->child->NODE_DECL_Dump(pointered, func_name);
             }
         }
         //ARRAY

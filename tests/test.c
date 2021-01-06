@@ -24,8 +24,10 @@ void main(){
     //for(;;)break;
     ptr = bb;
     (*ptr)[1];// = 1;
+    (*ptr)[2] = 12;
     bb[0][1] = 1;
     *&i=1;
+    
     //notdef = 3 + 5;
     //pt = 0;
     for(i = 0; i < 25; i++){

@@ -1,6 +1,7 @@
 #include "common.h"
 #include <fstream>
-ofstream iro;
+#include "output.h"
+ofstream iro, asmo;
 _domain* FSYM;
 extern TreeNode *root;
 extern FILE *yyin;
@@ -18,9 +19,13 @@ Type* TYPE_ARRAY = new Type(VALUE_ARRAY);
 Type* TYPE_VOID = new Type(VALUE_VOID);
 
 _domain *d_root;
+
+domain_elem* X86Regs[EBP];
+bool UsedRegs[EBP];
 int main(int argc, char *argv[])
 {
     iro.open("ir.out", ios::out | ios::trunc);
+    asmo.open("output.S", ios::out | ios::trunc);
     d_root = new _domain();
     if (argc == 2)
     {
@@ -66,7 +71,11 @@ int main(int argc, char *argv[])
     root->IRGenerate();
     iro << "=====IR======" << endl;
     root->print_all_funcs_ir();
+
+    //set reg sys
+    SetupReg();
     //close
     iro.close();
+    asmo.close();
     return 0;
 }

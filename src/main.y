@@ -830,12 +830,12 @@ declaration-specifiers declarator{
 
 pointer:
     LO_MUL  {TreeNode* node = new TreeNode(lineno, NODE_TYPE); node->type = TYPE_POINTER; $$ = node;}
-|   LO_MUL pointer{
-        TreeNode* node = new TreeNode(lineno, NODE_TYPE); 
-        node->type = TYPE_POINTER;
-        node->addSibling($2);
-        $$ = node;
-    }
+// |   LO_MUL pointer{
+//         TreeNode* node = new TreeNode(lineno, NODE_TYPE); 
+//         node->type = TYPE_POINTER;
+//         node->addSibling($2);
+//         $$ = node;
+//     }
 ;
 
 type-qualifier:

@@ -66,6 +66,7 @@ int OP2IROP(int opcode){
 BBlock CreateBBlock(){
     BBlock bb;
     bb = (BBlock)malloc(sizeof(struct bblock));
+    bb->next = NULL;
     bb->instlist.opcode = NOP;
     //initial dual-linklist
     bb->instlist.prev = bb->instlist.next = &bb->instlist;
@@ -129,10 +130,13 @@ static void print_inst(IRInst inst){
         iro << *inst->opds[2]->s <<endl;
         break;
     case CALL:
-        iro << "CALL " << 
-        inst->opds[0] <<","<< 
-        inst->opds[1] <<","<< 
-        inst->opds[2] << endl;
+        iro << "CALL ";
+        if((inst->opds[0] != NULL) && (inst->opds[0]->s != NULL))
+        iro << *inst->opds[0]->s <<",";
+        if((inst->opds[1] != NULL) && (inst->opds[1]->s != NULL))
+        iro << *inst->opds[1]->s <<endl;
+        //if((inst->opds[2] != NULL) && (inst->opds[2]->s != NULL))
+        //iro << *inst->opds[2]->s <<endl;
         break;
     case RET:
         iro << "RET " << 
@@ -865,10 +869,9 @@ static domain_elem* Deref(_Type ty, domain_elem* addr){
     domain_elem* tmp;
     
     assert(addr != NULL);
-    tmp = AddTemp(ty);iro << "???" << endl;
-    iro << addr << endl;
+    tmp = AddTemp(ty);
+    //iro << addr << endl;
     genAssign(ty, tmp, DEREF, addr, NULL);
-    iro << "???" << endl;
     return tmp;
 }
 
@@ -880,6 +883,14 @@ static domain_elem* TrOffset(_Type ty, domain_elem* addr, domain_elem* voff, int
         return Deref(ty, addr);
     }
     return Deref(ty, Simplyfy(T(POINTER), ADD, addr, IntConst(coff)));
+}
+
+static domain_elem* Addressof(domain_elem* src){
+    domain_elem* t = AddTemp(T(POINTER));
+    iro << src << endl;
+    return t;
+    genAssign(T(POINTER), t, ADDR, src, NULL);
+    return t;
 }
 
 static domain_elem* TranslateArrayIndex(TreeNode* expr){
@@ -998,13 +1009,6 @@ static domain_elem* TranslatePostfixExpression(TreeNode* expr){
     }
 }
 
-static domain_elem* Addressof(domain_elem* src){
-    domain_elem* t = AddTemp(T(POINTER));
-    iro << src << endl;
-    return t;
-    genAssign(T(POINTER), t, ADDR, src, NULL);
-    return t;
-}
 
 static domain_elem* TranslateUnaryExpression(TreeNode* expr){
     domain_elem* src;
@@ -1316,13 +1320,15 @@ void TranslateFunction(TreeNode* function){
     StartBBlock((BBlock)FSYM->exitBB);
 
     BBlock bb = (BBlock)FSYM->entryBB;
-    iro << "naming blocks" << endl;
+    iro << "after func translation" << endl;
     while(bb != NULL){
+        assert(bb != NULL);
         if(bb->label.s == NULL) bb->label.s = new string();
         iro << bb <<" "<< bb->next <<endl;
         copyfrom(AddLabel(), &bb->label);
         iro << "copy fine" << endl;
         bb = bb->next;
     }
+    //if (function->nodeID == )
     iro << "finished function translation " << function->nodeID << endl; 
 }
