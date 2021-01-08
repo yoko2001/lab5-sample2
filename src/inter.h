@@ -3,6 +3,7 @@
 #include<fstream>
 #include"domain.h"
 #include"tree.h"
+void initTranslation();
 // //we run into a new function and gets its Function symbol vec
 // extern _domain* FSYM;
 

@@ -13,6 +13,8 @@ int i = 0;
 
 void main(){
     int i;
+    scanf("%d", &i);
+    printf("%d\n", i);
     // if (c > 1){
     //     unsigned int h;
     //     //h = 1;
@@ -26,7 +28,7 @@ void main(){
     (*ptr)[1];// = 1;
     (*ptr)[2] = 12;
     bb[0][1] = 1;
-    *&i=1;
+    //*&i=1;
     
     //notdef = 3 + 5;
     //pt = 0;

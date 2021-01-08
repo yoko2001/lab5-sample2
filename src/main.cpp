@@ -3,6 +3,8 @@
 #include "output.h"
 ofstream iro, asmo;
 _domain* FSYM;
+vector<domain_elem*>Strings;
+
 extern TreeNode *root;
 extern FILE *yyin;
 extern int yyparse();
@@ -68,12 +70,13 @@ int main(int argc, char *argv[])
     cout << "AST after type CHECK \n"; 
     root->printAST();
 
+    initTranslation();
     root->IRGenerate();
     iro << "=====IR======" << endl;
     root->print_all_funcs_ir();
 
-    //set reg sys
-    SetupReg();
+    //set output assamble lgg
+    EmitProg(root);
     //close
     iro.close();
     asmo.close();

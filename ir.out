@@ -1,438 +1,4 @@
-handeling66
-handeling64
-ckpt1
-translating expr : 63
-translating expr : 61
-enter TranslatePrimaryExpression
-got var a
-binary translate 2nd expression 62
-translating expr : 62
-enter TranslatePrimaryExpression
-got var b
-l & r ok a b
----Simplyfy---5
-src2 == NULL
-returining from simplify
-l & r ok a b
-add temp t0
-adter t l & r ok a b
-added temp, try genAssignab
-0x1da4af0
-assigning op:5 src1: a
-genAssign success
-malloc ok
-genReturn before AppendInst
-pass  64
-64 cpd finished
-pass  66
-after func translation
-0x1da58e0 0x1da5e20
-new label: BB0
-copy fine
-0x1da5e20 0x1da59d0
-new label: BB1
-copy fine
-0x1da59d0 0
-new label: BB2
-copy fine
-finished function translation 67
-handeling226
-handeling130
 TranslateStatement doesn't support this stype: 1 nodeid: 130
-pass  130
-130 cpd finished
-handeling138
-translating expr : 138
-translating expr : 137
-translating expr : 136
-translating expr : 133
-enter TranslatePrimaryExpression
-got var ptr
-translating expr : 135
-enter TranslatePrimaryExpression
-got var bb
-pass  138
-138 cpd finished
-handeling147
-translating expr : 147
-translating expr : 146
-translating expr : 145
-translating expr : 231
-translating expr : 144
-translating expr : 143
-enter TranslatePrimaryExpression
- intconst created 1
-add int const of ival: 1
-binary translate 2nd expression 232
-translating expr : 232
-enter TranslatePrimaryExpression
- intconst created 4
-add int const of ival: 4
-l & r ok 1 4
----Simplyfy---7
-simplify mul/div
-returining from simplify
-l & r ok 1 4
-add temp t1
-adter t l & r ok 1 4
-added temp, try genAssign14
-0x1da6500
-assigning op:7 src1: 1
-genAssign success
-using node 145
-translating expr : 141
-enter TranslateUnaryExpression
-translating expr : 140
-enter TranslatePrimaryExpression
-got var ptr
-add temp t2
-0x1da4660
-assigning op:25 src1: ptr
-addr from node141
- intconst created 0
----Simplyfy---5
-simplify add
----Simplyfy---5
-src2 == NULL
-returining from simplify
-l & r ok t2 t1
-add temp t3
-adter t l & r ok t2 t1
-added temp, try genAssignt2t1
-0x1da6780
-assigning op:5 src1: t2
-genAssign success
-add temp t4
-0x1da6940
-assigning op:25 src1: t3
-pass  147
-147 cpd finished
-handeling159
-translating expr : 159
-translating expr : 158
-translating expr : 157
-translating expr : 154
-translating expr : 233
-translating expr : 153
-translating expr : 152
-enter TranslatePrimaryExpression
- intconst created 2
-add int const of ival: 2
-binary translate 2nd expression 234
-translating expr : 234
-enter TranslatePrimaryExpression
- intconst created 4
-add int const of ival: 4
-l & r ok 2 4
----Simplyfy---7
-simplify mul/div
-returining from simplify
-l & r ok 2 4
-add temp t5
-adter t l & r ok 2 4
-added temp, try genAssign24
-0x1da6b10
-assigning op:7 src1: 2
-genAssign success
-using node 154
-translating expr : 150
-enter TranslateUnaryExpression
-translating expr : 149
-enter TranslatePrimaryExpression
-got var ptr
-add temp t6
-0x1da4660
-assigning op:25 src1: ptr
-addr from node150
- intconst created 0
----Simplyfy---5
-simplify add
----Simplyfy---5
-src2 == NULL
-returining from simplify
-l & r ok t6 t5
-add temp t7
-adter t l & r ok t6 t5
-added temp, try genAssignt6t5
-0x1da6d90
-assigning op:5 src1: t6
-genAssign success
-add temp t8
-0x1da6f50
-assigning op:25 src1: t7
-translating expr : 156
-enter TranslatePrimaryExpression
- intconst created 12
-add int const of ival: 12
-pass  159
-159 cpd finished
-handeling171
-translating expr : 171
-translating expr : 170
-translating expr : 169
-translating expr : 166
-translating expr : 237
-translating expr : 165
-translating expr : 164
-enter TranslatePrimaryExpression
- intconst created 1
-add int const of ival: 1
-binary translate 2nd expression 238
-translating expr : 238
-enter TranslatePrimaryExpression
- intconst created 4
-add int const of ival: 4
-l & r ok 1 4
----Simplyfy---7
-simplify mul/div
-returining from simplify
-l & r ok 1 4
-add temp t9
-adter t l & r ok 1 4
-added temp, try genAssign14
-0x1da72e0
-assigning op:7 src1: 1
-genAssign success
-using node 166
-translating expr : 235
-translating expr : 162
-translating expr : 161
-enter TranslatePrimaryExpression
- intconst created 0
-add int const of ival: 0
-binary translate 2nd expression 236
-translating expr : 236
-enter TranslatePrimaryExpression
- intconst created 20
-add int const of ival: 20
-l & r ok 0 20
----Simplyfy---7
-simplify mul/div
-returining from simplify
-l & r ok 0 20
-add temp t10
-adter t l & r ok 0 20
-added temp, try genAssign020
-0x1da7560
-assigning op:7 src1: 0
-genAssign success
----Simplyfy---5
-src2 == NULL
-returining from simplify
-l & r ok t9 t10
-add temp t11
-adter t l & r ok t9 t10
-added temp, try genAssignt9t10
-0x1da7460
-assigning op:5 src1: t9
-genAssign success
-using node 163
-translating expr : 160
-enter TranslatePrimaryExpression
-got var bb
-addr from node160
- intconst created 0
----Simplyfy---5
-simplify add
----Simplyfy---5
-src2 == NULL
-returining from simplify
-l & r ok bb t11
-add temp t12
-adter t l & r ok bb t11
-added temp, try genAssignbbt11
-0x1da4510
-assigning op:5 src1: bb
-genAssign success
-add temp t13
-0x1da79a0
-assigning op:25 src1: t12
-translating expr : 168
-enter TranslatePrimaryExpression
- intconst created 1
-add int const of ival: 1
-pass  171
-171 cpd finished
-handeling181
-translating expr : 181
-translating expr : 180
-translating expr : 179
-translating expr : 176
-enter TranslatePrimaryExpression
-got var i
-translating expr : 178
-enter TranslatePrimaryExpression
- intconst created 1
-add int const of ival: 1
-pass  181
-181 cpd finished
-handeling207
-translating expr : 186
-translating expr : 185
-translating expr : 182
-enter TranslatePrimaryExpression
-got var i
-translating expr : 184
-enter TranslatePrimaryExpression
- intconst created 0
-add int const of ival: 0
-handeling206
-handeling203
-translating expr : 203
-translating expr : 202
-translating expr : 201
-translating expr : 194
-enter TranslatePrimaryExpression
-got var a
-translating expr : 200
-translating func call 200
-translating expr : 196
-enter TranslatePrimaryExpression
-got var f
-translating expr : 197
-enter TranslatePrimaryExpression
-got var i
-translating expr : 199
-enter TranslatePrimaryExpression
- intconst created 1
-add int const of ival: 1
-TranslateFunctionCall 200
-f
-func has return
-add temp t14
-arg: 197
-arg: 199
-pass  203
-203 cpd finished
-handeling205
-pass  205
-205 cpd finished
-pass  206
-translating expr : 193
-translating expr : 192
-translating expr : 191
-enter TranslatePrimaryExpression
-got var i
-add temp t15
-translating expr : 240
-translating expr : 191
-enter TranslatePrimaryExpression
-got var i
-translating expr : 239
-enter TranslatePrimaryExpression
- intconst created 1
-add int const of ival: 1
-translating expr : 190
-translating expr : 189
-add temp t16
-translating expr : 187
-enter TranslatePrimaryExpression
-got var i
-translating expr : 188
-enter TranslatePrimaryExpression
- intconst created 25
-add int const of ival: 25
- intconst created 0
- intconst created 1
-189branch set
-test t16
-pass  207
-207 cpd finished
-handeling225
-handeling224
-handeling221
-translating expr : 221
-translating expr : 220
-translating expr : 219
-translating expr : 216
-enter TranslatePrimaryExpression
-got var a
-translating expr : 218
-enter TranslatePrimaryExpression
- intconst created 0
-add int const of ival: 0
-pass  221
-221 cpd finished
-handeling223
-break translate ok
-pass  223
-223 cpd finished
-pass  224
-translating expr : 215
-translating expr : 214
-translating expr : 208
-enter TranslatePrimaryExpression
-got var a
-translating expr : 213
-translating expr : 212
-add temp t17
-translating expr : 210
-enter TranslatePrimaryExpression
-got var i
-translating expr : 211
-enter TranslatePrimaryExpression
- intconst created 0
-add int const of ival: 0
- intconst created 0
- intconst created 1
-212branch set
-test a
-pass  225
-225 cpd finished
-pass  226
-after func translation
-0x1da6280 0x1da7da0
-new label: BB3
-copy fine
-0x1da7da0 0x1da8520
-new label: BB4
-copy fine
-0x1da8520 0x1da7e90
-new label: BB5
-copy fine
-0x1da7e90 0x1da8070
-new label: BB6
-copy fine
-0x1da8070 0x1da8b90
-new label: BB7
-copy fine
-0x1da8b90 0x1da8aa0
-new label: BB8
-copy fine
-0x1da8aa0 0x1da89b0
-new label: BB9
-copy fine
-0x1da89b0 0x1da7f80
-new label: BB10
-copy fine
-0x1da7f80 0x1da9140
-new label: BB11
-copy fine
-0x1da9140 0x1da9590
-new label: BB12
-copy fine
-0x1da9590 0x1da9230
-new label: BB13
-copy fine
-0x1da9230 0x1da9960
-new label: BB14
-copy fine
-0x1da9960 0x1da9870
-new label: BB15
-copy fine
-0x1da9870 0x1da9780
-new label: BB16
-copy fine
-0x1da9780 0x1da9320
-new label: BB17
-copy fine
-0x1da9320 0x1da6370
-new label: BB18
-copy fine
-0x1da6370 0
-new label: BB19
-copy fine
-finished function translation 227
 =====IR======
 ====================================
 BB0:
@@ -443,55 +9,59 @@ BB1:
 BB2:
 ====================================
 BB3:
-  MOV ptr,bb
-  MUL t1,1,4
-  DEREF t2,ptr
-  ADD t3,t2,t1
-  DEREF t4,t3
-  MUL t5,2,4
-  DEREF t6,ptr
-  ADD t7,t6,t5
-  DEREF t8,t7
-  MOV t8,12
-  MUL t9,1,4
-  MUL t10,0,20
-  ADD t11,t9,t10
-  ADD t12,bb,t11
-  DEREF t13,t12
-  MOV t13,1
-  MOV i,1
-  MOV i,0
-  JMP BB7
+  ADDR t1,i
+  CALL scanf
 BB4:
-  CALL t14,f
-  MOV a,t14
-  JMP BB6
+  CALL printf
 BB5:
+  MOV ptr,bb
+  MUL t2,1,4
+  DEREF t3,ptr
+  ADD t4,t3,t2
+  DEREF t5,t4
+  MUL t6,2,4
+  DEREF t7,ptr
+  ADD t8,t7,t6
+  DEREF t9,t8
+  MOV t9,12
+  MUL t10,1,4
+  MUL t11,0,20
+  ADD t12,t10,t11
+  ADD t13,bb,t12
+  DEREF t14,t13
+  MOV t14,1
+  MOV i,0
+  JMP BB9
 BB6:
-  MOV t15,i
-  MOV i,1
+  CALL t15,f
+  MOV a,t15
+  JMP BB8
 BB7:
-  JL BB9,i,25
 BB8:
-  MOV t16,0
+  MOV t16,i
+  MOV i,1
 BB9:
-  MOV t16,1
+  JL BB11,i,25
 BB10:
-  JNZ BB4,t16
-BB11:
-  JMP BB12
-BB12:
-  MOV a,0
-  JMP BB18
-BB13:
-BB14:
-  JG BB16,i,0
-BB15:
   MOV t17,0
-BB16:
+BB11:
   MOV t17,1
+BB12:
+  JNZ BB6,t17
+BB13:
+  JMP BB14
+BB14:
+  MOV a,0
+  JMP BB20
+BB15:
+BB16:
+  JG BB18,i,0
 BB17:
-  MOV a,t17
-  JNZ BB12,a
+  MOV t18,0
 BB18:
+  MOV t18,1
 BB19:
+  MOV a,t18
+  JNZ BB14,a
+BB20:
+BB21:

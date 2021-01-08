@@ -9,6 +9,7 @@ bool tyCheckBreakStatement(TreeNode* stmt);
 bool tyCheckLoopStatement(TreeNode* stmt);
 bool tyCheckSelectStatement(TreeNode* stmt);
 bool tyCheckExpressionStatement(TreeNode* stmt);
+bool tyCheckIOStatement(TreeNode* stmt);
 bool tyCheckStatement(TreeNode* stmt){
     //cout << "cheking stmt :" << stmt->nodeID << endl;
     if(stmt->nodeType == NODE_STMT){
@@ -41,9 +42,13 @@ bool tyCheckStatement(TreeNode* stmt){
                 tyCheckSelectStatement(stmt);
                 break;
             case STMT_EXPRESSION:
-                cout << "ckpt expr stmt " << stmt->nodeID << endl;
+                //cout << "ckpt expr stmt " << stmt->nodeID << endl;
                 tyCheckExpressionStatement(stmt);
-                cout << "ckpt expr stmt finish" << stmt->nodeID << endl;
+                //cout << "ckpt expr stmt finish" << stmt->nodeID << endl;
+                break;
+            case STMT_SCANF:
+            case STMT_PRINTF:
+                tyCheckIOStatement(stmt);
                 break;
             default:
                 cout << "this kind of statement check unrealized: nodeID: " << stmt->nodeID << endl;
@@ -55,7 +60,22 @@ bool tyCheckStatement(TreeNode* stmt){
         return false;
     }
 }
+bool tyCheckIOStatement(TreeNode* stmt){
+    TreeNode* format, * opd;
+    format = stmt->child;
+    opd = format->sibling;
 
+    if(stmt->stype == STMT_SCANF){
+        assert(opd != NULL);
+    }
+
+    if(!format->isConstStr()){
+        cout << "scanf | printf parameter error" << endl;
+        return false;
+    }
+    cout << "tyCheckIOStatement " << opd->nodeID << endl;
+    return tyCheckExpression(opd);
+}
 bool tyCheckCompoundStatement(TreeNode* stmt){
     TreeNode* compound = stmt->child;
     //cout <<"compound "<< stmt->nodeID << endl;

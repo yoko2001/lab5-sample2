@@ -212,7 +212,7 @@ static void print_inst(IRInst inst){
         *inst->opds[1]->s << endl;
         break;
     case ADDR:
-        iro << "ADDR" <<
+        iro << "ADDR " <<
         *inst->opds[0]->s <<","<< 
         *inst->opds[1]->s << endl;
         break;
@@ -287,12 +287,12 @@ void genAssign(_Type ty, domain_elem* dst, int opcode, domain_elem* src1, domain
     IRInst inst;
     inst = (IRInst)malloc(sizeof(irinst));
     dst->ref++;
-    iro << src1 << endl;
+    //iro << src1 << endl;
     src1->ref++;
     if (src2 != NULL) src2->ref++;
     inst->ty = ty;
     inst->opcode = opcode;
-    iro << "assigning op:" << opcode << " src1: " << *src1->s << endl;
+    //iro << "assigning op:" << opcode << " src1: " << *src1->s << endl;
     inst->opds[0] = dst;
     inst->opds[1] = src1;
     inst->opds[2] = src2;
@@ -323,13 +323,13 @@ void genIMOV(_Type ty, domain_elem* dst, domain_elem* src){
 void genReturn(_Type ty, domain_elem* src){
     IRInst inst;
     inst = (IRInst)malloc(sizeof(irinst));
-    iro << "malloc ok" << endl;
+    //iro << "malloc ok" << endl;
     src->ref++;
     inst->ty = ty;
     inst->opcode = RET;
     inst->opds[0] = src;
     inst->opds[1] = inst->opds[2] = NULL;
-    iro << "genReturn before AppendInst" << endl;
+    //iro << "genReturn before AppendInst" << endl;
     AppendInst(inst, currentBB);    
 }
 
@@ -385,7 +385,21 @@ void genRet(_Type ty, domain_elem* src){
 
     AppendInst(inst, currentBB);
 }
+void genIOCall(domain_elem* faddr, domain_elem* fmt, domain_elem* t){
+    IRInst inst;
+    inst = (IRInst)malloc(sizeof(irinst));
+    faddr->ref++;
+    inst->ty = T(VOID);
+    vector<domain_elem*>* args = new  vector<domain_elem*>();
+    args->push_back(fmt);
+    args->push_back(t);
+    inst->opds[0] = NULL;
+    inst->opds[1] =faddr;
+    inst->opds[2] = (domain_elem*)args;
 
+    inst->opcode = CALL;
+    AppendInst(inst, currentBB); 
+}
 /**
  * faddr: the element of the function
  * recv: a = f(a, b); -> a
@@ -399,7 +413,7 @@ void genFuncCall(_Type ty, domain_elem* recv, domain_elem* faddr, TreeNode* args
     TreeNode* arg = args->child;
     //mark ref
     while(arg){
-        iro << "arg: " << arg->nodeID << endl;
+        //iro << "arg: " << arg->nodeID << endl;
         if(arg->nodeType == NODE_CONST){
             arg =arg->sibling;
             continue;
@@ -413,7 +427,7 @@ void genFuncCall(_Type ty, domain_elem* recv, domain_elem* faddr, TreeNode* args
     inst->opds[1] = faddr;
     //just save it here in this way, have to
     //transform to treenode brfore deref
-    inst->opds[2] = (domain_elem*) args;
+    inst->opds[2] = (domain_elem*) args->func_args;
 
     inst->opcode = CALL;
     AppendInst(inst, currentBB);
@@ -441,7 +455,28 @@ domain_elem* IntConst(int i){
 
     e->defined = false;
     e->kind = DEK_Constant;
-    iro <<" intconst created "<< i << endl;
+    //iro <<" intconst created "<< i << endl;
+    assert(e != NULL);
+    return e;
+}
+extern domain* d_root;
+static int stringnum = 0;
+domain_elem* StringConst(TreeNode* str){
+    domain_elem*e;
+    e = new domain_elem();
+    e->ty = str->sysType;
+    e->s = new string();
+    ss.clear();
+    ss<<".LC";
+    ss<<stringnum++;
+    ss>>*e->s;
+    e->str_val = str->str_val;
+    e->intval = 0;
+    e->dm = d_root;
+    e->pos = FSYM->startline;
+    e->defined = true;
+    e->kind = DEK_String;
+
     assert(e != NULL);
     return e;
 }
@@ -476,7 +511,7 @@ domain_elem* AddTemp(_Type ty){
     ss << "t"; ss << TempNum++;
     e->s = new string();
     ss >> *(e->s);
-    iro << "add temp " << *(e->s) << endl;
+    //iro << "add temp " << *(e->s) << endl;
     e->dm = FSYM;
     e->pos = FSYM->startline;
     FSYM->add_element(e);
@@ -493,7 +528,7 @@ domain_elem* AddLabel(){
     ss << "BB"; ss << (int)(LabelNum++);
     e->s = new string();
     ss >> *(e->s);
-    iro << "new label: " << *(e->s) << endl;
+    //iro << "new label: " << *(e->s) << endl;
     e->pos = FSYM->startline;
     return e;
 }
@@ -551,22 +586,22 @@ TreeNode* NOT(TreeNode* expr){
 
 
 domain_elem* Simplyfy(_Type ty, int opcode, domain_elem* src1, domain_elem* src2){
-    iro << "---Simplyfy---" << opcode<< endl;
+    //iro << "---Simplyfy---" << opcode<< endl;
     if(src2 == NULL || (src2->kind != DEK_Constant && opcode != SUB)){
-        iro << "src2 == NULL" << endl;
+        //iro << "src2 == NULL" << endl;
         goto ret;
     }
     //src2 is constant for sure
     switch (opcode)
     {
     case ADD:
-        iro << "simplify add" << endl;
+        //iro << "simplify add" << endl;
         if (src2->intval == 0){
             return src1;
         }
         goto ret;
     case SUB:
-        iro << "simplify sub" << endl;
+        //iro << "simplify sub" << endl;
         assert((src1 != NULL) && (src2 != NULL));
         if(src2->kind == DEK_Constant && src2->intval == 0){
             return src1;
@@ -574,9 +609,9 @@ domain_elem* Simplyfy(_Type ty, int opcode, domain_elem* src1, domain_elem* src2
         goto ret;
     case MUL:
     case DIV:
-        iro << "simplify mul/div" << endl;
+        //iro << "simplify mul/div" << endl;
         if(src2->intval == 1){
-            iro << "simplified mul/div" << endl;
+            //iro << "simplified mul/div" << endl;
             return src1;
         }
         break;
@@ -589,17 +624,17 @@ domain_elem* Simplyfy(_Type ty, int opcode, domain_elem* src1, domain_elem* src2
         break;
     }
 ret:
-    iro << "returining from simplify" << endl;
+    //iro << "returining from simplify" << endl;
     domain_elem*t;    
-    iro << "l & r ok " << (*src1->s) << " " << (*src2->s) << endl;
+    //iro << "l & r ok " << (*src1->s) << " " << (*src2->s) << endl;
 
     t = AddTemp(ty);
-    iro << "adter t l & r ok " << (*src1->s) << " " << (*src2->s) << endl;
+    //iro << "adter t l & r ok " << (*src1->s) << " " << (*src2->s) << endl;
 
-    iro << "added temp, try genAssign"<<(*src1->s) << (*src2->s)<< endl;
+    //iro << "added temp, try genAssign"<<(*src1->s) << (*src2->s)<< endl;
     
     genAssign(ty, t, opcode, src1, src2);
-    iro << "genAssign success" << endl;
+    //iro << "genAssign success" << endl;
     return t;
 }
 
@@ -682,23 +717,29 @@ domain_elem* TranslateCast(_Type ty, _Type sty, domain_elem* src){\
     
     return e;
 }
-
+extern vector<domain_elem*>Strings;
 //part1 translate expressions
 static domain_elem* TranslatePrimaryExpression(TreeNode* expr){
-    iro << "enter TranslatePrimaryExpression" << endl;
+    //iro << "enter TranslatePrimaryExpression" << endl;
     if(expr->optype == OP_CONST){
         if(IsIntType(expr->sysType)){
             domain_elem* ret =  IntConst(expr->int_val);
-            iro << "add int const of ival: " << *ret->s << endl;
+            //iro << "add int const of ival: " << *ret->s << endl;
 
             assert(ret != NULL);
             return ret;
+        }
+        else if (expr->isConstStr()){
+            domain_elem* ret = StringConst(expr);
+            assert(ret != NULL);
+            Strings.push_back(ret);
+            return ret;
         }else{
-            iro << "TranslatePrimaryExpression only work with int, nodeid:" << expr->nodeID << endl;
+            iro << "TranslatePrimaryExpression only work with int & string, nodeid:" << expr->nodeID << endl;
         }
     }
     else if(expr->nodeType == NODE_VAR){
-        iro << "got var "  << *((domain_elem*)(expr->p_val))->s << endl;
+        //iro << "got var "  << *((domain_elem*)(expr->p_val))->s << endl;
         return (domain_elem*)(expr->p_val);
     }
     if (expr->p_val != NULL){
@@ -776,11 +817,11 @@ void TranslateBranch(TreeNode* expr, BBlock trueBB, BBlock falseBB){
         else{
             ty = expr->sysType;
             if(ty->categ < INT){
-                iro << "test casted" <<endl;
+                //iro << "test casted" <<endl;
                 src1 = TranslateCast(T(INT), ty, src1);
                 ty = T(INT);
             }
-            iro <<"test " << *src1->s << endl;
+            //iro <<"test " << *src1->s << endl;
             genBranch(ty, trueBB, JNZ, src1, NULL);
         }
     }
@@ -834,7 +875,7 @@ static domain_elem* TranslateBranchExpression(TreeNode* expr){
     StartBBlock(truebb);
     genMov(expr->sysType, t, IntConst(1));
     StartBBlock(nextbb);
-    iro << expr->nodeID << "branch set" << endl;
+    //iro << expr->nodeID << "branch set" << endl;
     return t;
 }
 
@@ -857,10 +898,10 @@ static domain_elem* TranslateNormalBinaryExpression(TreeNode* expr){
     c2 = c1->sibling;
     assert(c1 != NULL && c2 != NULL);
     src1 = TranslateExpression(c1);
-    iro << "binary translate 2nd expression " << c2->nodeID <<endl;
+    //iro << "binary translate 2nd expression " << c2->nodeID <<endl;
     src2 = TranslateExpression(c2);
     assert(src1 != NULL && src2 != NULL);
-    iro << "l & r ok " << (*src1->s) << " " << (*src2->s) << endl;
+    //iro << "l & r ok " << (*src1->s) << " " << (*src2->s) << endl;
     domain_elem*ret = Simplyfy(expr->sysType, OP2IROP(expr->optype), src1, src2);
     return ret;
 }
@@ -887,8 +928,6 @@ static domain_elem* TrOffset(_Type ty, domain_elem* addr, domain_elem* voff, int
 
 static domain_elem* Addressof(domain_elem* src){
     domain_elem* t = AddTemp(T(POINTER));
-    iro << src << endl;
-    return t;
     genAssign(T(POINTER), t, ADDR, src, NULL);
     return t;
 }
@@ -918,7 +957,7 @@ static domain_elem* TranslateArrayIndex(TreeNode* expr){
             voff = Simplyfy(voff->ty, ADD, voff, TranslateExpression(rch));
         }
         //n = lch;
-        iro << "using node " << n->nodeID << endl;
+        //iro << "using node " << n->nodeID << endl;
         if(lch != NULL && lch->optype == 0 && lch->nodeType != NODE_VAR){
             lch = lch->child;
             n = lch;
@@ -933,7 +972,7 @@ static domain_elem* TranslateArrayIndex(TreeNode* expr){
     }while(n->child != NULL && n->optype == OP_OFFSET_ACCESS);
     assert(n != NULL);
     addr = TranslateExpression(n);
-    iro << "addr from node" << n->nodeID << endl;
+    //iro << "addr from node" << n->nodeID << endl;
     assert(addr != NULL);
     dst = TrOffset(expr->sysType, addr, voff, coff);
 
@@ -961,11 +1000,11 @@ static domain_elem* TranslateFunctionCall(TreeNode* expr){
         params->func_args->push_back(TranslateExpression(param));
         param = param->sibling;
     }
-    iro << "TranslateFunctionCall " << expr->nodeID << endl;
+    //iro << "TranslateFunctionCall " << expr->nodeID << endl;
     recv = NULL;
-    iro << *faddr->s << endl;
+    //iro << *faddr->s << endl;
     if(expr->sysType->categ != VOID){
-        iro << "func has return" << endl;
+        //iro << "func has return" << endl;
         recv = AddTemp(expr->sysType);
     }
     genFuncCall(expr->sysType, recv, faddr, params);
@@ -995,7 +1034,7 @@ static domain_elem* TranslatePostfixExpression(TreeNode* expr){
     case OP_OFFSET_ACCESS:
         return TranslateArrayIndex(expr);
     case OP_FUNC_CALL:
-        iro << "translating func call " << expr->nodeID << endl;
+        //iro << "translating func call " << expr->nodeID << endl;
         return TranslateFunctionCall(expr);
     case OP_POSTSELFDEC:
     case OP_POSTSELFINC:
@@ -1012,10 +1051,11 @@ static domain_elem* TranslatePostfixExpression(TreeNode* expr){
 
 static domain_elem* TranslateUnaryExpression(TreeNode* expr){
     domain_elem* src;
-    iro << "enter TranslateUnaryExpression" << endl;
+    //iro << "enter TranslateUnaryExpression" << endl;
     src = TranslateExpression(expr->child);
     switch (expr->optype){
         case OP_UNA_REF:
+            //iro << "????" << endl;
             return Addressof(src);
         case OP_UNA_DEREF:
             return Deref(expr->sysType, src);
@@ -1026,7 +1066,7 @@ static domain_elem* TranslateUnaryExpression(TreeNode* expr){
 }
 domain_elem* TranslateExpression(TreeNode* expr){
     domain_elem* src;
-    iro << "translating expr : " << expr->nodeID << endl;
+    //iro << "translating expr : " << expr->nodeID << endl;
     if(expr->nodeType == NODE_VAR){
         return TranslatePrimaryExpression(expr);
     }
@@ -1114,7 +1154,6 @@ static void TranslateReturnStatement(TreeNode* stmt){
     && (stmt->stype == STMT_RETURN));
 
     if(stmt->child != NULL){
-        iro << "ckpt1" << endl;
         genReturn(stmt->child->sysType, TranslateExpression(stmt->child));
     }
     genJump((BBlock)FSYM->exitBB);
@@ -1225,7 +1264,7 @@ static void TranslateBreakStatement(TreeNode* stmt){
     assert(stmt->stype == STMT_BREAK);
     genJump(((TreeNode*) stmt->p_val)->nextBB);
     StartBBlock(CreateBBlock());
-    iro << "break translate ok" << endl;
+    //iro << "break translate ok" << endl;
 }
 
 static void TranslateIfStatement(TreeNode* stmt){
@@ -1264,13 +1303,55 @@ static void TranslateCompoundStatement(TreeNode* stmt){
     
     while(chstmt){
         TranslateStatement(chstmt);
-        iro << chstmt->nodeID << " cpd finished" << endl;
+        //iro << chstmt->nodeID << " cpd finished" << endl;
         chstmt = chstmt->sibling;
     }
 }
 
+extern _domain* d_root;
+domain_elem* scanfaddr, *printfaddr;
+void initTranslation(){
+    scanfaddr = new domain_elem("scanf", -1, T(FUNCTION));
+    printfaddr = new domain_elem("printf", -1, T(FUNCTION));
+    d_root->add_element(scanfaddr);
+    d_root->add_element(scanfaddr);
+}
+
+static void TranslatePrintf(TreeNode* stmt){
+    assert(stmt->stype == STMT_PRINTF);
+    TreeNode* format, * opd;
+    format = stmt->child;
+    opd = format->sibling;
+    BBlock nextBB;
+    nextBB = CreateBBlock();
+    
+    domain_elem* faddr = printfaddr;
+    domain_elem* fmt = TranslateExpression(format);
+    domain_elem* expr = TranslateExpression(opd);
+    
+    genIOCall(faddr, fmt, expr);
+    StartBBlock(nextBB);
+}
+
+static void TranslateScanf(TreeNode* stmt){
+    assert(stmt->stype == STMT_SCANF);
+    TreeNode* format, * opd;
+    format = stmt->child;
+    opd = format->sibling;
+
+    BBlock nextBB;
+    nextBB = CreateBBlock();
+    
+    domain_elem* faddr = scanfaddr;
+    domain_elem* fmt = TranslateExpression(format);
+    domain_elem* expr = TranslateExpression(opd);
+    
+    genIOCall(faddr, fmt, expr);
+    StartBBlock(nextBB);
+}
+
 static void TranslateStatement(TreeNode* stmt){
-    iro << "handeling" << stmt->nodeID << endl;
+    //iro << "handeling" << stmt->nodeID << endl;
     switch(stmt->stype){
     case STMT_RETURN:
         TranslateReturnStatement(stmt);
@@ -1299,10 +1380,16 @@ static void TranslateStatement(TreeNode* stmt){
     case STMT_EXPRESSION:
         TranslateExpression(stmt);
         break;
+    case STMT_SCANF:
+        TranslateScanf(stmt);
+        break;
+    case STMT_PRINTF:
+        TranslatePrintf(stmt);
+        break;
     default:
         iro << "TranslateStatement doesn't support this stype: " << stmt->stype << " nodeid: " << stmt->nodeID<<endl;
     }
-    iro << "pass  "<<stmt->nodeID <<endl;
+    //iro << "pass  "<<stmt->nodeID <<endl;
 }
 
 /**
@@ -1320,15 +1407,15 @@ void TranslateFunction(TreeNode* function){
     StartBBlock((BBlock)FSYM->exitBB);
 
     BBlock bb = (BBlock)FSYM->entryBB;
-    iro << "after func translation" << endl;
+    //iro << "after func translation" << endl;
     while(bb != NULL){
         assert(bb != NULL);
         if(bb->label.s == NULL) bb->label.s = new string();
-        iro << bb <<" "<< bb->next <<endl;
+        //iro << bb <<" "<< bb->next <<endl;
         copyfrom(AddLabel(), &bb->label);
-        iro << "copy fine" << endl;
+        //iro << "copy fine" << endl;
         bb = bb->next;
     }
     //if (function->nodeID == )
-    iro << "finished function translation " << function->nodeID << endl; 
+    //iro << "finished function translation " << function->nodeID << endl; 
 }

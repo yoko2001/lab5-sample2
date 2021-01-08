@@ -85,7 +85,9 @@ void TreeNode::copyto(TreeNode* nn){
     nn->lineno = lineno;
     nn->l_value = l_value;
 }
-
+bool TreeNode::isConstStr(){
+    return this->str_val.size() > 0;
+}
 TreeNode::TreeNode(int lineno, NodeType type):lineno(lineno), nodeType(type){
     genNodeId();    //assign a ID for node
     this->sysType = NULL;
@@ -137,7 +139,7 @@ void TreeNode::printSpecialInfo() {
         
         case NODE_CONST:
             if(this->sysType){
-                cout << this->int_val;
+                cout << " intval: "<<this->int_val << ", strval: " << this->str_val;
                 break;
             }
             if (!this->type && !this->sysType){
@@ -660,7 +662,7 @@ void TreeNode::funcTypeDump(){
         e->pos = this->lineno;
         e->ty = (_Type)func_ret_type;
         e->kind = DEK_function;
-        cout << *e->s <<endl;
+        //cout << *e->s <<endl;
         this->domain->add_element(e);
         this->domain->father_domain->add_element(e);
         //this->domain->father_domain->add_element(funcname, this->lineno, (_Type)func_ret_type);

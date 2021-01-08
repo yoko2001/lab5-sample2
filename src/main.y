@@ -12,7 +12,7 @@
     int yyerror( char const * );
     
 %}
-%token T_CHAR T_INT T_STRING T_BOOL T_VOID
+%token T_CHAR T_INT T_STRING T_BOOL T_VOID SCANF PRINTF
 
 %token LO_EQ LO_N_EQ RO_AS_ADDEQ RO_AS_SUBEQ RO_AS_MULEQ RO_AS_DIVEQ RO_AS_SFTL_EQ
 
@@ -84,7 +84,22 @@ statement:
 | selection-statement{$$ = $1;}
 | iteration-statement{$$ = $1;}
 | jump-statement{$$ = $1;}
+| io-statement{$$ = $1;}
 ;
+
+io-statement:
+PRINTF L_BRACKET STRING LO_COMMA assignment-expression R_BRACKET SEMICOLON{
+    $$ = new TreeNode(lineno, NODE_STMT);
+    $$->stype = STMT_PRINTF;
+    $$->addChild($3);
+    $$->addChild($5);
+}
+| SCANF L_BRACKET STRING LO_COMMA unary-expression R_BRACKET SEMICOLON{
+    $$ = new TreeNode(lineno, NODE_STMT);
+    $$->stype = STMT_SCANF;
+    $$->addChild($3);
+    $$->addChild($5);
+}
 
 jump-statement:
     KW_BREAK SEMICOLON{

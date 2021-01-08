@@ -118,6 +118,8 @@ enum StmtType {
     STMT_BREAK,
     STMT_CONTINUE,
     STMT_EXPRESSION,
+    STMT_PRINTF,
+    STMT_SCANF,
 }
 ;
 //we run into a new function and gets its Function symbol vec
@@ -287,6 +289,7 @@ public:
     void print_all_funcs_ir();
     void redefCheck();
     void idTypeDump();
+    bool isConstStr();
     inline void swapchild();
 private:
     _Type NODE_STMT_Dump();

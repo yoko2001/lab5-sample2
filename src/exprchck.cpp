@@ -286,7 +286,7 @@ bool tyCheckEqualityOP(TreeNode* expr){
 bool tyCheckUnaryExpression(TreeNode* expr){
     TreeNode* ch;
     _Type ty;
-    cout << "enter tyCheckUnaryExpression " << expr->optype << endl;
+    //cout << "enter tyCheckUnaryExpression " << expr->optype << endl;
     switch (expr->optype){
     case OP_UNA_DEREF:  //*
         ch = expr->child;
@@ -720,7 +720,7 @@ TreeNode* tyCheckPostfixExpression(TreeNode*expr){
     TreeNode* ln, *rn;
     ln = expr->child;
     rn = ln->sibling;
-    cout << "enter tyCheckPostfixExpression"<< expr->nodeID << endl; 
+    //cout << "enter tyCheckPostfixExpression"<< expr->nodeID << endl; 
     switch (expr->optype)
     {
     case OP_OFFSET_ACCESS:
@@ -875,7 +875,7 @@ void printUndefFunc(TreeNode* expr){
 bool tyCheckFunctionCall(TreeNode*expr){
     TreeNode* func = expr->child;
     TreeNode* auges = func->sibling;
-    cout << "enter tyCheckFunctionCall nodeid:"<<expr->nodeID << endl;
+    //cout << "enter tyCheckFunctionCall nodeid:"<<expr->nodeID << endl;
     
     if(func->nodeType != NODE_VAR){
         cout << "syntax design error" << endl;

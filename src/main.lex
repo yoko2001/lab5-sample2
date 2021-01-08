@@ -78,6 +78,9 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "continue"  return KW_CONTINUE;
 "break"     return KW_BREAK;
 
+"scanf"     return SCANF;
+"printf"    return PRINTF;
+
 "unsigned"  return  T_UNSIGNED;
 "signed"    return T_SIGNED;
 "const"     return  Q_CONST;
@@ -105,6 +108,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     node->type = TYPE_CHAR;
     node->int_val = yytext[1];
     node->sysType = T(CCHAR);
+    node->optype = OP_CONST;
     yylval = node;
     return CHAR;
 }
@@ -113,10 +117,35 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_STRING;
     node->str_val = yytext;
+    string s = "";
+    
     node->str_val = node->str_val.substr(1);
+    
     int len = node->str_val.size();
     node->str_val = node->str_val.substr(0, len-1);
+    for(int i = 0; i < node->str_val.size(); i++){
+        switch(node->str_val[i]){
+        case '\n':
+            s+= '\\';
+            s+= 'n';
+            break;
+        case '\t':
+            s+='\\';
+            s+='t';
+            break;
+        case '\r':
+            s+='\\';
+            s+='r';
+            break;
+        default:
+            s+= node->str_val[i];
+        }
+        
+    }
+    node->str_val = s;
+    cout << node->str_val << endl;
     node->sysType = ArrayOf(node->str_val.size(), T(CCHAR));
+    node->optype = OP_CONST;
     yylval = node;
     return STRING;
 }
